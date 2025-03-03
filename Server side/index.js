@@ -5,7 +5,7 @@ const PATH = 8000;
 const db = require('./database.js')
 
 app.get('/users', (req, res, next) => {
-    const sql = "select * from user"
+    const sql = "select * from user "
     const params = [];
     db.all(sql, params, (err, rows) => {
         if (err) {
@@ -20,7 +20,7 @@ app.get('/users', (req, res, next) => {
     
 })
 
-app.get('/user:id', (req, res, next) => {
+app.get('/users/:id', (req, res, next) => {
     const sql = 'select * from user where id = ?'
     const params = [req.params.id]
     db.get(sql, params, (err, row) => {
