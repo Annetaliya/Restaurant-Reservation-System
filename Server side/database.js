@@ -10,6 +10,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
     throw err;
   } else {
     console.log("Connected to the SQLite database");
+    db.run("PRAGMA foreign_keys = ON")
     db.run(
       `CREATE TABLE IF NOT EXISTS user (
             id TEXT PRIMARY KEY,
@@ -63,6 +64,43 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
           }
           insertUser('first', 'admin', 'admin@example.com', 'admin1235', '0723456790')
           insertUser('Annette', 'Aliya', 'aliya@example.com', 'aliya678', '0723456797')
+        }
+      }
+    );
+
+    db.run(
+      `CREATE TABLE IF NOT EXISTS reservations (
+      id TEXT PRIMARY KEY,
+      tableNumber INTEGER UNIQUE,
+      guestNumber INTEGER,
+      status TEXT CHECK(status IN ('available', 'reserved')) DEFAULT 'available',
+      floorLevel TEXT CHECK(floorLevel IN ('Level 1', 'Level 2', 'Level 3')) NOT NULL
+      )`,
+      (err) => {
+        if (err) {
+          console.log('Failed to create reservation table', err.message)
+        } else {
+          console.log('Reservation table created successfuly')
+
+          function insertReservation(tableNumber, guestNumber, status, floorLevel) {
+            const insert = 'INSERT INTO reservations(id, tableNumber, guestNumber, status, floorLevel) VALUES (?,?,?,?,?)'
+            db.run(insert, [
+              uuidv4(),
+              tableNumber,
+              guestNumber,
+              status,
+              floorLevel
+            ], (err) => {
+              if (err) {
+                console.log('Error inserting a reservation', err.message)
+              } else {
+                console.log('Reservation created successfully')
+              }
+            })
+          }
+          insertReservation(1, 4, 'available', 'Level 1' )
+
+          
         }
       }
     );

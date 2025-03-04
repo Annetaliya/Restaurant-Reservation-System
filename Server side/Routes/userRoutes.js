@@ -58,4 +58,21 @@ router.post('/', (req, res, next) => {
         })
     })
 })
+
+router.delete('/id:', (req, res, next) => {
+    db.run(
+        'DELETE FROM user WHERE id = ?',
+        req.params.id,
+        function(error, result) {
+            if (error) {
+                res.status(400).json({"error": error.message})
+                return;
+            }
+            res.json({
+                "message": "user deleted",
+                changes: this.changes
+            })
+        }
+    )
+})
 module.exports = router
