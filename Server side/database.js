@@ -98,7 +98,11 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
               }
             })
           }
-          insertReservation(1, 4, 'available', 'Level 1' )
+          insertReservation(1, 4, 'available', 'Level 1' );
+          insertReservation(2, 6, 'available', 'Level 1' );
+          insertReservation(3, 4, 'reserved', 'Level 1' );
+          insertReservation(4, 2, 'available', 'Level 1' );
+          
 
           
         }
