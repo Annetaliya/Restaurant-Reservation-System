@@ -27,7 +27,8 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
           console.log("User table was created successfully");
 
           
-          function insertUser(id, firstName, secondName, email, password, phone) {
+          function insertUser(firstName, secondName, email, password, phone) {
+  
             db.get(
               'SELECT * FROM user WHERE email = ? OR phone = ?',
               [email, phone],
@@ -37,6 +38,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 } else if(row) {
                   console.log('user already exists', email, phone)
                 } else {
+                  
                   const insert =
                  "INSERT INTO user(id, firstName, secondName, email, password, phone) VALUES (?,?,?,?,?,?)";
                  db.run(insert, [
