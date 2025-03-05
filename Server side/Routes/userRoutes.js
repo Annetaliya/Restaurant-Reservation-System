@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid')
 
 
 
-router.get('/', (req, res, next) => {
+router.get('/', (req, res) => {
     const sql = 'select * from user';
     const params = [];
     db.all(sql, params, (err, rows) => {
