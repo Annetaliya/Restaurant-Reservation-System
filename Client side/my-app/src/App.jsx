@@ -1,15 +1,14 @@
-import { useState } from 'react'
-import Home from './components/Home'
 
-import './App.css'
+import Home from './components/Home';
+import Navs from './components/Navs';
 
 function App() {
 
 
   return (
     <>
-     <Home />
-      
+      <Navs /> 
+     <Home /> 
     </>
   )
 }
