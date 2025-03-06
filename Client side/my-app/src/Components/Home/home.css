@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+.homeIntro{
+    font-family: 'Playfair', sans-serif;
+    text-align: center;
+    padding-top: 4rem;
+    font-size: 3rem;
+    font-weight: 400;
+}
+.homeTxt {
+    text-align: center;
+    margin-top: 0;
+    font-size: 1rem;
+}
+.floorLevels {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+.floorLevels button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background-color: #865D36
+}
+.floorLevels button:hover {
+    background-color: #3E362E;
+    color: #fff;
+}
+.tableItems {
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+
+}
+
+.table {
+    height: 80px;
+    width: 80px;
+    background-color: white;
+    border-radius: 50%;
+}
+.individualTable {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.availability {
+    fill: green;
+}
+.noAvailability {
+    fill: red
+}
