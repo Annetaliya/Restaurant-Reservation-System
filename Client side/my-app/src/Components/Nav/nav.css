@@ -5,18 +5,20 @@
 }
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #dbd0c8;
+    background: rgb(238,174,202);
+    background: linear-gradient(90deg, rgba(238,174,202,1) 0%, rgba(233,178,148,0.11034668994550945) 100%);
 }
 .navParentContainer {
     display: flex;
     justify-content: end;
     padding-right: 40px;
-    background-color: #93785B;
+    /* background-color: #E7717D; */
 }
 .navContainer {
     display: flex;
     align-items: center;
-    gap: 20px
+    gap: 20px;
+    padding-top: 10px;
 }
 .navContainer li {
     list-style: none;
@@ -25,8 +27,8 @@ body {
     padding: 5px 8px;
 }
 .navContainer li:hover {
-    background-color: #3E362E;
-    color: white;
+    background-color: #E7717D;
+    color: #000;
     
     border-radius: 5px;
     

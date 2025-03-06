@@ -19,14 +19,15 @@
     gap: 40px;
 }
 .floorLevels button {
-    padding: 10px 18px;
-    border: none;
+    padding: 8px 26px;
+    border: 1px solid #E7717D;
     border-radius: 8px;
-    background-color: #865D36
+    background-color: transparent;
 }
 .floorLevels button:hover {
-    background-color: #3E362E;
+    background-color: #E7717D;
     color: #fff;
+    border: none;
 }
 .tableItems {
     margin-top: 2rem;
