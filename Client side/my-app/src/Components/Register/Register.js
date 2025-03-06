@@ -10,12 +10,12 @@ import './register.css'
 const Register = () => {
     const [validated, setValidate] = useState(false);
     const [formData, setFormData] = useState({
-      firsName: 'firstName',
-      secondName: 'secondName',
-      email: 'email',
-      password: 'password',
-      confirmPassword: 'confirmPassword',
-      phone: 'phone',
+      firsName: '',
+      secondName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phone: '',
     
     })
 
