@@ -5,15 +5,10 @@ import './home.css';
 const Home = () => {
     const [reservationTable, setReservationTable] = useState([]);
     const [loading, setLoading] =  useState(false);
+    const [selectedLevel, setSelectedLevel] = useState('Level 1')
     
 
-    const handleTableChange = () => {
-
-    }
-
-
-
-
+    const filterdTables = reservationTable.filter((item) => item.floorLevel === selectedLevel)
 
     const fetchReservationTables = async () => {
         setLoading(true)
@@ -42,21 +37,20 @@ const Home = () => {
         <h1 className='homeIntro'>Welcome to eatery bay!</h1>
         <p className='homeTxt'>Please first choose your prefered floor level</p>
         <div className='floorLevels'>
-            <button>Level 1</button>
-            <button>Level 2</button>
-            <button>Level 3</button>
+            <button onClick={() => setSelectedLevel('Level 1')}>Level 1</button>
+            <button onClick={() => setSelectedLevel('Level 2')}>Level 2</button>
+            <button onClick={() => setSelectedLevel('Level 3')}>Level 3</button>
         </div>
         <div className='tableItems'>
-            {reservationTable.length !== 0 ?
+            {filterdTables.length !== 0 ?
 
-            reservationTable.map((item) => (
+            filterdTables.map((item) => (
             
                 <div key={item.id} className='individualTable'>
                     <FaCircle className={`availability ${item.status === 'available' ? 'availability' : 'noAvailability'}`}/>
                     <div className='table'></div>
                     <p>{item.tableNumber}</p>
-                </div>
-                    
+                </div>       
                 
             ))
             : <p>No tables available</p>}

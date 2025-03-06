@@ -3,6 +3,7 @@ import { FaHome } from "react-icons/fa";
 import { FaPhoneAlt } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
+import { TiThMenu } from "react-icons/ti";
 import './nav.css';
 const navItems = [
     {item: 'Home', icon: <FaHome />},
@@ -11,10 +12,18 @@ const navItems = [
     {item: 'Reservation', icon: <FaShoppingCart />}
 ]
 const NavBar = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
+
+
+    function handleToggleMenu() {
+        setShowMenu(!showMenu)
+        console.log(showMenu)
+    }
   return (
     <nav className='navParentContainer'>
-        <ul className='navContainer'>
+       
+        <ul className={`navContainer ${showMenu ? 'menuMobile' : ''}`}>
             {navItems.map((element, index) => (
                 <div key={index} className='listcontainer'>
                     <div>{element.icon}</div>
@@ -23,6 +32,10 @@ const NavBar = () => {
                 </div>
             ))}
         </ul>
+        <div className='menu' onClick={handleToggleMenu}>
+            <TiThMenu  size={35} />
+        </div>
+        
     </nav>
   )
 }
