@@ -23,7 +23,6 @@ const Home = () => {
             setLoading(false)
             console.log(result)
 
-
         } catch (err) {
             console.log(err.message)
 

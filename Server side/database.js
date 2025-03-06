@@ -31,7 +31,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
           function insertUser(firstName, secondName, email, password, phone) {
   
             db.get(
-              'SELECT * FROM user WHERE email = ? OR phone = ?',
+              'SELECT COUNT(*) AS count FROM user WHERE email = ? OR phone = ?',
               [email, phone],
               (err, row) => {
                 if(err) {
@@ -62,8 +62,17 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             )
 
           }
-          insertUser('first', 'admin', 'admin@example.com', 'admin1235', '0723456790')
-          insertUser('Annette', 'Aliya', 'aliya@example.com', 'aliya678', '0723456797')
+          db.get("SELECT COUNT(*) AS  count FROM user," , (err,row) => {
+            if (err) {
+              console.log('Error checking user', err.message)
+            } else if (row.count === 0) {
+              insertUser('first', 'admin', 'admin@example.com', 'admin1235', '0723456790')
+              insertUser('Annette', 'Aliya', 'aliya@example.com', 'aliya678', '0723456797')
+            } else {
+              console.log('Users aready exist, skipping insertion')
+            }
+          })
+          
         }
       }
     );
@@ -98,10 +107,20 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
               }
             })
           }
-          insertReservation(1, 4, 'available', 'Level 1' );
-          insertReservation(2, 6, 'available', 'Level 1' );
-          insertReservation(3, 4, 'reserved', 'Level 1' );
-          insertReservation(4, 2, 'available', 'Level 1');
+          db.get('SELECT COUNT (*) AS count FROM reservations', (err,row) => {
+            if (err) {
+              console.log('Error checking reservation', err.message)
+            } else if (row.count === 0) {
+              insertReservation(1, 4, 'available', 'Level 1' );
+              insertReservation(2, 6, 'available', 'Level 1' );
+              insertReservation(3, 4, 'reserved', 'Level 1' );
+              insertReservation(4, 2, 'available', 'Level 1');
+
+            } else {
+              console.log('Reservation already exist, skipping insertion')
+            }
+          })
+          
           
 
           
