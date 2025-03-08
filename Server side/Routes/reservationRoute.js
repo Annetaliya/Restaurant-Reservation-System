@@ -1,6 +1,7 @@
 const express = require('express');
 const route = express.Router();
-const db = require('../database.js')
+const db = require('../database.js');
+const { v4: uuidv4 } = require('uuid')
 
 route.get('/', (req, res) => {
     const sql = 'select * from reservations';
@@ -30,5 +31,52 @@ route.get('/:id', (req, res) => {
         })
     })
 
+})
+
+route.post('/', (req, res) => {
+    const {tableNumber, guestNumber,status, floorLevel} = req.body;
+    console.log("Request Body:", req.body);
+    if (!tableNumber || !guestNumber || !status || !floorLevel) {
+        return res.status(400).json({"Error": "Error missing required field"})
+    } 
+    const reservationsid = uuidv4();
+
+    const sql = 'INSERT INTO reservations (id, tableNumber, guestNumber, status, floorLevel) values(?,?,?,?,?)';
+    const params =[reservationsid, tableNumber, guestNumber, status, floorLevel]
+    db.run(sql, params, (err, result) => {
+        if (err){
+            res.status(400).json({"error": err.message})
+            return;
+        }
+        res.json({
+            "message": "success",
+            "id": reservationsid
+        })
+    })
+
+})
+
+route.patch('/:id', (req, res) => {
+    const {tableNumber, guestNumber,status, floorLevel} = req.body;
+    const { id } = req.params;
+    db.run (
+        `UPDATE reservations set
+        tableNumber = COALESCE(?, tableNumber),
+        guestNumber = COALESCE(?, guestNumber),
+        status =  COALESCE(?, status),
+        floorLevel =  COALESCE(?, floorLevel)
+        WHERE id = ?`,
+        [id, tableNumber, guestNumber, status, floorLevel],
+        (err, result) => {
+            if (err) {
+                res.status(400).json({"error": err.message})
+                return;
+            }
+            res.json({
+                "message": "success",
+                "data": req.body
+            })
+        }
+    )
 })
 module.exports = route
