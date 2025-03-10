@@ -67,10 +67,13 @@ route.patch('/:id', (req, res) => {
         floorLevel =  COALESCE(?, floorLevel)
         WHERE id = ?`,
         [id, tableNumber, guestNumber, status, floorLevel],
-        (err, result) => {
+        function (err, result) {
             if (err) {
                 res.status(400).json({"error": err.message})
                 return;
+            }
+            if (this.changes === 0 ) {
+                return res.status(400).json({"error":"reservation not found"})
             }
             res.json({
                 "message": "success",
