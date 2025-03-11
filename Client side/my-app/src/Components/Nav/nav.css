@@ -14,6 +14,10 @@ body {
     padding-right: 40px;
     /* background-color: #E7717D; */
 }
+.listcontainer a {
+    text-decoration: none;
+    color: #000;
+}
 .navContainer {
     display: flex;
     align-items: center;

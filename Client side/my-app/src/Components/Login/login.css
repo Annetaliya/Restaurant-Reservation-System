@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
 .parent-container {
     padding: 25px;
     margin: 0 auto;
@@ -6,4 +7,11 @@
     border-radius: 10px;
     border: 1px solid #E7717D;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+.loginHeader{
+    text-align: center;
+    font-family: 'Zilla+Slab:ital', sans-serif;
+}
+.signupTxt{
+    text-align: center;
 }

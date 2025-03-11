@@ -6,6 +6,7 @@ import Row from "react-bootstrap/Row";
 import "./register.css";
 import { Formik, Field } from "formik";
 import Swal from "sweetalert2";
+import { Link, useNavigate } from "react-router";
 
 const Register = () => {
   const validate = (values) => {
@@ -56,7 +57,7 @@ const Register = () => {
     confirmPassword: "",
     phone: "",
   };
-
+  const navigate = useNavigate()
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const response = await fetch("http://localhost:8000/users", {
@@ -74,6 +75,7 @@ const Register = () => {
           icon: "success",
         });
         resetForm();
+        navigate('/login')
       } else {
         alert(result.message || "Something went wrong!");
       }
@@ -210,7 +212,7 @@ const Register = () => {
       </Formik>
       <p>
         Already have an Account? 
-        <span><a href="#">Login</a></span>
+        <span><Link to='/login'>Login</Link></span>
       </p>
     </div>
   );

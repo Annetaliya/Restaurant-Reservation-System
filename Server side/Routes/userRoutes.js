@@ -38,7 +38,8 @@ router.get('/:id', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
 
-    const {firstName, secondName, email, password, confirmPassword, phone} = req.body
+    const {firstName, secondName, email, password, confirmPassword, phone, role} = req.body
+    const userRole  = role || 'user';
     if (!firstName || !email|| !password || !phone ) {
         res.status(400).json({"error": "Missing the required fields"})
     }
@@ -47,8 +48,8 @@ router.post('/', (req, res, next) => {
     }
     const userId = uuidv4();
 
-    const sql = 'INSERT INTO user (id, firstname, secondName, email, password, phone) values(?,?,?,?,?,?)';
-    const params = [userId, firstName, secondName, email, password, phone]
+    const sql = 'INSERT INTO user (id, firstname, secondName, email, password, phone, role) values(?,?,?,?,?,?,?)';
+    const params = [userId, firstName, secondName, email, password, phone, userRole]
     db.run(sql, params, (err, result) => {
         if(err){
             res.status(500).json({"error": err.message})
