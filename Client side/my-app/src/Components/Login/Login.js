@@ -5,6 +5,9 @@ import Form from "react-bootstrap/Form";
 import './login.css'
 import { Formik, Field } from "formik";
 import Swal from "sweetalert2";
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 
 const Login = () => {
 const validate = (values) => {
@@ -14,16 +17,19 @@ const validate = (values) => {
   } else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)){
     errors.email = 'Invalid email'
   }
+  if (!values.password) {
+    errors.password = 'Required'
+  }
   return errors;
+ 
 }
-if (!values.password) {
-  errors.password = 'Required'
-}
+
 
 const initialVaues = {
   email: '',
   password: ''
 }
+const navigate = useNavigate();
 const handleSubmit = async (values, { setSubmitting, setErrors }) => {
   try {
     const response = await fetch('http://localhost:8000/login', {
@@ -42,12 +48,13 @@ const handleSubmit = async (values, { setSubmitting, setErrors }) => {
       }
       return
     }
-    localStorage.setItem({'token': result.token})
+    localStorage.setItem('token', result.token)
     Swal.fire({
               title: "Good Job",
               text: "Login successful!",
               icon: "success",
             });
+    navigate('/');
 
   } catch (error) {
     console.log(error, 'login failed')
@@ -64,6 +71,7 @@ const handleSubmit = async (values, { setSubmitting, setErrors }) => {
 
   return (
     <div  className="col-6 parent-container">
+      <h4 className='loginHeader'>Please Login to Continue...</h4>
       <Formik
       initialValues={initialVaues}
       validate={validate}
@@ -81,7 +89,7 @@ const handleSubmit = async (values, { setSubmitting, setErrors }) => {
 
        
         <Form onSubmit={handleSubmit}>
-            <Form.Group  as={Col} md="6" controlId='email'>
+            <Form.Group  as={Col} md="8" className='mb-2'controlId='email'>
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                 type='text'
@@ -97,7 +105,7 @@ const handleSubmit = async (values, { setSubmitting, setErrors }) => {
                 {errors.email}
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group  as={Col} md="6" controlId='password'>
+            <Form.Group  as={Col} md="8" controlId='password'>
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                 type='password'
@@ -112,12 +120,17 @@ const handleSubmit = async (values, { setSubmitting, setErrors }) => {
                   {errors.password}
                 </Form.Control.Feedback>
             </Form.Group>
-            <Button type='submit' disabled={isSubmitting}>
+            <Button type='submit' disabled={isSubmitting} className='mt-2 mb-2'>
               {isSubmitting ? 'Submitting...' : 'Submit'}
             </Button>
         </Form>
         )}
       </Formik>
+      <p className='signupTxt'>Don't have an Account? 
+        <span>
+          <Link to='/register'>SignUp</Link>
+        </span>
+      </p>
     </div>
   )
 }

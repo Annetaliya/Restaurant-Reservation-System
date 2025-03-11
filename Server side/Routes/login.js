@@ -10,15 +10,18 @@ router.post('/', (req,res) => {
     const { email, password }  = req.body;
 
     db.get('SELECT * FROM user WHERE email = ?',
-        [email], async (err, user) => {
+        [email], (err, user) => {
             if (err) {
+                console.log(err)
                 return res.status(500).json({error: 'Database error'})
+                
             }
             if (!user) {
                 return res.status(400).json({error: 'Email not found'})
             }
-            const matchPasscode = await bcrypt.compare(password, user.password);
-            if (!matchPasscode) {
+            
+            if (password !== user.password) {
+                console.log(err)
                 return res.status(400).json({error: 'Incorrect password'})
             }
             const token = jwt.sign(

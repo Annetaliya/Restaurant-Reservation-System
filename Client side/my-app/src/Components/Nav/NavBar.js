@@ -5,11 +5,12 @@ import { FaUser } from "react-icons/fa";
 import { FaShoppingCart } from "react-icons/fa";
 import { TiThMenu } from "react-icons/ti";
 import './nav.css';
+
 const navItems = [
-    {item: 'Home', icon: <FaHome />},
-    {item: 'Contact', icon: <FaPhoneAlt />},
-    {item: 'Profile', icon: <FaUser />},
-    {item: 'Reservation', icon: <FaShoppingCart />}
+    {item: 'Home', icon: <FaHome />, path: '/'},
+    {item: 'Contact', icon: <FaPhoneAlt />, path: '/contact'},
+    {item: 'Profile', icon: <FaUser />, path: '/profile'},
+    {item: 'Reservation', icon: <FaShoppingCart />, path: '/reservat'}
 ]
 const NavBar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -28,7 +29,9 @@ const NavBar = () => {
                 <div key={index} className='listcontainer'>
                     <div>{element.icon}</div>
                     
-                    <li>{element.item}</li>
+                    <a href={element.path}>
+                        <li>{element.item}</li>
+                    </a>
                 </div>
             ))}
         </ul>
