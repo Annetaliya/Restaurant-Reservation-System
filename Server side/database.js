@@ -19,6 +19,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             email TEXT UNIQUE,
             password TEXT,
             phone TEXT UNIQUE,
+            role TEXT DEFAULT 'user',
             CONSTRAINT email__phone_unique UNIQUE (email, phone)
             )`,
       (err) => {
@@ -28,7 +29,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
           console.log("User table was created successfully");
 
           
-          function insertUser(firstName, secondName, email, password, phone) {
+          function insertUser(firstName, secondName, email, password, phone, role='user') {
   
             db.get(
               'SELECT COUNT(*) AS count FROM user WHERE email = ? OR phone = ?',
@@ -41,7 +42,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 } else {
                   
                   const insert =
-                 "INSERT INTO user(id, firstName, secondName, email, password, phone) VALUES (?,?,?,?,?,?)";
+                 "INSERT INTO user(id, firstName, secondName, email, password, phone, role) VALUES (?,?,?,?,?,?,?)";
                  db.run(insert, [
                   uuidv4(),
                   firstName,
@@ -49,6 +50,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                   email,
                   md5(password),
                   phone,
+                  role,
 
                  ], (err) => {
                   if (err) {
@@ -66,8 +68,9 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             if (err) {
               console.log('Error checking user', err.message)
             } else if (row.count === 0) {
-              insertUser('first', 'admin', 'admin@example.com', 'admin1235', '0723456790')
-              insertUser('Annette', 'Aliya', 'aliya@example.com', 'aliya678', '0723456797')
+              insertUser('Emeli', 'Sande', 'sandeadmin@example.com', 'sande12345', '0745600911', 'admin');
+              insertUser('first', 'admin', 'admin@example.com', 'admin1235', '0723456790', 'user')
+              insertUser('Annette', 'Aliya', 'aliya@example.com', 'aliya678', '0723456797', 'user')
             } else {
               console.log('Users aready exist, skipping insertion')
             }
