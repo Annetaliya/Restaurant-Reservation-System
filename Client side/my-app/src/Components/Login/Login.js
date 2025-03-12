@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import './login.css'
-import { Formik, Field } from "formik";
+import { Formik } from "formik";
 import Swal from "sweetalert2";
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 
-const Login = () => {
+const Login = ({ setIsLoggedIn }) => {
+
+
 const validate = (values) => {
   const errors = {};
   if (!values.email) {
@@ -49,11 +51,13 @@ const handleSubmit = async (values, { setSubmitting, setErrors }) => {
       return
     }
     localStorage.setItem('token', result.token)
+    localStorage.setItem('user', JSON.stringify(result.user))
     Swal.fire({
               title: "Good Job",
               text: "Login successful!",
               icon: "success",
             });
+    setIsLoggedIn(true);
     navigate('/');
 
   } catch (error) {
@@ -125,7 +129,7 @@ const handleSubmit = async (values, { setSubmitting, setErrors }) => {
             </Button>
         </Form>
         )}
-        // add some space here
+  
       </Formik>
       <p className='signupTxt'>Don't have an Account? 
         <span>

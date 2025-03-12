@@ -12,8 +12,7 @@ const navItems = [
     {item: 'Profile', icon: <FaUser />, path: '/profile'},
     {item: 'Reservation', icon: <FaShoppingCart />, path: '/reservat'}
 ]
-const NavBar = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+const NavBar = ({ isLoggedIn }) => {
     const [showMenu, setShowMenu] = useState(false);
 
 
@@ -25,9 +24,12 @@ const NavBar = () => {
     <nav className='navParentContainer'>
        
         <ul className={`navContainer ${showMenu ? 'menuMobile' : ''}`}>
-            {navItems.map((element, index) => (
+            {navItems
+            .filter((element) => isLoggedIn || element.item !== 'Profile' )
+            .map((element, index) => (
                 <div key={index} className='listcontainer'>
                     <div>{element.icon}</div>
+                    
                     
                     <a href={element.path}>
                         <li>{element.item}</li>

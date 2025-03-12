@@ -6,6 +6,10 @@ const Home = () => {
     const [reservationTable, setReservationTable] = useState([]);
     const [loading, setLoading] =  useState(false);
     const [selectedLevel, setSelectedLevel] = useState('Level 1')
+    const [table, setTable] = useState(null);
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    console.log(user)
     
 
     const filterdTables = reservationTable.filter((item) => item.floorLevel === selectedLevel)
@@ -31,9 +35,34 @@ const Home = () => {
     useEffect(() => {
         fetchReservationTables()
     }, [])
+
+    const fetchTablebyId = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:8000/reservations/${id}`)
+            if (!response.ok) {
+                console.log('Errorfetching table')
+            }
+            const result = await response.json();
+            console.log(result);
+            setTable(result)
+
+        } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+    const handleGetReservation = () => {
+
+    }
   return (
     <div>
-        <h1 className='homeIntro'>Welcome to eatery bay!</h1>
+        {user && 
+            <h1 className='homeIntro'>Welcome to eatery bay ! 
+                <span>{user.firstName}</span>
+            </h1>
+            
+        }
+        
         <p className='homeTxt'>Please first choose your prefered floor level</p>
         <div className='floorLevels'>
             <button onClick={() => setSelectedLevel('Level 1')}>Level 1</button>
@@ -45,7 +74,7 @@ const Home = () => {
 
             filterdTables.map((item) => (
             
-                <div key={item.id} className='individualTable'>
+                <div key={item.id} className='individualTable' onClick={() => fetchTablebyId(item.id)} >
                     <FaCircle className={`availability ${item.status === 'available' ? 'availability' : 'noAvailability'}`}/>
                     <div className='table'></div>
                     <p>{item.tableNumber}</p>
