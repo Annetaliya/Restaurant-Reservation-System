@@ -79,6 +79,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         }
       }
     );
+    
 
     db.run(
       `CREATE TABLE IF NOT EXISTS reservations (
@@ -122,14 +123,29 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             } else {
               console.log('Reservation already exist, skipping insertion')
             }
-          })
-          
-          
-
-          
+          })   
         }
       }
     );
+    db.run(
+      `CREATE TABLE IF NOT EXISTS booking (
+      id TEXT NOT NULL PRIMARY KEY,
+      userId TEXT NOT NULL,
+      reservationId TEXT NOT NULL,
+      bookingDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+      status TEXT CHECK (status IN ('pending', 'confirmed', 'cancelled')) NOT NULL DEFAULT 'pending',
+      FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE,
+      FOREIGN KEY (reservationId) REFERENCES reservations(id) ON DELETE CASCADE
+
+      )`,(err) => {
+        if (err) {
+          console.log('Error creating booking table', err.message)
+        } else {
+          console.log('Booking Table was created')
+        }
+      }
+    );
+    
   }
 });
 module.exports = db;
