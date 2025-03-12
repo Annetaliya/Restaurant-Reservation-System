@@ -38,17 +38,21 @@ router.get('/:id', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
 
-    const {firstName, secondName, email, password, phone} = req.body
+    const {firstName, secondName, email, password, confirmPassword, phone, role} = req.body
+    const userRole  = role || 'user';
     if (!firstName || !email|| !password || !phone ) {
         res.status(400).json({"error": "Missing the required fields"})
     }
+    if (password !== confirmPassword) {
+        return res.status(400).json({message: 'password does not match'})
+    }
     const userId = uuidv4();
 
-    const sql = 'INSERT INTO user (id, firstname, secondName, email, password, phone) values(?,?,?,?,?,?)';
-    const params = [userId, firstName, secondName, email, password, phone]
+    const sql = 'INSERT INTO user (id, firstname, secondName, email, password, phone, role) values(?,?,?,?,?,?,?)';
+    const params = [userId, firstName, secondName, email, password, phone, userRole]
     db.run(sql, params, (err, result) => {
         if(err){
-            res.status(400).json({"error": err.message})
+            res.status(500).json({"error": err.message})
             return;
         }
         res.json({

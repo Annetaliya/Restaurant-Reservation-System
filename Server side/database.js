@@ -19,6 +19,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             email TEXT UNIQUE,
             password TEXT,
             phone TEXT UNIQUE,
+            role TEXT DEFAULT 'user',
             CONSTRAINT email__phone_unique UNIQUE (email, phone)
             )`,
       (err) => {
@@ -28,10 +29,10 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
           console.log("User table was created successfully");
 
           
-          function insertUser(firstName, secondName, email, password, phone) {
+          function insertUser(firstName, secondName, email, password, phone, role='user') {
   
             db.get(
-              'SELECT * FROM user WHERE email = ? OR phone = ?',
+              'SELECT COUNT(*) AS count FROM user WHERE email = ? OR phone = ?',
               [email, phone],
               (err, row) => {
                 if(err) {
@@ -41,7 +42,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                 } else {
                   
                   const insert =
-                 "INSERT INTO user(id, firstName, secondName, email, password, phone) VALUES (?,?,?,?,?,?)";
+                 "INSERT INTO user(id, firstName, secondName, email, password, phone, role) VALUES (?,?,?,?,?,?,?)";
                  db.run(insert, [
                   uuidv4(),
                   firstName,
@@ -49,6 +50,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
                   email,
                   md5(password),
                   phone,
+                  role,
 
                  ], (err) => {
                   if (err) {
@@ -62,11 +64,22 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             )
 
           }
-          insertUser('first', 'admin', 'admin@example.com', 'admin1235', '0723456790')
-          insertUser('Annette', 'Aliya', 'aliya@example.com', 'aliya678', '0723456797')
+          db.get("SELECT COUNT(*) AS  count FROM user," , (err,row) => {
+            if (err) {
+              console.log('Error checking user', err.message)
+            } else if (row.count === 0) {
+              insertUser('Emeli', 'Sande', 'sandeadmin@example.com', 'sande12345', '0745600911', 'admin');
+              insertUser('first', 'admin', 'admin@example.com', 'admin1235', '0723456790', 'user')
+              insertUser('Annette', 'Aliya', 'aliya@example.com', 'aliya678', '0723456797', 'user')
+            } else {
+              console.log('Users aready exist, skipping insertion')
+            }
+          })
+          
         }
       }
     );
+    
 
     db.run(
       `CREATE TABLE IF NOT EXISTS reservations (
@@ -98,16 +111,41 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
               }
             })
           }
-          insertReservation(1, 4, 'available', 'Level 1' );
-          insertReservation(2, 6, 'available', 'Level 1' );
-          insertReservation(3, 4, 'reserved', 'Level 1' );
-          insertReservation(4, 2, 'available', 'Level 1');
-          
+          db.get('SELECT COUNT (*) AS count FROM reservations', (err,row) => {
+            if (err) {
+              console.log('Error checking reservation', err.message)
+            } else if (row.count === 0) {
+              insertReservation(1, 4, 'available', 'Level 1' );
+              insertReservation(2, 6, 'available', 'Level 1' );
+              insertReservation(3, 4, 'reserved', 'Level 1' );
+              insertReservation(4, 2, 'available', 'Level 1');
 
-          
+            } else {
+              console.log('Reservation already exist, skipping insertion')
+            }
+          })   
         }
       }
     );
+    db.run(
+      `CREATE TABLE IF NOT EXISTS booking (
+      id TEXT NOT NULL PRIMARY KEY,
+      userId TEXT NOT NULL,
+      reservationId TEXT NOT NULL,
+      bookingDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+      status TEXT CHECK (status IN ('pending', 'confirmed', 'cancelled')) NOT NULL DEFAULT 'pending',
+      FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE,
+      FOREIGN KEY (reservationId) REFERENCES reservations(id) ON DELETE CASCADE
+
+      )`,(err) => {
+        if (err) {
+          console.log('Error creating booking table', err.message)
+        } else {
+          console.log('Booking Table was created')
+        }
+      }
+    );
+    
   }
 });
 module.exports = db;
