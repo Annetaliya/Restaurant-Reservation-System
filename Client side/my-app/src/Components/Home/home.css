@@ -7,10 +7,19 @@
     font-size: 3rem;
     font-weight: 400;
 }
+.homeIntro span {
+}
 .homeTxt {
     text-align: center;
     margin-top: 0;
     font-size: 1rem;
+}
+.tableNumber {
+    font-size: 0.7rem;
+}
+.guestNumber {
+    font-size: 0.9rem;
+    font-weight: 300;
 }
 .floorLevels {
     display: flex;
@@ -44,6 +53,11 @@
     width: 80px;
     background-color: white;
     border-radius: 15px;
+    transition: transform 0.3s ease-in-out;
+}
+.table:hover {
+    cursor: pointer;
+    transform: scale(1.1);
 }
 .individualTable {
     display: flex;
