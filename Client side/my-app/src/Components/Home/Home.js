@@ -83,7 +83,18 @@ const Home = ( ) => {
             ))
             : <p>No tables available</p>}
         </div>
-        {loading ? <p>...loading</p> : table.status === 'reserved' ? <h1>Not availabe</h1> : table && <Booking table={table}/>}
+        {loading ? (
+            <p>...loading</p>
+        ) : table ? (
+            table.status === 'reserved' ? (
+                <h1>Not available</h1>
+            ) : (
+                <Booking table={table} />
+            )
+        ) : (
+            <p>No tables available</p>
+        )
+    }
     </div>
   )
 }
