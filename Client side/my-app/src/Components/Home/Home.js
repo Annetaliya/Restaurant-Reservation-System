@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { FaCircle } from "react-icons/fa";
 import './home.css';
+import Booking from '../Booking/Booking';
 
-const Home = () => {
+const Home = ( ) => {
     const [reservationTable, setReservationTable] = useState([]);
     const [loading, setLoading] =  useState(false);
     const [selectedLevel, setSelectedLevel] = useState('Level 1')
     const [table, setTable] = useState(null);
+   
 
     const user = JSON.parse(localStorage.getItem('user'));
     console.log(user)
@@ -15,7 +17,7 @@ const Home = () => {
     const filterdTables = reservationTable.filter((item) => item.floorLevel === selectedLevel)
 
     const fetchReservationTables = async () => {
-        setLoading(true)
+        
         try {
             const response =  await fetch('http://localhost:8000/reservations');
             if (!response.ok) {
@@ -23,8 +25,6 @@ const Home = () => {
             }
             const result =  await response.json();
             setReservationTable(result.data)
-            
-            setLoading(false)
             console.log(result)
 
         } catch (err) {
@@ -37,28 +37,27 @@ const Home = () => {
     }, [])
 
     const fetchTablebyId = async (id) => {
+        setLoading(true)
         try {
             const response = await fetch(`http://localhost:8000/reservations/${id}`)
             if (!response.ok) {
                 console.log('Errorfetching table')
             }
             const result = await response.json();
-            console.log(result);
-            setTable(result)
+            console.log('cicked table',result);
+            setTable(result.data)
+            setLoading(false)
 
         } catch (error) {
             console.log(error.message)
         }
     }
 
-    const handleGetReservation = () => {
-
-    }
+   
   return (
     <div>
         {user && 
-            <h1 className='homeIntro'>Welcome to eatery bay ! 
-                <span>{user.firstName}</span>
+            <h1 className='homeIntro'>Welcome to eatery bay {user.firstName}! 
             </h1>
             
         }
@@ -77,12 +76,14 @@ const Home = () => {
                 <div key={item.id} className='individualTable' onClick={() => fetchTablebyId(item.id)} >
                     <FaCircle className={`availability ${item.status === 'available' ? 'availability' : 'noAvailability'}`}/>
                     <div className='table'></div>
-                    <p>{item.tableNumber}</p>
+                    <p className='tableNumber'>Table No.{item.tableNumber}</p>
+                    <p className='guestNumber'>Guest Number {item.guestNumber}</p>
                 </div>       
                 
             ))
             : <p>No tables available</p>}
         </div>
+        {loading ? <p>...loading</p> : table.status === 'reserved' ? <h1>Not availabe</h1> : table && <Booking table={table}/>}
     </div>
   )
 }
