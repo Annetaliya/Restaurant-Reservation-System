@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
@@ -41,8 +41,19 @@ const Booking = ({ table }) => {
                 },
                 body: JSON.stringify(formData)
                 });
+                if (!response.ok) {
+                    throw new Error('Failed to create booking')
+                }
                 const result =  await response.json();
-                setFormData(result)
+                console.log('booking data', result)
+                if (result.data) {
+                    setFormData((prev) => ({
+                        ...prev,
+                        ...result.data
+                    }))
+
+                }
+                localStorage.setItem('booking', JSON.stringify(result.data))
                 Swal.fire({
                               title: "Good Job",
                               text: "Reservation successful wait for confirmation!",
