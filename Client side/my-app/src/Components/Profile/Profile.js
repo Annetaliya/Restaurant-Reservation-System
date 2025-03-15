@@ -1,4 +1,7 @@
 import React, {useEffect, useState} from 'react';
+import './profile.css';
+import { FaUserCircle } from "react-icons/fa";
+import Button from "react-bootstrap/Button";
 
 
 const Profile = ({ booking }) => {
@@ -28,14 +31,22 @@ const Profile = ({ booking }) => {
         }
     }, [booking])
   return (
-    <div>
-        <div>
+    <div className='parent col-6'>
+        
             {selectBooking ? 
-            <p>{selectBooking.firstName}</p>
+            <div className='userInfo'>
+                <div className='profileHeader'></div>
+                <div className='profileIcon'><FaUserCircle size={40} /></div>
+                <p>{selectBooking.firstName} {selectBooking.secondName}</p>
+                <p>{selectBooking.email}</p>
+                <p>Table No: {selectBooking.tableNumber}</p>
+                <p>No of Guests {selectBooking.guestNumber}</p>
+                <p className='bookingStatus'>Status: {selectBooking.status}</p>
+                <Button className='btn btn-danger'>Cancel Reservation</Button>
+                
+            </div>
             
             : <p>No data yet</p>}
-            
-        </div>
 
     </div>
   )
