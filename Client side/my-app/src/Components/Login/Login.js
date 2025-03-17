@@ -32,7 +32,6 @@ const initialVaues = {
   password: ''
 }
 const navigate = useNavigate();
-// submit the login form
 const handleSubmit = async (values, { setSubmitting, setErrors }) => {
   try {
     const response = await fetch('http://localhost:8000/login', {
