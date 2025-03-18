@@ -7,6 +7,7 @@ const Home = ( ) => {
     const [reservationTable, setReservationTable] = useState([]);
     const [loading, setLoading] =  useState(false);
     const [selectedLevel, setSelectedLevel] = useState('Level 1')
+    const [selectIndex, setSelectedIndex] = useState(0)
     const [table, setTable] = useState(null);
     
    
@@ -65,9 +66,21 @@ const Home = ( ) => {
         
         <p className='homeTxt'>Please first choose your prefered floor level</p>
         <div className='floorLevels'>
-            <button onClick={() => setSelectedLevel('Level 1')}>Level 1</button>
-            <button onClick={() => setSelectedLevel('Level 2')}>Level 2</button>
-            <button onClick={() => setSelectedLevel('Level 3')}>Level 3</button>
+            {['Level 1', 'Level 2', 'Level 3'].map((level, index) => (
+                <button 
+                key={index}
+                className={`levelbutton ${selectIndex === index ? 'active' : ''}`}
+                onClick={() => {setSelectedLevel(level)
+                                setSelectedIndex(index)
+
+                }}
+                
+                >
+                    {level}
+        
+                </button>
+            ))}
+
         </div>
         <div className='tableItems'>
             {filterdTables.length !== 0 ?
@@ -93,7 +106,7 @@ const Home = ( ) => {
                 <Booking table={table} />
             )
         ) : (
-            <p>No tables available</p>
+            ''
         )
     }
     </div>

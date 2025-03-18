@@ -13,7 +13,7 @@ router.post('/', (req, res) => {
 
     const bookingId = uuidv4();
     const status = 'pending';
-    const bookingDate = new Date().toISOString().split('T')[0]
+    const bookingDate = new Date().toISOString().replace('T', ' ').split('.')[0];
 
     const sql = `INSERT INTO booking (id, userId, reservationId, bookingDate, status) VALUES (?,?,?,?,?)`;
     const params = [bookingId, userId, reservationId, bookingDate, status];

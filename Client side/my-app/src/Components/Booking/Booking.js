@@ -15,7 +15,8 @@ const Booking = ({ table }) => {
     const [formData, setFormData] = useState({
         userId: user ? user.id : '',
         reservationId: table ? table.id :'',
-        guestNumber: '',
+        tableNo: table ? table.tableNumber : '',
+        guestNo: table ? table.guestNumber: '',
         bookingDate: '',
     })
 
@@ -34,12 +35,15 @@ const Booking = ({ table }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+           
+            const {userId, reservationId, bookingDate} = formData;
+            const payload = {userId, reservationId, bookingDate};
             const response  =  await fetch('http://localhost:8000/bookings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(payload)
                 });
                 if (!response.ok) {
                     throw new Error('Failed to create booking')
@@ -80,23 +84,23 @@ const Booking = ({ table }) => {
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit}> 
-                    <Form.Group className='mb-3' controlId='userId'>
-                        <Form.Label>Id</Form.Label>
+                    <Form.Group className='mb-3' controlId='tableNo'>
+                        <Form.Label>Table Number</Form.Label>
                         <Form.Control 
                         type='text'
-                        name='userId'
-                        value={formData.userId}
+                        name='tableNo'
+                        value={formData.tableNo}
                         onChange={handleChange}
                         readOnly
                         />
 
                     </Form.Group>
-                    <Form.Group className='mb-3' controlId='reservationId'>
-                        <Form.Label>Table Id</Form.Label>
+                    <Form.Group className='mb-3' controlId='guestNo'>
+                        <Form.Label>No. of Guests</Form.Label>
                         <Form.Control 
                         type='text'
-                        name='reservationId'
-                        value={formData.reservationId}
+                        name='guestNo'
+                        value={formData.guestNo}
                         onChange={handleChange}
                         readOnly
                         />
@@ -107,7 +111,8 @@ const Booking = ({ table }) => {
                         selected={selectedDate}
                         onChange={(date) => setSelectedDate(date)}
                         className='form-control mb-3'
-                        dateFormat='yyyy-MM-dd'
+                        //dateFormat='yyyy-MM-dd'
+                        showTimeSelect dateFormat="Pp" 
                         placeholderText='click to pick date'
                         />
                     </Form.Group>
