@@ -34,15 +34,15 @@ route.get('/:id', (req, res) => {
 })
 
 route.post('/', (req, res) => {
-    const {tableNumber, guestNumber,status, floorLevel} = req.body;
+    const {tableNumber, guestNumber,status, price, floorLevel} = req.body;
     console.log("Request Body:", req.body);
     if (!tableNumber || !guestNumber || !status || !floorLevel) {
         return res.status(400).json({"Error": "Error missing required field"})
     } 
     const reservationsid = uuidv4();
 
-    const sql = 'INSERT INTO reservations (id, tableNumber, guestNumber, status, floorLevel) values(?,?,?,?,?)';
-    const params =[reservationsid, tableNumber, guestNumber, status, floorLevel]
+    const sql = 'INSERT INTO reservations (id, tableNumber, guestNumber, price, status, floorLevel) values(?,?,?,?,?,?)';
+    const params =[reservationsid, tableNumber, guestNumber, price, status, floorLevel]
     db.run(sql, params, (err, result) => {
         if (err){
             res.status(400).json({"error": err.message})
@@ -57,16 +57,17 @@ route.post('/', (req, res) => {
 })
 
 route.patch('/:id', (req, res) => {
-    const {tableNumber, guestNumber,status, floorLevel} = req.body;
+    const {tableNumber, guestNumber, price, status, floorLevel} = req.body;
     const { id } = req.params;
     db.run (
         `UPDATE reservations set
         tableNumber = COALESCE(?, tableNumber),
         guestNumber = COALESCE(?, guestNumber),
+        price = COALESCE(?, price),
         status =  COALESCE(?, status),
         floorLevel =  COALESCE(?, floorLevel)
         WHERE id = ?`,
-        [id, tableNumber, guestNumber, status, floorLevel],
+        [id, tableNumber, guestNumber, price, status, floorLevel],
         function (err, result) {
             if (err) {
                 res.status(400).json({"error": err.message})

@@ -86,6 +86,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
       id TEXT PRIMARY KEY,
       tableNumber INTEGER UNIQUE,
       guestNumber INTEGER,
+      price INTEGER,
       status TEXT CHECK(status IN ('available', 'reserved')) DEFAULT 'available',
       floorLevel TEXT CHECK(floorLevel IN ('Level 1', 'Level 2', 'Level 3')) NOT NULL
       )`,
@@ -95,12 +96,13 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         } else {
           console.log('Reservation table created successfuly')
 
-          function insertReservation(tableNumber, guestNumber, status, floorLevel) {
-            const insert = 'INSERT INTO reservations(id, tableNumber, guestNumber, status, floorLevel) VALUES (?,?,?,?,?)'
+          function insertReservation(tableNumber, guestNumber, price, status, floorLevel) {
+            const insert = 'INSERT INTO reservations(id, tableNumber, guestNumber, price, status, floorLevel) VALUES (?,?,?,?,?,?)'
             db.run(insert, [
               uuidv4(),
               tableNumber,
               guestNumber,
+              price,
               status,
               floorLevel
             ], (err) => {
@@ -115,10 +117,10 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             if (err) {
               console.log('Error checking reservation', err.message)
             } else if (row.count === 0) {
-              insertReservation(1, 4, 'available', 'Level 1' );
-              insertReservation(2, 6, 'available', 'Level 1' );
-              insertReservation(3, 4, 'reserved', 'Level 1' );
-              insertReservation(4, 2, 'available', 'Level 1');
+              insertReservation(1, 4, 26, 'available', 'Level 1' );
+              insertReservation(2, 6, 26, 'available', 'Level 1' );
+              insertReservation(3, 4, 24, 'reserved', 'Level 1' );
+              insertReservation(4, 2, 20, 'available', 'Level 1');
 
             } else {
               console.log('Reservation already exist, skipping insertion')

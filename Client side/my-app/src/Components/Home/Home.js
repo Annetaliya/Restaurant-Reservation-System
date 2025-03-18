@@ -92,6 +92,7 @@ const Home = ( ) => {
                     <div className='table'></div>
                     <p className='tableNumber'>Table No.{item.tableNumber}</p>
                     <p className='guestNumber'>Guest Number {item.guestNumber}</p>
+                    <p>${item.price}</p>
                 </div>       
                 
             ))
