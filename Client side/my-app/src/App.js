@@ -3,6 +3,7 @@ import Home from "./Components/Home/Home";
 import Register from "./Components/Register/Register";
 import Login from "./Components/Login/Login";
 import AdminPanel from "./Components/Admin/AdminPanel";
+import ProtectedRoute from "./Components/ProtectedRoute";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import { useEffect, useState } from "react";
 import Profile from "./Components/Profile/Profile";
@@ -32,8 +33,9 @@ function App() {
           <Route path='/register' element={<Register />}/>
           <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn}/>}/>
           <Route path='/profile' element={<Profile booking={booking}  />}/>
-          <Route path='/admin' element={<AdminPanel />} />
-          
+          <Route element={<ProtectedRoute user={user} />}>
+            <Route path='/admin' element={<AdminPanel />} />
+          </Route>   
         </Routes>
       </Router>
       
