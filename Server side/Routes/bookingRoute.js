@@ -51,7 +51,7 @@ router.get('/', (req, res) => {
             return res.status(500).json({error: err.message})
         }
         res.json({
-            bookings: rows
+            'data': rows
         })
     })
 })
@@ -86,6 +86,21 @@ router.get('/:id', (req, res) => {
                 floorLevel: row.floorLevel
             }
         })
+    })
+})
+
+router.delete('/:id', (req, res) =>{
+    const sql = `DELETE FROM booking WHERE id = ?`
+    const params = [req.params.id];
+
+    db.run(sql, params, function (err) {
+        if (err) {
+            return res.status(500).json({error: 'Database error'})
+        }
+        if (this.changes === 0) {
+            return res.status(400).json({message: 'Booking not found'})
+        }
+        res.json({ message: 'Booking deleted', bookingId: req.params.id})
     })
 })
 module.exports = router
