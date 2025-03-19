@@ -5,15 +5,16 @@ const { v4: uuidv4 } = require('uuid');
 
 
 router.post('/', (req, res) => {
-    const {userId, reservationId} = req.body;
+    const {userId, reservationId, bookingDate} = req.body;
 
-    if (!userId || !reservationId) {
+    if (!userId || !reservationId || !bookingDate) {
+        console.log()
         return res.status(400).json({error: 'Missing userId or reservationId'})
     }
 
     const bookingId = uuidv4();
     const status = 'pending';
-    const bookingDate = new Date().toISOString().split('T')[0]
+    //const bookingDate = new Date().toISOString().replace('T', ' ').split('.')[0];
 
     const sql = `INSERT INTO booking (id, userId, reservationId, bookingDate, status) VALUES (?,?,?,?,?)`;
     const params = [bookingId, userId, reservationId, bookingDate, status];
@@ -51,7 +52,7 @@ router.get('/', (req, res) => {
             return res.status(500).json({error: err.message})
         }
         res.json({
-            bookings: rows
+            'data': rows
         })
     })
 })
@@ -88,4 +89,57 @@ router.get('/:id', (req, res) => {
         })
     })
 })
+
+router.patch('/:id', (req, res) => {
+    const { id } = req.params;
+    const {status, bookingDate} = req.body;
+
+    if (!bookingDate || !status) {
+        return res.status(400).json({error: 'no fields to update'})
+    }
+
+    let fieldsToUpdate = [];
+    let params = [];
+
+    if (bookingDate) {
+        fieldsToUpdate.push('bookingDate = ?')
+        params.push(bookingDate)
+    }
+    if (status) {
+        fieldsToUpdate.push('status = ?')
+        params.push(status)
+    }
+    params.push(id);
+    const sql = `UPDATE booking SET ${fieldsToUpdate.join(', ')} WHERE ud = ?`
+
+    db.run(sql, params, function (err) {
+        if (err) {
+            return res.status(500).json({error: 'Database error'})
+        }
+
+        if (this.changes === 0) {
+            return res.status(400).json({error: 'booking not founf'})
+        }
+        res.json({ message: 'Booking updated', bookingId: id})
+    }
+
+    )
+})
+
+router.delete('/:id', (req, res) =>{
+    const sql = `DELETE FROM booking WHERE id = ?`
+    const params = [req.params.id];
+
+    db.run(sql, params, function (err) {
+        if (err) {
+            return res.status(500).json({error: 'Database error'})
+        }
+        if (this.changes === 0) {
+            return res.status(400).json({message: 'Booking not found'})
+        }
+        res.json({ message: 'Booking deleted', bookingId: req.params.id})
+    })
+})
+
+
 module.exports = router

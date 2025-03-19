@@ -27,16 +27,24 @@
     justify-content: center;
     gap: 40px;
 }
-.floorLevels button {
+.levelbutton {
     padding: 8px 26px;
     border: 1px solid #E7717D;
     border-radius: 8px;
     background-color: transparent;
 }
-.floorLevels button:hover {
+.levelbutton:hover {
     background-color: #E7717D;
     color: #fff;
     border: none;
+}
+
+.active {
+    padding: 8px 26px;
+    border: none;
+    border-radius: 8px;
+    background-color: #E7717D;
+
 }
 .tableItems {
     margin-top: 2rem;
