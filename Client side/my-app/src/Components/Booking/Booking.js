@@ -27,6 +27,18 @@ const Booking = ({ table }) => {
         }))
     }
 
+    const handleDateChange = (date) => {
+        if (!date) return;
+        const options = {timeZone: 'Africa/Nairobi', hour12: false};
+        const formattedDate = new Date().toLocaleString('en-GB', options).replace(',', '');
+        setSelectedDate(date);
+        setFormData((prev) => ({
+            ...prev,
+            bookingDate: formattedDate
+        }))
+
+    }
+
    
 
     const handeClose = () => setShow(false);
@@ -44,7 +56,9 @@ const Booking = ({ table }) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(payload)
+                
                 });
+                console.log('this is the booking payload:', payload)
                 if (!response.ok) {
                     throw new Error('Failed to create booking')
                 }
@@ -109,7 +123,7 @@ const Booking = ({ table }) => {
                     <Form.Group>
                         <DatePicker 
                         selected={selectedDate}
-                        onChange={(date) => setSelectedDate(date)}
+                        onChange={handleDateChange}
                         className='form-control mb-3'
                         //dateFormat='yyyy-MM-dd'
                         showTimeSelect dateFormat="Pp" 

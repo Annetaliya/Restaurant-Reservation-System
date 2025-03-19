@@ -4,6 +4,7 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import { IoSearchSharp } from "react-icons/io5";
 import Table from 'react-bootstrap/Table';
 import Button from "react-bootstrap/Button";
+import Swal from "sweetalert2";
 
 const AdminPanel = () => {
   const [reservations, setReservations] = useState([]);
@@ -41,7 +42,32 @@ const AdminPanel = () => {
     setTodaysReservations(filterdReservation)
   }, [reservations, today])
 
-  
+  const handeDeleteReservation = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8000/bookings/${id}`, {
+        method: 'DELETE'
+      }
+      )
+      if (!response.ok) {
+        throw new Error(`Error deleting reservation: ${response.statusText}`)
+      }
+      const tablesLeft = reservations.filter((element) => element.id !== id )
+      setReservations(tablesLeft)
+        Swal.fire({
+                    text: "Delete successful!",
+                    icon: "success",
+                  });
+
+    } catch (error) {
+      console.log(error.message)
+      Swal.fire({
+                  title: "Error",
+                  text: "Something went wrong",
+                  icon: "error",
+                });
+    }
+
+  }
   return (
     <div>
       <InputGroup  className="w-50 mx-auto mb-5">
@@ -75,11 +101,13 @@ const AdminPanel = () => {
 
     )}
 
-    <Table  className="w-50 mx-auto">
+    <Table  className="col-10 mx-auto">
       <thead>
         <tr>
           <td>Date</td>
+          <td>Time</td>
           <td>Booking Ref</td>
+          <td>Table no.</td>
           <td>Guest No.</td>
           <td>Status</td>
           <td>Extend</td>
@@ -91,11 +119,13 @@ const AdminPanel = () => {
         reservations.map((item) => (
           <tr key={item.id}>
             <td>{item.bookingDate.split(' ')[0]}</td>
+            <td>{item.bookingDate.split(' ')[1]}</td>
             <td>{item.id.split('-')[0]}</td>
+            <td>{item.tableNumber}</td>
             <td>{item.guestNumber}</td>
             <td>{item.status}</td>
-            <td><Button>Extend</Button></td>
-            <td><Button className='btn btn-danger'>Cancel</Button></td>
+            <td><Button>Confirm</Button></td>
+            <td><Button className='btn btn-danger' onClick={() => handeDeleteReservation(item.id)}>Cancel</Button></td>
             
           </tr>
         ))
