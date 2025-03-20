@@ -3,7 +3,7 @@ import { FaCircle } from "react-icons/fa";
 import './home.css';
 import Booking from '../Booking/Booking';
 
-const Home = ( ) => {
+const Home = ({ booking }) => {
     const [reservationTable, setReservationTable] = useState([]);
     const [loading, setLoading] =  useState(false);
     const [selectedLevel, setSelectedLevel] = useState('Level 1')

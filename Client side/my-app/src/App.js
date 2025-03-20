@@ -29,7 +29,7 @@ function App() {
       <NavBar isLoggedIn={isLoggedIn} />
       <Router>
         <Routes>
-          <Route path="/" element={<Home />}/>
+          <Route path="/" element={<Home booking={booking}/>}/>
           <Route path='/register' element={<Register />}/>
           <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn}/>}/>
           <Route path='/profile' element={<Profile booking={booking}  />}/>
