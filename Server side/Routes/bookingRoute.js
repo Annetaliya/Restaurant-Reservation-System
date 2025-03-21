@@ -92,35 +92,45 @@ router.get('/:id', (req, res) => {
 
 router.patch('/:id', (req, res) => {
     const { id } = req.params;
-    const {status, bookingDate} = req.body;
+    const {status} = req.body;
 
-    if (!bookingDate || !status) {
+    if (!status) {
         return res.status(400).json({error: 'no fields to update'})
     }
 
     let fieldsToUpdate = [];
     let params = [];
 
-    if (bookingDate) {
-        fieldsToUpdate.push('bookingDate = ?')
-        params.push(bookingDate)
-    }
     if (status) {
         fieldsToUpdate.push('status = ?')
         params.push(status)
     }
     params.push(id);
-    const sql = `UPDATE booking SET ${fieldsToUpdate.join(', ')} WHERE ud = ?`
+    const sql = `UPDATE booking SET ${fieldsToUpdate.join(', ')} WHERE id = ?`
 
     db.run(sql, params, function (err) {
         if (err) {
+            console.log(err.message)
             return res.status(500).json({error: 'Database error'})
+            
         }
 
         if (this.changes === 0) {
-            return res.status(400).json({error: 'booking not founf'})
+            return res.status(400).json({error: 'booking not found'})
         }
-        res.json({ message: 'Booking updated', bookingId: id})
+        db.get(`SELECT * FROM booking WHERE id = ?`, [id] , (err, row) => {
+            if (err) {
+                console.log(err.message)
+                return res.status(500).json({error: 'Error fetching updated bookings'})
+            }
+            res.json({
+                message: 'updated booking successfuly',
+                data: row
+            })
+        }
+    )
+       
+       
     }
 
     )

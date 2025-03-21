@@ -57,30 +57,34 @@ route.post('/', (req, res) => {
 })
 
 route.patch('/:id', (req, res) => {
-    const {tableNumber, guestNumber, price, status, floorLevel} = req.body;
+    const {status} = req.body;
     const { id } = req.params;
-    db.run (
-        `UPDATE reservations set
-        tableNumber = COALESCE(?, tableNumber),
-        guestNumber = COALESCE(?, guestNumber),
-        price = COALESCE(?, price),
-        status =  COALESCE(?, status),
-        floorLevel =  COALESCE(?, floorLevel)
-        WHERE id = ?`,
-        [id, tableNumber, guestNumber, price, status, floorLevel],
-        function (err, result) {
-            if (err) {
-                res.status(400).json({"error": err.message})
-                return;
-            }
-            if (this.changes === 0 ) {
-                return res.status(400).json({"error":"reservation not found"})
-            }
-            res.json({
-                "message": "success",
-                "data": req.body
-            })
+
+    if (!status) {
+        return res.status(400).json({error: 'no fields to update'})
+    }
+    let fieldsToUpdate = [];
+    let params = [];
+
+    if (status) {
+        fieldsToUpdate.push('status = ?')
+        params.push(status)
+    }
+    params.push(id);
+    const sql = `UPDATE reservations SET ${fieldsToUpdate.join(', ')} WHERE id = ?`
+    db.run(sql, params, function (err) {
+        if (err) {
+            console.log(err.message)
+            return res.status(500).json({error: 'Database error'})
         }
+        if (this.changes === 0) {
+            console.log(err.message)
+            return res.status(400).json({error: 'booking not found'})
+        }
+        res.json({ message: 'reservations updated', reservationId: id})
+    }
+
     )
+    
 })
 module.exports = route

@@ -7,6 +7,7 @@ import Button from "react-bootstrap/Button";
 const Profile = ({ booking }) => {
 
     const [selectBooking, setSelectedBooking] = useState(null)
+    console.log(booking)
    
 
     const fetchBookingById = async (id) => {
