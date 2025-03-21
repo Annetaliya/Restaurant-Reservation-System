@@ -6,19 +6,19 @@ import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Swal from "sweetalert2";
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import Modal from 'react-bootstrap/Modal';
 
 
-function Example() {
-  const [show, setShow] = useState(false);
+function ModalForm ({ showModal, handleCloseModal}) {
+  
   const [formData, setFormData] = useState({
     tableNumber: '',
     guestNumber: '',
     price: '',
     status: '',
-    floorLevel: '',
-    
+    floorLevel: '',    
   })
-
+  
   const handleSubmitTable = async (e) => {
     e.preventDefault();
     try {
@@ -37,17 +37,89 @@ function Example() {
         ...prev,
         ...result.data
       }))
-      
-
     } catch (error) {
       console.log(error.message)
 
     }
-
   }
+
+
+
+  
+
+  return (
+    <div>
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Fill the table details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className='mb-3' controlId='tableNumber'>
+              <Form.Label>Table Number</Form.Label>
+              <Form.Control 
+                type='text'
+                name='tableNo'
+                value={formData.tableNumber}
+                //onChange={handleChange}     
+              />
+            </Form.Group>
+            <Form.Select aria-label="Default select example" className='mb-3'>
+              <option>Choose guest No</option>
+              <option value="2">2</option>
+              <option value="4">4</option>
+              <option value="6">6</option>
+            </Form.Select>
+            <Form.Group className='mb-3' controlId='price'>
+              <Form.Label>Price</Form.Label>
+              <Form.Control 
+                type='text'
+                name='price'
+                value={formData.price}
+               // onChange={handleChange}     
+              />
+            </Form.Group>
+            <Form.Select aria-label="Default select example" className='mb-3'>
+              <option>Choose status</option>
+              <option value="available">Available</option>
+              <option value="reserved">Reserved</option>
+            </Form.Select>
+            <Form.Select aria-label="Default select example">
+              <option>Choose floor level</option>
+              <option value="Level 1">Level 1</option>
+              <option value="Level 2">Level 2</option>
+              <option value="Leve 3">Level 3</option>
+            </Form.Select>
+
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+          <Button variant="primary" onCick={handleCloseModal}>
+            Submit
+
+          </Button>
+        </Modal.Footer>
+
+      </Modal>
+
+    </div>
+  )
+
+}
+
+function SideBar() {
+  const [show, setShow] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  const handleCloseModal = () => setShowModal(false);
+  const handleShowModal = () => setShowModal(true);
 
   return (
     <>
@@ -61,9 +133,10 @@ function Example() {
         </Offcanvas.Header>
         <Offcanvas.Body>
           <p>Create a new table</p>
-          <Button>Create Table</Button>
+          <Button onClick={handleShowModal}>Create Table</Button>
         </Offcanvas.Body>
       </Offcanvas>
+      <ModalForm showModal={showModal} handleCloseModal={handleCloseModal}/>
     </>
   );
 }
@@ -162,7 +235,7 @@ const AdminPanel = () => {
   };
   return (
     <div>
-    <Example />
+    <SideBar />
       <InputGroup className="w-50 mx-auto mb-5">
         <InputGroup.Text>
           <IoSearchSharp />
