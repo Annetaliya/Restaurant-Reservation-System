@@ -5,6 +5,69 @@ import { IoSearchSharp } from "react-icons/io5";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Swal from "sweetalert2";
+import Offcanvas from 'react-bootstrap/Offcanvas';
+
+
+function Example() {
+  const [show, setShow] = useState(false);
+  const [formData, setFormData] = useState({
+    tableNumber: '',
+    guestNumber: '',
+    price: '',
+    status: '',
+    floorLevel: '',
+    
+  })
+
+  const handleSubmitTable = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:8000/reservations', {
+        method: 'POST',
+        header: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      if (!response.ok) {
+        console.log('error posting a table')
+      }
+      const result = await response.json();
+      setFormData((prev) => ({
+        ...prev,
+        ...result.data
+      }))
+      
+
+    } catch (error) {
+      console.log(error.message)
+
+    }
+
+  }
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  return (
+    <>
+      <Button variant="primary" onClick={handleShow}>
+        Admin Actions
+      </Button>
+
+      <Offcanvas show={show} onHide={handleClose}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Actions</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+          <p>Create a new table</p>
+          <Button>Create Table</Button>
+        </Offcanvas.Body>
+      </Offcanvas>
+    </>
+  );
+}
+
 
 const AdminPanel = () => {
   const [reservations, setReservations] = useState([]);
@@ -99,6 +162,7 @@ const AdminPanel = () => {
   };
   return (
     <div>
+    <Example />
       <InputGroup className="w-50 mx-auto mb-5">
         <InputGroup.Text>
           <IoSearchSharp />
