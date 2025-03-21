@@ -5,47 +5,57 @@ import { IoSearchSharp } from "react-icons/io5";
 import Table from "react-bootstrap/Table";
 import Button from "react-bootstrap/Button";
 import Swal from "sweetalert2";
-import Offcanvas from 'react-bootstrap/Offcanvas';
-import Modal from 'react-bootstrap/Modal';
+import Offcanvas from "react-bootstrap/Offcanvas";
+import Modal from "react-bootstrap/Modal";
 
-
-function ModalForm ({ showModal, handleCloseModal}) {
-  
+function ModalForm({ showModal, handleCloseModal }) {
   const [formData, setFormData] = useState({
-    tableNumber: '',
-    guestNumber: '',
-    price: '',
-    status: '',
-    floorLevel: '',    
-  })
-  
+    tableNumber: "",
+    guestNumber: "",
+    price: "",
+    status: "",
+    floorLevel: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   const handleSubmitTable = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/reservations', {
-        method: 'POST',
-        header: {
-          'Content-Type': 'application/json'
+      const response = await fetch("http://localhost:8000/reservations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
-      })
+        body: JSON.stringify(formData),
+      });
       if (!response.ok) {
-        console.log('error posting a table')
+        console.log("error posting a table", response.statusText);
+        return;
       }
       const result = await response.json();
       setFormData((prev) => ({
         ...prev,
-        ...result.data
-      }))
+        ...result.data,
+      }));
+      Swal.fire({
+                text: "You created a table",
+                icon: "success",
+              });
     } catch (error) {
-      console.log(error.message)
-
+      Swal.fire({
+                  title: "Error",
+                  text: "Something went wrong",
+                  icon: "error",
+                });
+      console.error('Fetching error',error.message);
     }
-  }
-
-
-
-  
+  };
 
   return (
     <div>
@@ -54,66 +64,79 @@ function ModalForm ({ showModal, handleCloseModal}) {
           <Modal.Title>Fill the table details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Group className='mb-3' controlId='tableNumber'>
+          <Form onSubmit={handleSubmitTable}>
+            <Form.Group className="mb-3" controlId="tableNumber">
               <Form.Label>Table Number</Form.Label>
-              <Form.Control 
-                type='text'
-                name='tableNo'
+              <Form.Control
+                type="text"
+                name="tableNumber"
                 value={formData.tableNumber}
-                //onChange={handleChange}     
+                onChange={handleChange}
               />
             </Form.Group>
-            <Form.Select aria-label="Default select example" className='mb-3'>
-              <option>Choose guest No</option>
+            <Form.Select 
+              name="guestNumber"
+              value={formData.guestNumber}
+              onChange={handleChange}
+              aria-label="Default select example" 
+              className="mb-3"
+            >
+              <option value="">Choose guest No</option>
               <option value="2">2</option>
               <option value="4">4</option>
               <option value="6">6</option>
             </Form.Select>
-            <Form.Group className='mb-3' controlId='price'>
+            <Form.Group className="mb-3" controlId="price">
               <Form.Label>Price</Form.Label>
-              <Form.Control 
-                type='text'
-                name='price'
+              <Form.Control
+                type="text"
+                name="price"
                 value={formData.price}
-               // onChange={handleChange}     
+                onChange={handleChange}
               />
             </Form.Group>
-            <Form.Select aria-label="Default select example" className='mb-3'>
-              <option>Choose status</option>
+            <Form.Select 
+              name='status'
+              value={formData.status}
+              onChange={handleChange}
+              aria-label="Default select example" 
+              className="mb-3"
+              >
+              <option value="">Choose status</option>
               <option value="available">Available</option>
               <option value="reserved">Reserved</option>
             </Form.Select>
-            <Form.Select aria-label="Default select example">
-              <option>Choose floor level</option>
+            <Form.Select 
+              name='floorLevel'
+              value={formData.floorLevel}
+              onChange={handleChange}
+              aria-label="Default select example"
+            >
+              <option value="">Choose floor level</option>
               <option value="Level 1">Level 1</option>
               <option value="Level 2">Level 2</option>
-              <option value="Leve 3">Level 3</option>
+              <option value="Level 3">Level 3</option>
             </Form.Select>
 
+            <Button variant="primary" type="submit">
+            Submit
+          </Button>
           </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
             Close
           </Button>
-          <Button variant="primary" onCick={handleCloseModal}>
-            Submit
-
-          </Button>
+          
         </Modal.Footer>
-
       </Modal>
-
     </div>
-  )
-
+  );
 }
 
 function SideBar() {
   const [show, setShow] = useState(false);
   const [showModal, setShowModal] = useState(false);
-
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -136,15 +159,21 @@ function SideBar() {
           <Button onClick={handleShowModal}>Create Table</Button>
         </Offcanvas.Body>
       </Offcanvas>
-      <ModalForm showModal={showModal} handleCloseModal={handleCloseModal}/>
+      <ModalForm showModal={showModal} handleCloseModal={handleCloseModal} />
     </>
   );
 }
 
-
 const AdminPanel = () => {
   const [reservations, setReservations] = useState([]);
   const [todaysReservations, setTodaysReservations] = useState(null);
+  const [searchParams, setSearchParams] = useState('');
+
+
+  const filteredSearchReservations = reservations.filter((element) => 
+    element.firstName.toLowerCase().includes(searchParams.toLocaleLowerCase()) || 
+    element.id.includes(searchParams)
+  )
 
   const fetchReservations = async () => {
     try {
@@ -163,9 +192,11 @@ const AdminPanel = () => {
   useEffect(() => {
     fetchReservations();
   }, []);
-  const options = {timeZone: 'Africa/Nairobi', hour12: false};
-  const today = new Date().toLocaleString('en-GB', options).replace(',', '').split(' ')[0];
- 
+  const options = { timeZone: "Africa/Nairobi", hour12: false };
+  const today = new Date()
+    .toLocaleString("en-GB", options)
+    .replace(",", "")
+    .split(" ")[0];
 
   useEffect(() => {
     const filterdReservation = reservations.filter((element) => {
@@ -178,7 +209,7 @@ const AdminPanel = () => {
   const handleUpdateReservation = async (id) => {
     try {
       const response = await fetch(`http://localhost:8000/bookings/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -190,9 +221,9 @@ const AdminPanel = () => {
             item.id === id ? { ...item, status: "confirmed" } : item
           )
         );
-        const result =  await response.json();
-        console.log('Admin changed result', result)
-        localStorage.setItem('booking', JSON.stringify(result.data))
+        const result = await response.json();
+        console.log("Admin changed result", result);
+        localStorage.setItem("booking", JSON.stringify(result.data));
         Swal.fire({
           text: "Update successful!",
           icon: "success",
@@ -235,12 +266,17 @@ const AdminPanel = () => {
   };
   return (
     <div>
-    <SideBar />
+      <SideBar />
       <InputGroup className="w-50 mx-auto mb-5">
         <InputGroup.Text>
           <IoSearchSharp />
         </InputGroup.Text>
-        <Form.Control type="search" placeholder="search" />
+        <Form.Control 
+          type="search" 
+          placeholder="search by name or id" 
+          value={searchParams}
+          onChange={(e) => setSearchParams(e.target.value)}
+        />
       </InputGroup>
 
       {todaysReservations && todaysReservations.length > 0 ? (
@@ -281,8 +317,8 @@ const AdminPanel = () => {
           </tr>
         </thead>
         <tbody>
-          {reservations.length !== 0 ? (
-            reservations.map((item) => (
+          {filteredSearchReservations.length !== 0 ? (
+            filteredSearchReservations.map((item) => (
               <tr key={item.id}>
                 <td>{item.bookingDate.split(" ")[0]}</td>
                 <td>{item.bookingDate.split(" ")[1]}</td>
