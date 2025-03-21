@@ -118,7 +118,19 @@ router.patch('/:id', (req, res) => {
         if (this.changes === 0) {
             return res.status(400).json({error: 'booking not found'})
         }
-        res.json({ message: 'Booking updated', bookingId: id})
+        db.get(`SELECT * FROM booking WHERE id = ?`, [id] , (err, row) => {
+            if (err) {
+                console.log(err.message)
+                return res.status(500).json({error: 'Error fetching updated bookings'})
+            }
+            res.json({
+                message: 'updated booking successfuly',
+                data: row
+            })
+        }
+    )
+       
+       
     }
 
     )

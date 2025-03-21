@@ -27,8 +27,9 @@ const AdminPanel = () => {
   useEffect(() => {
     fetchReservations();
   }, []);
-
-  const today = new Date().toISOString().split("T")[0];
+  const options = {timeZone: 'Africa/Nairobi', hour12: false};
+  const today = new Date().toLocaleString('en-GB', options).replace(',', '').split(' ')[0];
+ 
 
   useEffect(() => {
     const filterdReservation = reservations.filter((element) => {
@@ -53,6 +54,9 @@ const AdminPanel = () => {
             item.id === id ? { ...item, status: "confirmed" } : item
           )
         );
+        const result =  await response.json();
+        console.log('Admin changed result', result)
+        localStorage.setItem('booking', JSON.stringify(result.data))
         Swal.fire({
           text: "Update successful!",
           icon: "success",

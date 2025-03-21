@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { FaCircle } from "react-icons/fa";
 import './home.css';
 import Booking from '../Booking/Booking';
@@ -9,6 +9,7 @@ const Home = ({ booking }) => {
     const [selectedLevel, setSelectedLevel] = useState('Level 1')
     const [selectIndex, setSelectedIndex] = useState(0)
     const [table, setTable] = useState(null);
+    console.log('This is home page booking:', booking)
     
    
 
@@ -54,6 +55,39 @@ const Home = ({ booking }) => {
             console.log(error.message)
         }
     }
+
+    const fetchUpdateReservationTable = async (id) => {
+        if (booking.status === 'confirmed') {
+            try { 
+                const response =  await fetch(`http://localhost:8000/reservations/${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({status: 'reserved'})
+                })
+                if (response.ok) {
+                    setReservationTable((prev) => 
+                        prev.map((item) => 
+                            item.id === id ? {...item, status: 'reserved'} : item
+                        )
+                    )
+                }
+
+                const updatedData =  await response.json();
+                console.log('this is a reserved table being updated', updatedData)
+
+            } catch (error) {
+                console.log(error.message)
+
+            }
+        }
+       
+        
+    }
+    useEffect(() => {
+        fetchUpdateReservationTable(booking.reservationId)
+    }, [])
 
    
   return (
