@@ -2,13 +2,20 @@ import React, {useEffect, useState} from 'react';
 import './profile.css';
 import { FaUserCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
+import { io } from "socket.io-client";
+import Swal from "sweetalert2";
+import { useNavigate } from 'react-router';
+
+const socket = io('http://localhost:8000')
+
 
 
 const Profile = ({ booking }) => {
 
     const [selectBooking, setSelectedBooking] = useState(null)
     console.log(booking)
-   
+
+   const navigate = useNavigate();
 
     const fetchBookingById = async (id) => {
         try {
@@ -27,14 +34,36 @@ const Profile = ({ booking }) => {
     }
 
     useEffect(() => {
-        if (booking && booking.id) {
-            fetchBookingById(booking.id)
+        fetchBookingById(booking.id)
+        socket.on('reservatio confirmed', (updatedBooking) => {
+            if (booking && booking.id  === updatedBooking.id) {
+                Swal.fire({
+                    title: 'Reservation Confirmed!',
+                    text: 'Your reservation has been confirmed',
+                    icon: 'success'
+                })
+                localStorage.setItem(
+                    'booking',
+                    JSON.stringify({...booking, status: 'confirmed'})
+                )
+            }
+        })
+        return () => {
+            socket.off('reservation confirmed')
         }
+        
     }, [booking])
+
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/login')
+    }
   return (
     <div className='parent col-6'>
         
-            {selectBooking ? 
+            {selectBooking && selectBooking.length !== 0 ? 
             <div className='userInfo'>
                 <div className='profileHeader'></div>
                 <div className='profileIcon'><FaUserCircle size={40} /></div>
@@ -43,7 +72,8 @@ const Profile = ({ booking }) => {
                 <p>Table No: {selectBooking.tableNumber}</p>
                 <p>No of Guests {selectBooking.guestNumber}</p>
                 <p className='bookingStatus'>Status: {selectBooking.status}</p>
-                <Button className='btn btn-danger'>Cancel Reservation</Button>
+                <Button className='btn btn-danger mb-3'>Cancel Reservation</Button>
+                <Button onClick={handleLogout}>Logout</Button>
                 
             </div>
             

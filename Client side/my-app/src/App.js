@@ -29,9 +29,9 @@ function App() {
       <NavBar isLoggedIn={isLoggedIn} />
       <Router>
         <Routes>
-          <Route path="/" element={<Home booking={booking}/>}/>
+          <Route path="/" element={<Home booking={booking} isLoggedIn={isLoggedIn}/>}/>
           <Route path='/register' element={<Register />}/>
-          <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn}/>}/>
+          <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} user={user}/>}/>
           <Route path='/profile' element={<Profile booking={booking}  />}/>
           <Route element={<ProtectedRoute user={user} />}>
             <Route path='/admin' element={<AdminPanel />} />

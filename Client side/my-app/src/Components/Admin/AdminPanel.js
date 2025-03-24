@@ -7,6 +7,9 @@ import Button from "react-bootstrap/Button";
 import Swal from "sweetalert2";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
+import { io } from "socket.io-client";
+
+const socket = io('http://localhost:8000');
 
 function ModalForm({ showModal, handleCloseModal }) {
   const [formData, setFormData] = useState({
@@ -191,6 +194,17 @@ const AdminPanel = () => {
 
   useEffect(() => {
     fetchReservations();
+    socket.on('new booking', (newBooking) => {
+      setReservations((prev) => [...prev, newBooking])
+      Swal.fire({
+        title: 'New Reservation',
+        text: 'A new reservation has been made',
+        icon: 'info',
+      })
+    })
+    return () => {
+      socket.off('new booking')
+    }
   }, []);
   const options = { timeZone: "Africa/Nairobi", hour12: false };
   const today = new Date()

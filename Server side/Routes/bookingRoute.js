@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 
 
 router.post('/', (req, res) => {
+    const io = req.app.get('io')
     const {userId, reservationId, bookingDate} = req.body;
 
     if (!userId || !reservationId || !bookingDate) {
@@ -24,6 +25,15 @@ router.post('/', (req, res) => {
             console.log('Error creating booking', err.message);
             return res.status(500).json({error: 'database error'})
         }
+
+        const newBooking = {
+            bookingId,
+            userId,
+            reservationId,
+            bookingDate,
+            status
+        }
+        io.emit('new booking', newBooking)
 
         res.status(201).json({
             'message': 'success',
@@ -73,24 +83,18 @@ router.get('/:id', (req, res) => {
             res.status(400).json({"error":err.message})
             return;
         }
+        if (!row) {
+            return res.status(404).json({ "error": "Booking not found" }); 
+        }
         res.json({
             "message": "ok",
-            "data": {
-                bookingId: row.bookingId,
-                bookingDate: row.bookingDate,
-                status: row.status,
-                firstName: row.firstName,
-                secondName: row.secondName,
-                email: row.email,
-                tableNumber: row.tableNumber,
-                guestNumber: row.guestNumber,
-                floorLevel: row.floorLevel
-            }
+            "data": row
         })
     })
 })
 
 router.patch('/:id', (req, res) => {
+    const io = req.app.get('io');
     const { id } = req.params;
     const {status} = req.body;
 
@@ -118,11 +122,14 @@ router.patch('/:id', (req, res) => {
         if (this.changes === 0) {
             return res.status(400).json({error: 'booking not found'})
         }
+        const updatedBooking = {id, status};
+        io.emit('confirmed', updatedBooking)
         db.get(`SELECT * FROM booking WHERE id = ?`, [id] , (err, row) => {
             if (err) {
                 console.log(err.message)
                 return res.status(500).json({error: 'Error fetching updated bookings'})
             }
+            
             res.json({
                 message: 'updated booking successfuly',
                 data: row

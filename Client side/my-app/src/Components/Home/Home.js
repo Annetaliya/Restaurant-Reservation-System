@@ -1,9 +1,10 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaCircle } from "react-icons/fa";
 import './home.css';
 import Booking from '../Booking/Booking';
+import { useNavigate } from 'react-router';
 
-const Home = ({ booking }) => {
+const Home = ({ booking , isLoggedIn}) => {
     const [reservationTable, setReservationTable] = useState([]);
     const [loading, setLoading] =  useState(false);
     const [selectedLevel, setSelectedLevel] = useState('Level 1')
@@ -15,6 +16,7 @@ const Home = ({ booking }) => {
 
     const user = JSON.parse(localStorage.getItem('user'));
     console.log(user)
+    const navigate  =  useNavigate()
     
 
     const filterdTables = reservationTable.filter((item) => item.floorLevel === selectedLevel)
@@ -40,6 +42,7 @@ const Home = ({ booking }) => {
     }, [])
 
     const fetchTablebyId = async (id) => {
+        
         setLoading(true)
         try {
             const response = await fetch(`http://localhost:8000/reservations/${id}`)
@@ -48,8 +51,13 @@ const Home = ({ booking }) => {
             }
             const result = await response.json();
             console.log('cicked table',result);
-            setTable(result.data)
-            setLoading(false)
+            if (user) {
+                setTable(result.data)
+                setLoading(false)
+            } else {
+                navigate('/login')
+            }
+            
 
         } catch (error) {
             console.log(error.message)

@@ -1,11 +1,13 @@
 import React from 'react';
 import { useState} from 'react';
+import { useNavigate } from 'react-router';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from "sweetalert2";
+
 
 const Booking = ({ table }) => {
     
@@ -19,6 +21,7 @@ const Booking = ({ table }) => {
         guestNo: table ? table.guestNumber: '',
         bookingDate: '',
     })
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData((prev) => ({
@@ -42,6 +45,7 @@ const Booking = ({ table }) => {
    
 
     const handeClose = () => setShow(false);
+     
     const handleShow = () => setShow(true);
 
     const handleSubmit = async (e) => {
@@ -77,6 +81,7 @@ const Booking = ({ table }) => {
                               text: "Reservation successful wait for confirmation!",
                               icon: "success",
                             });
+                navigate('/profile')
 
         } catch (error) {
             console.log(error.message)
