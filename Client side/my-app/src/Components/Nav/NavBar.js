@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FaHome } from "react-icons/fa";
 import { FaPhoneAlt } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
-import { FaShoppingCart } from "react-icons/fa";
 import { TiThMenu } from "react-icons/ti";
 import './nav.css';
 
@@ -11,7 +10,6 @@ const navItems = [
     {item: 'Home', icon: <FaHome />, path: '/'},
     {item: 'Contact', icon: <FaPhoneAlt />, path: '/contact'},
     {item: 'Profile', icon: <FaUser />, path: '/profile'},
-    {item: 'Reservation', icon: <FaShoppingCart />, path: '/reservat'}
 ]
 const NavBar = ({ isLoggedIn }) => {
     const [showMenu, setShowMenu] = useState(false);

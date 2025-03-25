@@ -10,10 +10,12 @@ const socket = io('http://localhost:8000')
 
 
 
-const Profile = ({booking}) => {
+const Profile = ({ booking }) => {
     
 
     const [selectBooking, setSelectedBooking] = useState(null)
+   
+
     
     useEffect(() => {
         
@@ -22,10 +24,13 @@ const Profile = ({booking}) => {
         
         }
     }, [booking]);
-    console.log(booking)
     
 
    const navigate = useNavigate();
+
+  
+
+   
 
     const fetchBookingById = async (id) => {
         try {
@@ -96,7 +101,11 @@ const Profile = ({booking}) => {
                 
             </div>
             
-            : <p>No data yet</p>}
+            : <div>
+                no data yet
+            </div>
+            }
+            
 
     </div>
   )

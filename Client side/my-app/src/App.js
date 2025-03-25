@@ -7,6 +7,7 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import { useEffect, useState } from "react";
 import Profile from "./Components/Profile/Profile";
+import Contact from "./Components/Contact/Contact";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,9 +17,12 @@ function App() {
  
 
 
-  const fetchUpdateReservationTable = async (id, newStatus) => {
+  const fetchUpdateReservationTable = async (id,) => {
          
              try { 
+              if (!id || !booking) {
+                throw new Error('Id and booking is required')
+              }
               const newStatus = booking?.status === 'confirmed' ? 'reserved': 'available'
                  const response =  await fetch(`http://localhost:8000/reservations/${id}`, {
                      method: 'PATCH',
@@ -29,15 +33,11 @@ function App() {
                  })
                  if (response.ok) {
                   const result = await response.json()
+                  console.log('reserved table is being updated', result);
                   setReservationTable((prev) => 
                     prev.map((item) => {
                       if(item.id === id) {
-                        if (newStatus === 'confirmed') {
-                          return {...item, status: 'reserved' }
-
-                        } else if (booking.message === 'Booking deleted') {
-                          return {...item, status : 'available'}
-                        }
+                        return {...item, status: newStatus}
                       }
                       return item
                     })
@@ -72,6 +72,7 @@ function App() {
           <Route path='/register' element={<Register />}/>
           <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} user={user}/>}/>
           <Route path='/profile' element={<Profile booking={booking}  user={user}/>}/>
+          <Route path='/contact' element={<Contact />}/>
           <Route element={<ProtectedRoute user={user} />}>
             <Route path='/admin' element={<AdminPanel fetchUpdateReservationTable={fetchUpdateReservationTable}/>} />
           </Route>   
