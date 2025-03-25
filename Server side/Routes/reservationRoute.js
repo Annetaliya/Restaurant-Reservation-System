@@ -78,7 +78,7 @@ route.patch('/:id', (req, res) => {
             return res.status(500).json({error: 'Database error'})
         }
         if (this.changes === 0) {
-            console.log(err.message)
+            //console.log(err.message)
             return res.status(400).json({error: 'booking not found'})
         }
         res.json({ message: 'reservations updated', reservationId: id})

@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 
 
 router.post('/', (req, res) => {
+    const io = req.app.get('io')
     const {userId, reservationId, bookingDate} = req.body;
 
     if (!userId || !reservationId || !bookingDate) {
@@ -24,6 +25,15 @@ router.post('/', (req, res) => {
             console.log('Error creating booking', err.message);
             return res.status(500).json({error: 'database error'})
         }
+
+        const newBooking = {
+            bookingId,
+            userId,
+            reservationId,
+            bookingDate,
+            status
+        }
+        io.emit('new booking', newBooking)
 
         res.status(201).json({
             'message': 'success',
@@ -62,8 +72,8 @@ router.get('/:id', (req, res) => {
                         user.firstName, user.secondName, user.email,
                         reservations.tableNumber, reservations.guestNumber, reservations.floorLevel
                 FROM booking
-                JOIN user ON booking.userId = user.id
-                JOIN reservations On booking.reservationId = reservations.id
+                LEFT JOIN user ON booking.userId = user.id
+                LEFT JOIN reservations On booking.reservationId = reservations.id
                 WHERE booking.id = ?
      `
 
@@ -73,24 +83,18 @@ router.get('/:id', (req, res) => {
             res.status(400).json({"error":err.message})
             return;
         }
+        if (!row) {
+            return res.status(404).json({ "error": "Booking not found" }); 
+        }
         res.json({
             "message": "ok",
-            "data": {
-                bookingId: row.bookingId,
-                bookingDate: row.bookingDate,
-                status: row.status,
-                firstName: row.firstName,
-                secondName: row.secondName,
-                email: row.email,
-                tableNumber: row.tableNumber,
-                guestNumber: row.guestNumber,
-                floorLevel: row.floorLevel
-            }
+            "data": row
         })
     })
 })
 
 router.patch('/:id', (req, res) => {
+    const io = req.app.get('io');
     const { id } = req.params;
     const {status} = req.body;
 
@@ -118,11 +122,14 @@ router.patch('/:id', (req, res) => {
         if (this.changes === 0) {
             return res.status(400).json({error: 'booking not found'})
         }
+        const updatedBooking = {id, status};
+        io.emit('confirmed', updatedBooking)
         db.get(`SELECT * FROM booking WHERE id = ?`, [id] , (err, row) => {
             if (err) {
                 console.log(err.message)
                 return res.status(500).json({error: 'Error fetching updated bookings'})
             }
+            
             res.json({
                 message: 'updated booking successfuly',
                 data: row
@@ -137,18 +144,43 @@ router.patch('/:id', (req, res) => {
 })
 
 router.delete('/:id', (req, res) =>{
-    const sql = `DELETE FROM booking WHERE id = ?`
-    const params = [req.params.id];
+   const bookingId = req.params.id;
 
-    db.run(sql, params, function (err) {
+   const getReservationSql = `SELECT reservationId FROM booking WHERE id = ?`
+
+   db.get(getReservationSql, [bookingId], (err, row) => {
+    if (err) {
+        console.error('Error fetching reservationId', err.message);
+        return res.status(500).json({error: 'database error'})
+    }
+    if (!row) {
+        return res.status(404).json({message: 'booking not found'})
+    }
+    const reservationId = row.reservationId
+
+    const sql = `DELETE FROM booking WHERE id = ?`
+    db.run(sql, [bookingId], function (err) {
         if (err) {
-            return res.status(500).json({error: 'Database error'})
+            console.error('Error deleting bookind')
+            return res.status(500).json({error: 'database error'})
         }
+
         if (this.changes === 0) {
-            return res.status(400).json({message: 'Booking not found'})
+            return res.status(400).json({message: 'booking not found'})
         }
-        res.json({ message: 'Booking deleted', bookingId: req.params.id})
+
+        const reservationSql = `UPDATE reservations SET status = 'available' WHERE id = ?`
+
+        db.run(reservationSql, [reservationId], function (err) {
+            if (err) {
+                console.error('Error updating reservation status', err.message)
+                res.status(500).json({error: 'database error'})
+            }
+            res.json({message: 'Booking deleted', 'data': row})
+        })
+
     })
+   })
 })
 
 

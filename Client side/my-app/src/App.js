@@ -7,15 +7,54 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import { useEffect, useState } from "react";
 import Profile from "./Components/Profile/Profile";
+import Contact from "./Components/Contact/Contact";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [reservationTable, setReservationTable] = useState([]);
   const user = JSON.parse(localStorage.getItem('user'));
   const booking = JSON.parse(localStorage.getItem('booking'));
  
 
 
+  const fetchUpdateReservationTable = async (id,) => {
+         
+             try { 
+              if (!id || !booking) {
+                throw new Error('Id and booking is required')
+              }
+              const newStatus = booking?.status === 'confirmed' ? 'reserved': 'available'
+                 const response =  await fetch(`http://localhost:8000/reservations/${id}`, {
+                     method: 'PATCH',
+                     headers: {
+                         'Content-Type': 'application/json'
+                     },
+                     body: JSON.stringify({status: newStatus})
+                 })
+                 if (response.ok) {
+                  const result = await response.json()
+                  console.log('reserved table is being updated', result);
+                  setReservationTable((prev) => 
+                    prev.map((item) => {
+                      if(item.id === id) {
+                        return {...item, status: newStatus}
+                      }
+                      return item
+                    })
+                  )
+                 }
  
+                 const updatedData =  await response.json();
+                 console.log('this is a reserved table being updated', updatedData)
+ 
+             } catch (error) {
+                 console.log(error.message)
+ 
+             }
+         
+        
+         
+     }
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -29,12 +68,13 @@ function App() {
       <NavBar isLoggedIn={isLoggedIn} />
       <Router>
         <Routes>
-          <Route path="/" element={<Home booking={booking}/>}/>
+          <Route path="/" element={<Home booking={booking} fetchUpdateReservationTable={fetchUpdateReservationTable}  reservationTable={reservationTable} setReservationTable={setReservationTable}/>}/>
           <Route path='/register' element={<Register />}/>
-          <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn}/>}/>
-          <Route path='/profile' element={<Profile booking={booking}  />}/>
+          <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} user={user}/>}/>
+          <Route path='/profile' element={<Profile booking={booking}  user={user}/>}/>
+          <Route path='/contact' element={<Contact />}/>
           <Route element={<ProtectedRoute user={user} />}>
-            <Route path='/admin' element={<AdminPanel />} />
+            <Route path='/admin' element={<AdminPanel fetchUpdateReservationTable={fetchUpdateReservationTable}/>} />
           </Route>   
         </Routes>
       </Router>

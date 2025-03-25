@@ -1,20 +1,174 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Alert from 'react-bootstrap/Alert';
 import { FaCircle } from "react-icons/fa";
 import './home.css';
-import Booking from '../Booking/Booking';
+//import Booking from '../Booking/Booking';
+import { useNavigate } from 'react-router';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Modal from 'react-bootstrap/Modal';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Swal from "sweetalert2";
+import Header from '../../Images/restaurant header.jpg';
 
-const Home = ({ booking }) => {
-    const [reservationTable, setReservationTable] = useState([]);
+const Booking = ({ table }) => {
+    
+    const user = JSON.parse(localStorage.getItem('user'))
+    const [show, setShow] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(null)
+    const [formData, setFormData] = useState({
+        userId: user ? user.id : '',
+        reservationId: table ? table.id :'',
+        tableNo: table ? table.tableNumber : '',
+        guestNo: table ? table.guestNumber: '',
+        bookingDate: '',
+    })
+    const navigate = useNavigate();
+
+    const handleChange = (e) => {
+        setFormData((prev) => ({
+            ...prev,
+            [e.target.name]: e.target.value
+        }))
+    }
+
+    const handleDateChange = (date) => {
+        if (!date) return;
+        const options = {timeZone: 'Africa/Nairobi', hour12: false};
+        const formattedDate = date.toLocaleString('en-GB', options).replace(',', '');
+        setSelectedDate(date);
+        setFormData((prev) => ({
+            ...prev,
+            bookingDate: formattedDate
+        }))
+
+    }
+
+   
+
+    const handeClose = () => setShow(false);
+     
+    const handleShow = () => setShow(true);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+           
+            const {userId, reservationId, bookingDate} = formData;
+            const payload = {userId, reservationId, bookingDate};
+            const response  =  await fetch('http://localhost:8000/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+                
+                });
+                console.log('this is the booking payload:', payload)
+                if (!response.ok) {
+                    throw new Error('Failed to create booking')
+                }
+                const result =  await response.json();
+                console.log('booking data', result)
+                if (result.data) {
+                    setFormData((prev) => ({
+                        ...prev,
+                        ...result.data
+                    }))
+
+                }
+                localStorage.setItem('booking', JSON.stringify(result.data))
+                Swal.fire({
+                              title: "Good Job",
+                              text: "Reservation successful wait for confirmation!",
+                              icon: "success",
+                            });
+                navigate('/profile')
+
+        } catch (error) {
+            console.log(error.message)
+
+        }
+        
+
+    }
+    
+  return (
+    <div>
+        <Button variant='primary'  className='modalBtn' onClick={handleShow}>
+            Click to Reserve table
+        </Button>
+        <Modal show={show} onHide={handeClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Only pick the date</Modal.Title>
+
+            </Modal.Header>
+            <Modal.Body>
+                <Form onSubmit={handleSubmit}> 
+                    <Form.Group className='mb-3' controlId='tableNo'>
+                        <Form.Label>Table Number</Form.Label>
+                        <Form.Control 
+                        type='text'
+                        name='tableNo'
+                        value={formData.tableNo}
+                        onChange={handleChange}
+                        readOnly
+                        />
+
+                    </Form.Group>
+                    <Form.Group className='mb-3' controlId='guestNo'>
+                        <Form.Label>No. of Guests</Form.Label>
+                        <Form.Control 
+                        type='text'
+                        name='guestNo'
+                        value={formData.guestNo}
+                        onChange={handleChange}
+                        readOnly
+                        />
+
+                    </Form.Group>
+                    <Form.Group>
+                        <DatePicker 
+                        selected={selectedDate}
+                        onChange={handleDateChange}
+                        className='form-control mb-3'
+                        
+                        showTimeSelect dateFormat="Pp" 
+                        placeholderText='click to pick date'
+                        />
+                    </Form.Group>
+                    <Button variant="success" type='submit'>
+                    Reserve
+                    </Button>
+                    
+                </Form>
+            </Modal.Body>
+            <Modal.Footer>
+            <Button variant="secondary" onClick={handeClose} className='mt-3'>
+                Close
+            </Button>
+           
+        </Modal.Footer>
+
+        </Modal>
+    </div>
+  )
+}
+
+const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReservationTable}) => {
     const [loading, setLoading] =  useState(false);
     const [selectedLevel, setSelectedLevel] = useState('Level 1')
     const [selectIndex, setSelectedIndex] = useState(0)
     const [table, setTable] = useState(null);
-    console.log('This is home page booking:', booking)
+    const [showAlert, setShowAlert] = useState(true)
+    
     
    
 
     const user = JSON.parse(localStorage.getItem('user'));
     console.log(user)
+    const navigate  =  useNavigate()
     
 
     const filterdTables = reservationTable.filter((item) => item.floorLevel === selectedLevel)
@@ -40,58 +194,37 @@ const Home = ({ booking }) => {
     }, [])
 
     const fetchTablebyId = async (id) => {
+        
         setLoading(true)
         try {
             const response = await fetch(`http://localhost:8000/reservations/${id}`)
             if (!response.ok) {
-                console.log('Errorfetching table')
+                console.log('Error fetching table')
             }
             const result = await response.json();
-            console.log('cicked table',result);
-            setTable(result.data)
-            setLoading(false)
+            if (user) {
+                setTable(result.data)
+                setLoading(false)
+            } else {
+                navigate('/login')
+            }
+            
 
         } catch (error) {
             console.log(error.message)
         }
     }
 
-    const fetchUpdateReservationTable = async (id) => {
-        if (booking.status === 'confirmed') {
-            try { 
-                const response =  await fetch(`http://localhost:8000/reservations/${id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({status: 'reserved'})
-                })
-                if (response.ok) {
-                    setReservationTable((prev) => 
-                        prev.map((item) => 
-                            item.id === id ? {...item, status: 'reserved'} : item
-                        )
-                    )
-                }
-
-                const updatedData =  await response.json();
-                console.log('this is a reserved table being updated', updatedData)
-
-            } catch (error) {
-                console.log(error.message)
-
-            }
-        }
-       
-        
-    }
+  
     useEffect(() => {
-        fetchUpdateReservationTable(booking.reservationId)
-    }, [])
-
+        if (booking && booking.reservationId) {
+            fetchUpdateReservationTable(booking.reservationId);
+        }
+    }, [booking]);
    
   return (
     <div>
+        <img className='headerImg' src={Header} alt='food'/>
         {user && 
             <h1 className='homeIntro'>Welcome to eatery bay {user.firstName}! 
             </h1>
@@ -136,7 +269,23 @@ const Home = ({ booking }) => {
             <p>...loading</p>
         ) : table ? (
             table.status === 'reserved' ? (
-                <h1>Not available</h1>
+                <div className='alert'>
+                    <Alert show={showAlert} variant="success">
+                        <Alert.Heading>My Alert</Alert.Heading>
+                        <p>
+                            This table is not available
+
+                        </p>
+                        <hr />
+                        <div className="d-flex justify-content-end">
+                        <Button onClick={() => setShowAlert(false)} variant="outline-success">
+                            Close me
+                        </Button>
+                        </div>
+                    </Alert>
+
+                    {!showAlert && <Button onClick={() => setShowAlert(true)}>Show Alert</Button>}
+                </div>
             ) : (
                 <Booking table={table} />
             )

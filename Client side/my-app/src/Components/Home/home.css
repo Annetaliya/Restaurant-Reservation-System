@@ -7,7 +7,15 @@
     font-size: 3rem;
     font-weight: 400;
 }
-.homeIntro span {
+.headerImg {
+    width: 100vw;
+    height: 40vh;
+    object-fit: cover;
+}
+.alert {
+    position: absolute;
+    bottom: 0;
+    width: 40vw
 }
 .homeTxt {
     text-align: center;
@@ -72,6 +80,12 @@
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    position: relative;
+}
+.modalBtn {
+    position: absolute;
+    bottom: 0;
+    right: 50%;
 }
 .availability {
     fill: green;
