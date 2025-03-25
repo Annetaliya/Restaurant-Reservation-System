@@ -4,8 +4,7 @@ import './home.css';
 import Booking from '../Booking/Booking';
 import { useNavigate } from 'react-router';
 
-const Home = ({ booking , isLoggedIn}) => {
-    const [reservationTable, setReservationTable] = useState([]);
+const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReservationTable}) => {
     const [loading, setLoading] =  useState(false);
     const [selectedLevel, setSelectedLevel] = useState('Level 1')
     const [selectIndex, setSelectedIndex] = useState(0)
@@ -64,39 +63,12 @@ const Home = ({ booking , isLoggedIn}) => {
         }
     }
 
-    const fetchUpdateReservationTable = async (id) => {
-        if (booking.status === 'confirmed') {
-            try { 
-                const response =  await fetch(`http://localhost:8000/reservations/${id}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({status: 'reserved'})
-                })
-                if (response.ok) {
-                    setReservationTable((prev) => 
-                        prev.map((item) => 
-                            item.id === id ? {...item, status: 'reserved'} : item
-                        )
-                    )
-                }
-
-                const updatedData =  await response.json();
-                console.log('this is a reserved table being updated', updatedData)
-
-            } catch (error) {
-                console.log(error.message)
-
-            }
-        }
-       
-        
-    }
+  
     useEffect(() => {
-        fetchUpdateReservationTable(booking.reservationId)
-    }, [])
-
+        if (booking && booking.reservationId) {
+            fetchUpdateReservationTable(booking.reservationId);
+        }
+    }, [booking]);
    
   return (
     <div>

@@ -10,10 +10,20 @@ const socket = io('http://localhost:8000')
 
 
 
-const Profile = ({ booking }) => {
+const Profile = ({booking}) => {
+    
 
     const [selectBooking, setSelectedBooking] = useState(null)
+    
+    useEffect(() => {
+        
+        if (booking) {
+            setSelectedBooking(booking)
+        
+        }
+    }, [booking]);
     console.log(booking)
+    
 
    const navigate = useNavigate();
 
@@ -21,11 +31,13 @@ const Profile = ({ booking }) => {
         try {
             const response = await fetch(`http://localhost:8000/bookings/${id}`)
             if (!response.ok){
-                console.log('Error fetching booking')
+                throw new Error('Error fetching booking')
             }
             const result = await response.json()
             console.log('booking for user:', result)
-            setSelectedBooking(result.data)
+            if (result && result.data){
+                setSelectedBooking(result.data)
+            }
 
         } catch (error) {
             console.log(error.message)
@@ -33,9 +45,15 @@ const Profile = ({ booking }) => {
         }
     }
 
+    console.log('fetched booking details', selectBooking)
+
     useEffect(() => {
-        fetchBookingById(booking.id)
-        socket.on('reservatio confirmed', (updatedBooking) => {
+        
+        if (booking?.id) {
+            fetchBookingById(booking.id)
+        }
+        
+        socket.on('reservation confirmed', (updatedBooking) => {
             if (booking && booking.id  === updatedBooking.id) {
                 Swal.fire({
                     title: 'Reservation Confirmed!',
@@ -45,7 +63,8 @@ const Profile = ({ booking }) => {
                 localStorage.setItem(
                     'booking',
                     JSON.stringify({...booking, status: 'confirmed'})
-                )
+                );
+                setSelectedBooking(updatedBooking)
             }
         })
         return () => {

@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
 import { io } from "socket.io-client";
+import { useNavigate } from "react-router";
 
 const socket = io('http://localhost:8000');
 
@@ -59,6 +60,7 @@ function ModalForm({ showModal, handleCloseModal }) {
       console.error('Fetching error',error.message);
     }
   };
+
 
   return (
     <div>
@@ -146,6 +148,13 @@ function SideBar() {
 
   const handleCloseModal = () => setShowModal(false);
   const handleShowModal = () => setShowModal(true);
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login')
+}
 
   return (
     <>
@@ -161,21 +170,22 @@ function SideBar() {
           <p>Create a new table</p>
           <Button onClick={handleShowModal}>Create Table</Button>
         </Offcanvas.Body>
+        <Button onClick={handleLogout}>Logout</Button>
       </Offcanvas>
       <ModalForm showModal={showModal} handleCloseModal={handleCloseModal} />
     </>
   );
 }
 
-const AdminPanel = () => {
+const AdminPanel = ({fetchUpdateReservationTable}) => {
   const [reservations, setReservations] = useState([]);
   const [todaysReservations, setTodaysReservations] = useState(null);
   const [searchParams, setSearchParams] = useState('');
 
 
   const filteredSearchReservations = reservations.filter((element) => 
-    element.firstName.toLowerCase().includes(searchParams.toLocaleLowerCase()) || 
-    element.id.includes(searchParams)
+    element.firstName?.toLowerCase().includes(searchParams.toLowerCase()) || 
+    element.id?.includes(searchParams)
   )
 
   const fetchReservations = async () => {
@@ -196,6 +206,7 @@ const AdminPanel = () => {
     fetchReservations();
     socket.on('new booking', (newBooking) => {
       setReservations((prev) => [...prev, newBooking])
+      console.log('new booking emited', newBooking)
       Swal.fire({
         title: 'New Reservation',
         text: 'A new reservation has been made',
@@ -255,7 +266,7 @@ const AdminPanel = () => {
     }
   };
 
-  const handeDeleteReservation = async (id) => {
+  const handeDeleteReservation = async (id, reservationId) => {
     try {
       const response = await fetch(`http://localhost:8000/bookings/${id}`, {
         method: "DELETE",
@@ -265,6 +276,12 @@ const AdminPanel = () => {
       }
       const tablesLeft = reservations.filter((element) => element.id !== id);
       setReservations(tablesLeft);
+      const result = await response.json();
+      console.log('response of delete function', result)
+      localStorage.removeItem("booking");
+      
+      await fetchUpdateReservationTable( reservationId, "available")
+
       Swal.fire({
         text: "Delete successful!",
         icon: "success",
@@ -343,7 +360,7 @@ const AdminPanel = () => {
                 <td>{item.status}</td>
                 <td>
                   <Button
-                    onClick={() => handleUpdateReservation(item.id)}
+                    onClick={() => handleUpdateReservation(item.id, item.reservationId)}
                     disabled={item.status === "confirmed"}
                   >
                     Confirm

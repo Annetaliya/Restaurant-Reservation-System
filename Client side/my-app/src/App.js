@@ -10,12 +10,51 @@ import Profile from "./Components/Profile/Profile";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [reservationTable, setReservationTable] = useState([]);
   const user = JSON.parse(localStorage.getItem('user'));
   const booking = JSON.parse(localStorage.getItem('booking'));
  
 
 
+  const fetchUpdateReservationTable = async (id, newStatus) => {
+         
+             try { 
+              const newStatus = booking?.status === 'confirmed' ? 'reserved': 'available'
+                 const response =  await fetch(`http://localhost:8000/reservations/${id}`, {
+                     method: 'PATCH',
+                     headers: {
+                         'Content-Type': 'application/json'
+                     },
+                     body: JSON.stringify({status: newStatus})
+                 })
+                 if (response.ok) {
+                  const result = await response.json()
+                  setReservationTable((prev) => 
+                    prev.map((item) => {
+                      if(item.id === id) {
+                        if (newStatus === 'confirmed') {
+                          return {...item, status: 'reserved' }
+
+                        } else if (booking.message === 'Booking deleted') {
+                          return {...item, status : 'available'}
+                        }
+                      }
+                      return item
+                    })
+                  )
+                 }
  
+                 const updatedData =  await response.json();
+                 console.log('this is a reserved table being updated', updatedData)
+ 
+             } catch (error) {
+                 console.log(error.message)
+ 
+             }
+         
+        
+         
+     }
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -29,12 +68,12 @@ function App() {
       <NavBar isLoggedIn={isLoggedIn} />
       <Router>
         <Routes>
-          <Route path="/" element={<Home booking={booking} isLoggedIn={isLoggedIn}/>}/>
+          <Route path="/" element={<Home booking={booking} fetchUpdateReservationTable={fetchUpdateReservationTable}  reservationTable={reservationTable} setReservationTable={setReservationTable}/>}/>
           <Route path='/register' element={<Register />}/>
           <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} user={user}/>}/>
-          <Route path='/profile' element={<Profile booking={booking}  />}/>
+          <Route path='/profile' element={<Profile booking={booking}  user={user}/>}/>
           <Route element={<ProtectedRoute user={user} />}>
-            <Route path='/admin' element={<AdminPanel />} />
+            <Route path='/admin' element={<AdminPanel fetchUpdateReservationTable={fetchUpdateReservationTable}/>} />
           </Route>   
         </Routes>
       </Router>

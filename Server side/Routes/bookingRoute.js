@@ -72,8 +72,8 @@ router.get('/:id', (req, res) => {
                         user.firstName, user.secondName, user.email,
                         reservations.tableNumber, reservations.guestNumber, reservations.floorLevel
                 FROM booking
-                JOIN user ON booking.userId = user.id
-                JOIN reservations On booking.reservationId = reservations.id
+                LEFT JOIN user ON booking.userId = user.id
+                LEFT JOIN reservations On booking.reservationId = reservations.id
                 WHERE booking.id = ?
      `
 
@@ -144,18 +144,43 @@ router.patch('/:id', (req, res) => {
 })
 
 router.delete('/:id', (req, res) =>{
-    const sql = `DELETE FROM booking WHERE id = ?`
-    const params = [req.params.id];
+   const bookingId = req.params.id;
 
-    db.run(sql, params, function (err) {
+   const getReservationSql = `SELECT reservationId FROM booking WHERE id = ?`
+
+   db.get(getReservationSql, [bookingId], (err, row) => {
+    if (err) {
+        console.error('Error fetching reservationId', err.message);
+        return res.status(500).json({error: 'database error'})
+    }
+    if (!row) {
+        return res.status(404).json({message: 'booking not found'})
+    }
+    const reservationId = row.reservationId
+
+    const sql = `DELETE FROM booking WHERE id = ?`
+    db.run(sql, [bookingId], function (err) {
         if (err) {
-            return res.status(500).json({error: 'Database error'})
+            console.error('Error deleting bookind')
+            return res.status(500).json({error: 'database error'})
         }
+
         if (this.changes === 0) {
-            return res.status(400).json({message: 'Booking not found'})
+            return res.status(400).json({message: 'booking not found'})
         }
-        res.json({ message: 'Booking deleted', bookingId: req.params.id})
+
+        const reservationSql = `UPDATE reservations SET status = 'available' WHERE id = ?`
+
+        db.run(reservationSql, [reservationId], function (err) {
+            if (err) {
+                console.error('Error updating reservation status', err.message)
+                res.status(500).json({error: 'database error'})
+            }
+            res.json({message: 'Booking deleted', 'data': row})
+        })
+
     })
+   })
 })
 
 
