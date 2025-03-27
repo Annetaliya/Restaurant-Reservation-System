@@ -74,6 +74,7 @@ const Login = ({ setIsLoggedIn, user }) => {
       setSubmitting(false);
     }
   };
+  
 
   return (
     <div className="col-6 parent-container">
