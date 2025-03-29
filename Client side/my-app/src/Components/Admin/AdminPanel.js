@@ -10,6 +10,8 @@ import Modal from "react-bootstrap/Modal";
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router";
 
+
+
 const socket = io('http://localhost:8000');
 
 function ModalForm({ showModal, handleCloseModal }) {
@@ -181,6 +183,8 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
   const [reservations, setReservations] = useState([]);
   const [todaysReservations, setTodaysReservations] = useState(null);
   const [searchParams, setSearchParams] = useState('');
+  const [notifications, setNotifications] = useState([]);
+ 
 
 
   const filteredSearchReservations = reservations.filter((element) => 
@@ -205,7 +209,7 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
   useEffect(() => {
     fetchReservations();
     socket.on('new booking', (newBooking) => {
-      setReservations((prev) => [...prev, newBooking])
+      setNotifications((prev) => [...prev, newBooking])
       console.log('new booking emited', newBooking)
       Swal.fire({
         title: 'New Reservation',
@@ -309,6 +313,8 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
           onChange={(e) => setSearchParams(e.target.value)}
         />
       </InputGroup>
+      
+      
 
       {todaysReservations && todaysReservations.length > 0 ? (
         <Table className="w-50 mx-auto mt-2">

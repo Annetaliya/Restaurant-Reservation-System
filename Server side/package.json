@@ -9,6 +9,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@novu/node": "^2.6.6",
     "bcryptjs": "^3.0.2",
     "cookie-session": "^2.1.0",
     "cors": "^2.8.5",

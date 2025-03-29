@@ -65,7 +65,7 @@ function App() {
   }, [])
   return (
     <div>
-      <NavBar isLoggedIn={isLoggedIn} />
+      <NavBar isLoggedIn={isLoggedIn} user={user}/>
       <Router>
         <Routes>
           <Route path="/" element={<Home booking={booking} fetchUpdateReservationTable={fetchUpdateReservationTable}  reservationTable={reservationTable} setReservationTable={setReservationTable}/>}/>

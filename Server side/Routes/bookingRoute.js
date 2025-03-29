@@ -2,6 +2,8 @@ const db =  require('../database');
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
+require('dotenv').config();
+
 
 
 router.post('/', (req, res) => {
@@ -15,7 +17,6 @@ router.post('/', (req, res) => {
 
     const bookingId = uuidv4();
     const status = 'pending';
-    //const bookingDate = new Date().toISOString().replace('T', ' ').split('.')[0];
 
     const sql = `INSERT INTO booking (id, userId, reservationId, bookingDate, status) VALUES (?,?,?,?,?)`;
     const params = [bookingId, userId, reservationId, bookingDate, status];
@@ -25,6 +26,8 @@ router.post('/', (req, res) => {
             console.log('Error creating booking', err.message);
             return res.status(500).json({error: 'database error'})
         }
+
+      
 
         const newBooking = {
             bookingId,

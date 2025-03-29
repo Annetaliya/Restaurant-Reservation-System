@@ -4,18 +4,20 @@ const cors = require('cors');
 const cookieSession = require('cookie-session')
 const PATH = 8000;
 const http = require('http');
-const socketIo = require('socket.io')
-const server = http.createServer(app)
-const userRoutes = require('./Routes/userRoutes.js')
+const socketIo = require('socket.io');
+const server = http.createServer(app);
+
+const userRoutes = require('./Routes/userRoutes.js');
 const reservationRoutes = require('./Routes/reservationRoute.js')
 const loginRoute = require('./Routes/login.js');
 const bodyParser = require('body-parser');
 const bookingRoute = require('./Routes/bookingRoute.js');
-const { IOERR } = require('sqlite3');
-// const cookieSession = require('cookie-session');
+//const cookieSession = require('cookie-session');
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 app.use(cors());
+
+
 
 const io = socketIo(server, {
     cors: {
