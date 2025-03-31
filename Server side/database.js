@@ -135,7 +135,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
       userId TEXT NOT NULL,
       reservationId TEXT NOT NULL,
       bookingDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-      status TEXT CHECK (status IN ('pending', 'confirmed', 'cancelled')) NOT NULL DEFAULT 'pending',
+      status TEXT CHECK (status IN ('pending', 'confirmed', 'cancelled')) NOT NULL DEFAULT 'confirmed',
       FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE,
       FOREIGN KEY (reservationId) REFERENCES reservations(id) ON DELETE CASCADE
 

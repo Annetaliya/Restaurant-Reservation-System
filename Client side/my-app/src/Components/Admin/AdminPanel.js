@@ -9,6 +9,8 @@ import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router";
+import './admin.css';
+import Toast from 'react-bootstrap/Toast';
 
 
 
@@ -302,6 +304,26 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
   return (
     <div>
       <SideBar />
+      <Toast>
+      <Toast.Header>
+        <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
+        <small>11 mins ago</small>
+      </Toast.Header>
+      <Toast.Body>
+      {notifications.length > 0 && (
+        notifications.map((item, index) => (
+          <div key={index}>
+            <p>{item.bookingDate}</p>
+
+          </div>
+        ))
+
+      )}
+
+      </Toast.Body>
+     
+      
+    </Toast>
       <InputGroup className="w-50 mx-auto mb-5">
         <InputGroup.Text>
           <IoSearchSharp />
@@ -339,7 +361,7 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
         <p>No reservations</p>
       )}
 
-      <Table className="col-10 mx-auto">
+      <Table className="col-10 mx-auto table">
         <thead>
           <tr>
             <td>Date</td>
