@@ -10,7 +10,7 @@ import Modal from "react-bootstrap/Modal";
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router";
 import './admin.css';
-import Toast from 'react-bootstrap/Toast';
+
 
 
 
@@ -186,6 +186,12 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
   const [todaysReservations, setTodaysReservations] = useState(null);
   const [searchParams, setSearchParams] = useState('');
   const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const handleNotificationShow = () => {
+    setShowNotifications(!showNotifications)
+    console.log(showNotifications)
+  }
  
 
 
@@ -218,6 +224,7 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
       try {
         const response = await fetch('http://localhost:8000/bookings/notifications');
         const result = await response.json()
+        console.log('notification data:', result)
         setNotifications(result.data)
 
       } catch (error) {
@@ -230,7 +237,7 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
       console.log('new booking emited', newBooking)
       Swal.fire({
         title: 'New Reservation',
-        text: 'A new reservation has been made',
+        text: newBooking.message,
         icon: 'info',
       })
     })
@@ -320,26 +327,19 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
   return (
     <div>
       <SideBar />
-      <Toast>
-      <Toast.Header>
-        <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
-        <small>11 mins ago</small>
-      </Toast.Header>
-      <Toast.Body>
-      {notifications.length > 0 && (
-        notifications.map((item, index) => (
-          <div key={index}>
-            <p>{item.bookingDate}</p>
+      <div className="notificationContainer">
+        <span className="notify" onClick={handleNotificationShow}>{notifications.length}</span>
+        {notifications.length > 0 && (
+          notifications.map((item) => (
+            <div key={item.id} className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
+              <p>{item.message}</p>
 
-          </div>
-        ))
+            </div>
+          ))
+        )}
 
-      )}
-
-      </Toast.Body>
-     
-      
-    </Toast>
+      </div>
+    
       <InputGroup className="w-50 mx-auto mb-5">
         <InputGroup.Text>
           <IoSearchSharp />
@@ -393,7 +393,9 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
         </thead>
         <tbody>
           {filteredSearchReservations.length !== 0 ? (
-            filteredSearchReservations.map((item) => (
+            filteredSearchReservations
+            .filter((element, index) => element.status !== 'cancelled')
+            .map((item) => (
               <tr key={item.id}>
                 <td>{item.bookingDate.split(" ")[0]}</td>
                 <td>{item.bookingDate.split(" ")[1]}</td>

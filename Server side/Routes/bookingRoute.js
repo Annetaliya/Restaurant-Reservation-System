@@ -39,6 +39,7 @@ router.post('/', (req, res) => {
       
 
         const newBooking = {
+            message: 'New booking Received',
             bookingId,
             userId,
             reservationId,

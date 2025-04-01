@@ -23,7 +23,14 @@ function App() {
               if (!id || !booking) {
                 throw new Error('Id and booking is required')
               }
-              const newStatus = booking?.status === 'confirmed' ? 'reserved': 'available'
+              let newStatus;
+              if (booking.status === 'confirmed') {
+                newStatus = 'reserved';
+              } else if (booking.status === 'cancelled') {
+                newStatus = 'available';
+              } else {
+                return;
+              }
                  const response =  await fetch(`http://localhost:8000/reservations/${id}`, {
                      method: 'PATCH',
                      headers: {
