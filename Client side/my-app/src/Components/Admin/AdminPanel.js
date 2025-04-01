@@ -210,6 +210,21 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
 
   useEffect(() => {
     fetchReservations();
+    
+  }, []);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/bookings/notifications');
+        const result = await response.json()
+        setNotifications(result.data)
+
+      } catch (error) {
+        console.error('Error fetching notifications', error.message)
+      }
+    }
+    fetchNotifications()
     socket.on('new booking', (newBooking) => {
       setNotifications((prev) => [...prev, newBooking])
       console.log('new booking emited', newBooking)
@@ -222,7 +237,8 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
     return () => {
       socket.off('new booking')
     }
-  }, []);
+  }, [])
+  
   const options = { timeZone: "Africa/Nairobi", hour12: false };
   const today = new Date()
     .toLocaleString("en-GB", options)

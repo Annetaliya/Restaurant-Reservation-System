@@ -26,6 +26,15 @@ router.post('/', (req, res) => {
             console.log('Error creating booking', err.message);
             return res.status(500).json({error: 'database error'})
         }
+        const notificationsId = uuidv4()
+
+        const notificationSql = `INSERT INTO notifications (id, message, bookingId) VALUES (?,?,?)`;
+        db.run(notificationSql, [notificationsId, `New booking received`, bookingId], function (err) {
+            if (err) {
+                console.error('Error saving notifications', err.message)
+                return res.status(500).json({error: 'database error'})
+            }
+        })
 
       
 
@@ -48,6 +57,17 @@ router.post('/', (req, res) => {
                 status
             }
         })
+    })
+})
+
+router.get('/notifications', (req, res) => {
+    const sql = `SELECT * FROM notifications ORDER BY createdAt DESC`
+    db.all(sql, [], (err,rows) => {
+        if (err) {
+            console.log(err.message)
+            return res.status(500).json({error: 'database error'})
+        }
+        res.json({ data: rows})
     })
 })
 

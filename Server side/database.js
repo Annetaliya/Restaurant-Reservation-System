@@ -147,6 +147,21 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         }
       }
     );
+
+    db.run(`CREATE TABLE IF NOT EXISTS notifications (
+      id TEXT NOT NULL PRIMARY KEY,
+      message TEXT,
+      bookingId TEXT NOT NULL,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      isRead BOOLEAN DEFAULT 0
+      )`, (err) => {
+        if (err) {
+          console.log('Error creating notifications table', err.message)
+        } else {
+          console.log('Successfully created notifications Table')
+        }
+      }
+      )
     
   }
 });
