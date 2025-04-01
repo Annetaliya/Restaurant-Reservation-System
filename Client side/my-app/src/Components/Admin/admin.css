@@ -1,0 +1,26 @@
+.table {
+    transform: none !important;
+}
+.notify {
+    background-color: red;
+    border-radius: 50%;
+    padding: 4px 10px;
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    font-size: 10px;
+    color: aliceblue;
+    cursor: pointer;
+}
+
+.notifyContainer{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 10px;
+    background-color: beige;
+    display: none;
+}
+.notifyShow {
+    display: block;
+}

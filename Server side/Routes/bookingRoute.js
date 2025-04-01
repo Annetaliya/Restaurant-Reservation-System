@@ -16,7 +16,7 @@ router.post('/', (req, res) => {
     }
 
     const bookingId = uuidv4();
-    const status = 'pending';
+    const status = 'confirmed';
 
     const sql = `INSERT INTO booking (id, userId, reservationId, bookingDate, status) VALUES (?,?,?,?,?)`;
     const params = [bookingId, userId, reservationId, bookingDate, status];
@@ -26,10 +26,20 @@ router.post('/', (req, res) => {
             console.log('Error creating booking', err.message);
             return res.status(500).json({error: 'database error'})
         }
+        const notificationsId = uuidv4()
+
+        const notificationSql = `INSERT INTO notifications (id, message, bookingId) VALUES (?,?,?)`;
+        db.run(notificationSql, [notificationsId, `New booking received`, bookingId], function (err) {
+            if (err) {
+                console.error('Error saving notifications', err.message)
+                return res.status(500).json({error: 'database error'})
+            }
+        })
 
       
 
         const newBooking = {
+            message: 'New booking Received',
             bookingId,
             userId,
             reservationId,
@@ -48,6 +58,17 @@ router.post('/', (req, res) => {
                 status
             }
         })
+    })
+})
+
+router.get('/notifications', (req, res) => {
+    const sql = `SELECT * FROM notifications ORDER BY createdAt DESC`
+    db.all(sql, [], (err,rows) => {
+        if (err) {
+            console.log(err.message)
+            return res.status(500).json({error: 'database error'})
+        }
+        res.json({ data: rows})
     })
 })
 
@@ -75,9 +96,9 @@ router.get('/:id', (req, res) => {
                         user.firstName, user.secondName, user.email,
                         reservations.tableNumber, reservations.guestNumber, reservations.floorLevel
                 FROM booking
-                LEFT JOIN user ON booking.userId = user.id
-                LEFT JOIN reservations On booking.reservationId = reservations.id
-                WHERE booking.id = ?
+                JOIN user ON booking.userId = user.id
+                JOIN reservations ON booking.reservationId = reservations.id
+                ORDER BY booking.bookingDate DESC;
      `
 
     const params = [req.params.id]
@@ -149,7 +170,7 @@ router.patch('/:id', (req, res) => {
 router.delete('/:id', (req, res) =>{
    const bookingId = req.params.id;
 
-   const getReservationSql = `SELECT reservationId FROM booking WHERE id = ?`
+   const getReservationSql = `SELECT reservationId, userId FROM booking WHERE id = ?`
 
    db.get(getReservationSql, [bookingId], (err, row) => {
     if (err) {
@@ -159,10 +180,11 @@ router.delete('/:id', (req, res) =>{
     if (!row) {
         return res.status(404).json({message: 'booking not found'})
     }
-    const reservationId = row.reservationId
+    const { reservationId, userId } = row
+    const updateStatusSql = `UPDATE booking SET status = 'cancelled' WHERE id = ?`
 
-    const sql = `DELETE FROM booking WHERE id = ?`
-    db.run(sql, [bookingId], function (err) {
+   // const sql = `DELETE FROM booking WHERE reservationId = ? AND userId = ?`
+    db.run(updateStatusSql, [bookingId], function (err) {
         if (err) {
             console.error('Error deleting bookind')
             return res.status(500).json({error: 'database error'})
@@ -185,6 +207,8 @@ router.delete('/:id', (req, res) =>{
     })
    })
 })
+
+
 
 
 module.exports = router

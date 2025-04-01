@@ -9,6 +9,8 @@ import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router";
+import './admin.css';
+
 
 
 
@@ -184,6 +186,12 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
   const [todaysReservations, setTodaysReservations] = useState(null);
   const [searchParams, setSearchParams] = useState('');
   const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const handleNotificationShow = () => {
+    setShowNotifications(!showNotifications)
+    console.log(showNotifications)
+  }
  
 
 
@@ -208,19 +216,36 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
 
   useEffect(() => {
     fetchReservations();
+    
+  }, []);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/bookings/notifications');
+        const result = await response.json()
+        console.log('notification data:', result)
+        setNotifications(result.data)
+
+      } catch (error) {
+        console.error('Error fetching notifications', error.message)
+      }
+    }
+    fetchNotifications()
     socket.on('new booking', (newBooking) => {
       setNotifications((prev) => [...prev, newBooking])
       console.log('new booking emited', newBooking)
       Swal.fire({
         title: 'New Reservation',
-        text: 'A new reservation has been made',
+        text: newBooking.message,
         icon: 'info',
       })
     })
     return () => {
       socket.off('new booking')
     }
-  }, []);
+  }, [])
+  
   const options = { timeZone: "Africa/Nairobi", hour12: false };
   const today = new Date()
     .toLocaleString("en-GB", options)
@@ -302,6 +327,19 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
   return (
     <div>
       <SideBar />
+      <div className="notificationContainer">
+        <span className="notify" onClick={handleNotificationShow}>{notifications.length}</span>
+        {notifications.length > 0 && (
+          notifications.map((item) => (
+            <div key={item.id} className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
+              <p>{item.message}</p>
+
+            </div>
+          ))
+        )}
+
+      </div>
+    
       <InputGroup className="w-50 mx-auto mb-5">
         <InputGroup.Text>
           <IoSearchSharp />
@@ -339,7 +377,7 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
         <p>No reservations</p>
       )}
 
-      <Table className="col-10 mx-auto">
+      <Table className="col-10 mx-auto table">
         <thead>
           <tr>
             <td>Date</td>
@@ -355,7 +393,9 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
         </thead>
         <tbody>
           {filteredSearchReservations.length !== 0 ? (
-            filteredSearchReservations.map((item) => (
+            filteredSearchReservations
+            .filter((element, index) => element.status !== 'cancelled')
+            .map((item) => (
               <tr key={item.id}>
                 <td>{item.bookingDate.split(" ")[0]}</td>
                 <td>{item.bookingDate.split(" ")[1]}</td>
