@@ -22,7 +22,7 @@ function ModalForm({ showModal, handleCloseModal }) {
     guestNumber: "",
     price: "",
     status: "",
-    floorLevel: "",ioiiii
+    floorLevel: "",
   });
 
   const handleChange = (e) => {

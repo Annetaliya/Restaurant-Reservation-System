@@ -8,6 +8,7 @@ import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import { useEffect, useState } from "react";
 import Profile from "./Components/Profile/Profile";
 import Contact from "./Components/Contact/Contact";
+import Footer from "./Components/Footer/Footer";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -85,6 +86,7 @@ function App() {
           </Route>   
         </Routes>
       </Router>
+      <Footer />
       
       
       

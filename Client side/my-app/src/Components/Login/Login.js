@@ -11,7 +11,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-const Login = ({ setIsLoggedIn, user }) => {
+const Login = ({ setIsLoggedIn }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const validate = (values) => {
@@ -60,8 +60,17 @@ const Login = ({ setIsLoggedIn, user }) => {
         text: "Login successful!",
         icon: "success",
       });
+      const user = JSON.parse(localStorage.getItem('user'))
       setIsLoggedIn(true);
-      navigate("/");
+      setTimeout(() => {
+        if (user.role === 'admin') {
+          navigate('/admin')
+        } else {
+          navigate('/')
+        }
+
+      }, 3000)
+      
     } catch (error) {
       console.log(error, "login failed");
 
@@ -74,7 +83,7 @@ const Login = ({ setIsLoggedIn, user }) => {
       setSubmitting(false);
     }
   };
-  
+ 
 
   return (
     <div className="col-6 parent-container">
