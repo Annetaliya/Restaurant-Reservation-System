@@ -31,11 +31,10 @@ const NavBar = ({ isLoggedIn, user }) => {
             .filter((element) => isLoggedIn || element.item !== 'Profile')
             .filter((element) => !isLoggedIn || element.item !== 'Login')
             .filter((element) => element.item !== 'Notify' || user?.role === 'admin')
+            .filter((element) => user?.role !== 'admin' || !['Home', 'Profile', 'Contact'].includes(element.item))
             .map((element, index) => (
                 <div key={index} className='listcontainer'>
                     <div>{element.icon}</div>
-                    
-                    
                     <a href={element.path}>
                         <li>{element.item}</li>
                     </a>
