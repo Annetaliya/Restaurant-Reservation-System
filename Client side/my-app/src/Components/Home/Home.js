@@ -167,7 +167,6 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
    
 
     const user = JSON.parse(localStorage.getItem('user'));
-    console.log(user)
     const navigate  =  useNavigate()
     
 
@@ -256,7 +255,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
             
                 <div key={item.id} className='individualTable' onClick={() => fetchTablebyId(item.id)} >
                     <FaCircle className={`availability ${item.status === 'available' ? 'availability' : 'noAvailability'}`}/>
-                    <div className='table'></div>
+                    <div className='tableHome'></div>
                     <p className='tableNumber'>Table No.{item.tableNumber}</p>
                     <p className='guestNumber'>Guest Number {item.guestNumber}</p>
                     <p>${item.price}</p>
