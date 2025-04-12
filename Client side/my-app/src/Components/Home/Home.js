@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Alert from 'react-bootstrap/Alert';
 import { FaCircle } from "react-icons/fa";
 import './home.css';
-import Spinner from 'react-bootstrap/Spinner';
+
 //import Booking from '../Booking/Booking';
 import { useNavigate } from 'react-router';
 import Button from 'react-bootstrap/Button';
@@ -154,9 +154,7 @@ const Booking = ({ table }) => {
             </Button>
            
         </Modal.Footer>
-        <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-        </Spinner>
+        
 
         </Modal>
     </div>

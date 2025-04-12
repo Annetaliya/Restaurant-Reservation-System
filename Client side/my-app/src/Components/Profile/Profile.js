@@ -2,18 +2,23 @@ import React, {useEffect, useState} from 'react';
 import './profile.css';
 import { FaUserCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams , useLocation} from 'react-router';
+import Spinner from 'react-bootstrap/Spinner';
 
-const Profile = ({ booking }) => {
+const Profile = ({ booking, setIsLoggedIn }) => {
     
 
     const [selectBooking, setSelectedBooking] = useState(null)
+    const [loading, setLoading] = useState(true);
     
    const navigate = useNavigate();
+   const params = useParams();
+   const location = useLocation();
 
-    const fetchBookingById = async (id) => {
+    const fetchBookingById = async (bookingId) => {
+        setLoading(true);
         try {
-            const response = await fetch(`http://localhost:8000/bookings/${id}`)
+            const response = await fetch(`http://localhost:8000/bookings/${bookingId}`)
             if (!response.ok){
                 throw new Error('Error fetching booking')
             }
@@ -23,6 +28,7 @@ const Profile = ({ booking }) => {
             if (result && result.data){
                 setSelectedBooking(result.data)
             }
+            setLoading(false)
 
         } catch (error) {
             console.log(error.message)
@@ -34,13 +40,14 @@ const Profile = ({ booking }) => {
       
 
     useEffect(() => {
-            fetchBookingById(booking.bookingId)
+        const bookingId = booking?.bookingId || params.bookingId || location.state?.bookingId;
+        if (!bookingId) {
+            navigate('/')
+        }
+        fetchBookingById(bookingId)
   
-    }, [booking])
-    setTimeout(() => {
-        console.log('fetched booking details', selectBooking)
-
-    }, 2000)
+    }, [params.bookingId, location.state])
+    
     
     
 
@@ -48,7 +55,16 @@ const Profile = ({ booking }) => {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setIsLoggedIn(false); 
         navigate('/login')
+    }
+
+    if (loading) {
+        return (
+            <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+            </Spinner>
+        )
     }
   return (
     <div className='parent col-6'>
