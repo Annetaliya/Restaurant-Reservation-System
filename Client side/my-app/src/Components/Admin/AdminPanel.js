@@ -157,6 +157,7 @@ function SideBar() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    setIsLoggedIn(false)
     navigate('/login')
 }
 
@@ -181,7 +182,7 @@ function SideBar() {
   );
 }
 
-const AdminPanel = ({fetchUpdateReservationTable}) => {
+const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
   const [reservations, setReservations] = useState([]);
   const [todaysReservations, setTodaysReservations] = useState(null);
   const [searchParams, setSearchParams] = useState('');

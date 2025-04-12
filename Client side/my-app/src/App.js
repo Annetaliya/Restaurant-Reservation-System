@@ -82,7 +82,7 @@ function App() {
           <Route path='/profile' element={<Profile booking={booking}  setIsLoggedIn={setIsLoggedIn}/>}/>
           <Route path='/contact' element={<Contact />}/>
           <Route element={<ProtectedRoute user={user} />}>
-            <Route path='/admin' element={<AdminPanel fetchUpdateReservationTable={fetchUpdateReservationTable}/>} />
+            <Route path='/admin' element={<AdminPanel fetchUpdateReservationTable={fetchUpdateReservationTable} setIsLoggedIn={setIsLoggedIn}/>} />
           </Route>   
         </Routes>
       </Router>
