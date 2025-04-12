@@ -98,6 +98,7 @@ router.get('/:id', (req, res) => {
                 FROM booking
                 JOIN user ON booking.userId = user.id
                 JOIN reservations ON booking.reservationId = reservations.id
+                WHERE booking.id = ?
                 ORDER BY booking.bookingDate DESC;
      `
 

@@ -6,7 +6,7 @@ const Contact = () => {
   return (
     <div className='contactContainer'>
       <h1 className='contactTitle'>Welcome to Eatery bay Gourmet restaurant</h1>
-      <p>Nestled in the heart of Nairobi, our gourmet restaurant offers a refined dining experience
+      <p className='contactIntro'>Nestled in the heart of Nairobi, our gourmet restaurant offers a refined dining experience
          that celebrates the finest ingredients, masterful techniques, and impeccable service.
           Each dish is thoughtfully crafted by our chefs to deliver a harmonious balance of flavor,
            presentation, and creativity. Whether you're joining us for an intimate dinner, 
