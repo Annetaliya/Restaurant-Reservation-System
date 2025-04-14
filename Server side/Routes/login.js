@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 const db = require('../database.js')
 
+
 router.post('/', (req,res) => {
     const { email, password }  = req.body;
 

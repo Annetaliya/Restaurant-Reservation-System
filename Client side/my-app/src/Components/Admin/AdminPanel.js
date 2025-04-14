@@ -143,7 +143,7 @@ function ModalForm({ showModal, handleCloseModal }) {
   );
 }
 
-function SideBar() {
+function SideBar({setIsLoggedIn}) {
   const [show, setShow] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -157,6 +157,7 @@ function SideBar() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    setIsLoggedIn(false)
     navigate('/login')
 }
 
@@ -181,7 +182,7 @@ function SideBar() {
   );
 }
 
-const AdminPanel = ({fetchUpdateReservationTable}) => {
+const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
   const [reservations, setReservations] = useState([]);
   const [todaysReservations, setTodaysReservations] = useState(null);
   const [searchParams, setSearchParams] = useState('');
@@ -326,7 +327,7 @@ const AdminPanel = ({fetchUpdateReservationTable}) => {
   };
   return (
     <div>
-      <SideBar />
+      <SideBar setIsLoggedIn={setIsLoggedIn}/>
       <div className="notificationContainer">
         <span className="notify" onClick={handleNotificationShow}>{notifications.length}</span>
         {notifications.length > 0 && (
