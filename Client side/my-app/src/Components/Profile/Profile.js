@@ -41,7 +41,7 @@ const Profile = ({ booking, setIsLoggedIn }) => {
       
 
     useEffect(() => {
-        const bookingId = booking?.bookingId ||id
+        const bookingId = booking?.bookingId ||id;
         if (!bookingId) {
             navigate('/')
         }
