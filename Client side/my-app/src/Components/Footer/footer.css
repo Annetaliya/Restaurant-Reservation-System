@@ -1,0 +1,30 @@
+.parentFooter {
+    background-color: #5A4FCF;
+    background-image: linear-gradient(315deg, #5A4FCF 0%, #242124 74%);
+    margin-bottom: 0;
+    padding-bottom: 0;
+    height: 30vh;
+    display: flex;
+    align-items: center;
+    gap: 80px;
+    justify-content: right;
+}
+.footerElements p {
+    color: #cfcfcf;
+    font-weight: 300;
+    
+}
+.iconsContact {
+    fill: #fff;
+    padding-right: 20px;
+    cursor: pointer;
+}
+.dispayIcons {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease-in-out;
+
+}
+.displayIcons:hover{
+    transform: scale(1.1);
+}

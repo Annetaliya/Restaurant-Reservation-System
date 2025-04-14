@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Alert from 'react-bootstrap/Alert';
 import { FaCircle } from "react-icons/fa";
 import './home.css';
+
 //import Booking from '../Booking/Booking';
 import { useNavigate } from 'react-router';
 import Button from 'react-bootstrap/Button';
@@ -84,7 +85,11 @@ const Booking = ({ table }) => {
                               text: "Reservation successful wait for confirmation!",
                               icon: "success",
                             });
-                navigate('/profile')
+                const booking = JSON.parse(localStorage.getItem('booking'))
+                setTimeout(()=> {
+                    navigate(`/profile/${booking.bookingId}`)
+                }, 2000)
+                
 
         } catch (error) {
             console.log(error.message)
@@ -150,6 +155,7 @@ const Booking = ({ table }) => {
             </Button>
            
         </Modal.Footer>
+        
 
         </Modal>
     </div>
@@ -167,7 +173,6 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
    
 
     const user = JSON.parse(localStorage.getItem('user'));
-    console.log(user)
     const navigate  =  useNavigate()
     
 
@@ -256,7 +261,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
             
                 <div key={item.id} className='individualTable' onClick={() => fetchTablebyId(item.id)} >
                     <FaCircle className={`availability ${item.status === 'available' ? 'availability' : 'noAvailability'}`}/>
-                    <div className='table'></div>
+                    <div className='tableHome'></div>
                     <p className='tableNumber'>Table No.{item.tableNumber}</p>
                     <p className='guestNumber'>Guest Number {item.guestNumber}</p>
                     <p>${item.price}</p>

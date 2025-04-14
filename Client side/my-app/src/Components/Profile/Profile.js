@@ -2,47 +2,34 @@ import React, {useEffect, useState} from 'react';
 import './profile.css';
 import { FaUserCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
-import { io } from "socket.io-client";
-import Swal from "sweetalert2";
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
+import Spinner from 'react-bootstrap/Spinner';
 
-const socket = io('http://localhost:8000')
-
-
-
-const Profile = ({ booking }) => {
+const Profile = ({ booking, setIsLoggedIn }) => {
     
 
     const [selectBooking, setSelectedBooking] = useState(null)
-   
-
+    const [loading, setLoading] = useState(true);
     
-    useEffect(() => {
-        
-        if (booking) {
-            setSelectedBooking(booking)
-        
-        }
-    }, [booking]);
-    
-
    const navigate = useNavigate();
-
-  
-
+   const { id } = useParams();
+   console.log('This is params', id)
    
 
-    const fetchBookingById = async (id) => {
+    const fetchBookingById = async (bookingId) => {
+        setLoading(true);
         try {
-            const response = await fetch(`http://localhost:8000/bookings/${id}`)
+            const response = await fetch(`http://localhost:8000/bookings/${bookingId}`)
             if (!response.ok){
                 throw new Error('Error fetching booking')
             }
             const result = await response.json()
             console.log('booking for user:', result)
+            console.log('Fetch request ran')
             if (result && result.data){
                 setSelectedBooking(result.data)
             }
+            setLoading(false)
 
         } catch (error) {
             console.log(error.message)
@@ -50,39 +37,35 @@ const Profile = ({ booking }) => {
         }
     }
 
-    console.log('fetched booking details', selectBooking)
+    
+      
 
     useEffect(() => {
-        
-        if (booking?.id) {
-            fetchBookingById(booking.id)
+        const bookingId = booking?.bookingId ||id;
+        if (!bookingId) {
+            navigate('/')
         }
-        
-        socket.on('reservation confirmed', (updatedBooking) => {
-            if (booking && booking.id  === updatedBooking.id) {
-                Swal.fire({
-                    title: 'Reservation Confirmed!',
-                    text: 'Your reservation has been confirmed',
-                    icon: 'success'
-                })
-                localStorage.setItem(
-                    'booking',
-                    JSON.stringify({...booking, status: 'confirmed'})
-                );
-                setSelectedBooking(updatedBooking)
-            }
-        })
-        return () => {
-            socket.off('reservation confirmed')
-        }
-        
-    }, [booking])
+        fetchBookingById(bookingId)
+  
+    }, [booking, id])
+    
+    
+    
 
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setIsLoggedIn(false); 
         navigate('/login')
+    }
+
+    if (loading) {
+        return (
+            <Spinner animation="border" role="status">
+                        <span className="visually-hidden">Loading...</span>
+            </Spinner>
+        )
     }
   return (
     <div className='parent col-6'>
@@ -93,6 +76,7 @@ const Profile = ({ booking }) => {
                 <div className='profileIcon'><FaUserCircle size={40} /></div>
                 <p>{selectBooking.firstName} {selectBooking.secondName}</p>
                 <p>{selectBooking.email}</p>
+                <p>Boking Date: {selectBooking.bookingDate.split(' ')[0]}</p>
                 <p>Table No: {selectBooking.tableNumber}</p>
                 <p>No of Guests {selectBooking.guestNumber}</p>
                 <p className='bookingStatus'>Status: {selectBooking.status}</p>

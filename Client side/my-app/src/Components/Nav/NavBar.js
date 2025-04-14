@@ -4,13 +4,15 @@ import { FaPhoneAlt } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";
 import { TiThMenu } from "react-icons/ti";
 import { IoMdNotifications } from "react-icons/io";
+import { CiLogin } from "react-icons/ci";
 import './nav.css';
 
 
 const navItems = [
     {item: 'Home', icon: <FaHome />, path: '/'},
     {item: 'Contact', icon: <FaPhoneAlt />, path: '/contact'},
-    {item: 'Profile', icon: <FaUser />, path: '/profile'},
+    {item: 'Profile', icon: <FaUser />, path: '/profile/:id'},
+    {item: 'Login', icon: <CiLogin />, path: '/login'},
     {item: 'Notify', icon: <IoMdNotifications />}
 ]
 const NavBar = ({ isLoggedIn, user }) => {
@@ -26,13 +28,13 @@ const NavBar = ({ isLoggedIn, user }) => {
        
         <ul className={`navContainer ${showMenu ? 'menuMobile' : ''}`}>
             {navItems
-            .filter((element) => isLoggedIn || element.item !== 'Profile' )
-            .filter((element) => element.item !== 'Notify' || user.role === 'admin')
+            .filter((element) => isLoggedIn || element.item !== 'Profile')
+            .filter((element) => !isLoggedIn || element.item !== 'Login')
+            .filter((element) => element.item !== 'Notify' || user?.role === 'admin')
+            .filter((element) => user?.role !== 'admin' || !['Home', 'Profile', 'Contact'].includes(element.item))
             .map((element, index) => (
                 <div key={index} className='listcontainer'>
                     <div>{element.icon}</div>
-                    
-                    
                     <a href={element.path}>
                         <li>{element.item}</li>
                     </a>
