@@ -143,7 +143,7 @@ function ModalForm({ showModal, handleCloseModal }) {
   );
 }
 
-function SideBar() {
+function SideBar({setIsLoggedIn}) {
   const [show, setShow] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -327,7 +327,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
   };
   return (
     <div>
-      <SideBar />
+      <SideBar setIsLoggedIn={setIsLoggedIn}/>
       <div className="notificationContainer">
         <span className="notify" onClick={handleNotificationShow}>{notifications.length}</span>
         {notifications.length > 0 && (

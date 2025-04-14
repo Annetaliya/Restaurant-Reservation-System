@@ -11,7 +11,7 @@ import './nav.css';
 const navItems = [
     {item: 'Home', icon: <FaHome />, path: '/'},
     {item: 'Contact', icon: <FaPhoneAlt />, path: '/contact'},
-    {item: 'Profile', icon: <FaUser />, path: '/profile'},
+    {item: 'Profile', icon: <FaUser />, path: '/profile/:id'},
     {item: 'Login', icon: <CiLogin />, path: '/login'},
     {item: 'Notify', icon: <IoMdNotifications />}
 ]

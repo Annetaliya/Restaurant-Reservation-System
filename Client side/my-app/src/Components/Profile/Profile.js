@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import './profile.css';
 import { FaUserCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
-import { useNavigate, useParams , useLocation} from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import Spinner from 'react-bootstrap/Spinner';
 
 const Profile = ({ booking, setIsLoggedIn }) => {
@@ -12,8 +12,9 @@ const Profile = ({ booking, setIsLoggedIn }) => {
     const [loading, setLoading] = useState(true);
     
    const navigate = useNavigate();
-   const params = useParams();
-   const location = useLocation();
+   const { id } = useParams();
+   console.log('This is params', id)
+   
 
     const fetchBookingById = async (bookingId) => {
         setLoading(true);
@@ -40,13 +41,13 @@ const Profile = ({ booking, setIsLoggedIn }) => {
       
 
     useEffect(() => {
-        const bookingId = booking?.bookingId || params.bookingId || location.state?.bookingId;
+        const bookingId = booking?.bookingId ||id
         if (!bookingId) {
             navigate('/')
         }
         fetchBookingById(bookingId)
   
-    }, [params.bookingId, location.state])
+    }, [booking, id])
     
     
     

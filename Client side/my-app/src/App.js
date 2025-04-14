@@ -4,7 +4,7 @@ import Register from "./Components/Register/Register";
 import Login from "./Components/Login/Login";
 import AdminPanel from "./Components/Admin/AdminPanel";
 import ProtectedRoute from "./Components/ProtectedRoute";
-import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
+import {BrowserRouter as Router, Routes, Route, useParams} from 'react-router-dom'
 import { useEffect, useState } from "react";
 import Profile from "./Components/Profile/Profile";
 import Contact from "./Components/Contact/Contact";
@@ -79,7 +79,7 @@ function App() {
           <Route path="/" element={<Home booking={booking} fetchUpdateReservationTable={fetchUpdateReservationTable}  reservationTable={reservationTable} setReservationTable={setReservationTable}/>}/>
           <Route path='/register' element={<Register />}/>
           <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} user={user}/>}/>
-          <Route path='/profile' element={<Profile booking={booking}  setIsLoggedIn={setIsLoggedIn}/>}/>
+          <Route path='/profile/:id/' element={<Profile booking={booking}  setIsLoggedIn={setIsLoggedIn}/>}/>
           <Route path='/contact' element={<Contact />}/>
           <Route element={<ProtectedRoute user={user} />}>
             <Route path='/admin' element={<AdminPanel fetchUpdateReservationTable={fetchUpdateReservationTable} setIsLoggedIn={setIsLoggedIn}/>} />

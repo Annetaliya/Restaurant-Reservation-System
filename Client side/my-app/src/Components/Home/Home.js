@@ -85,8 +85,9 @@ const Booking = ({ table }) => {
                               text: "Reservation successful wait for confirmation!",
                               icon: "success",
                             });
+                const booking = JSON.parse(localStorage.getItem('booking'))
                 setTimeout(()=> {
-                    navigate('/profile')
+                    navigate(`/profile/${booking.bookingId}`)
                 }, 2000)
                 
 
