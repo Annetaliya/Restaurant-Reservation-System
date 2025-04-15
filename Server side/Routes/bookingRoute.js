@@ -38,15 +38,7 @@ router.post('/', (req, res) => {
 
       
 
-        const newBooking = {
-            message: 'New booking Received',
-            bookingId,
-            userId,
-            reservationId,
-            bookingDate,
-            status
-        }
-        io.emit('new booking', newBooking)
+        
 
         res.status(201).json({
             'message': 'success',
@@ -119,7 +111,6 @@ router.get('/:id', (req, res) => {
 })
 
 router.patch('/:id', (req, res) => {
-    const io = req.app.get('io');
     const { id } = req.params;
     const {status} = req.body;
 
@@ -147,8 +138,7 @@ router.patch('/:id', (req, res) => {
         if (this.changes === 0) {
             return res.status(400).json({error: 'booking not found'})
         }
-        const updatedBooking = {id, status};
-        io.emit('confirmed', updatedBooking)
+
         db.get(`SELECT * FROM booking WHERE id = ?`, [id] , (err, row) => {
             if (err) {
                 console.log(err.message)

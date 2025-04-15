@@ -41,7 +41,7 @@ const Profile = ({ booking, setIsLoggedIn }) => {
       
 
     useEffect(() => {
-        const bookingId = booking?.bookingId ||id;
+        const bookingId = booking?.bookingId || id;
         if (!bookingId) {
             navigate('/')
         }
@@ -53,11 +53,23 @@ const Profile = ({ booking, setIsLoggedIn }) => {
     
 
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setIsLoggedIn(false); 
-        navigate('/login')
+    const handleLogout = async() => {
+        try { 
+            await fetch('http://localhost:8000/logout', {
+                method: 'POST',
+                credentials: 'include',
+            })
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('booking')
+            setIsLoggedIn(false); 
+            navigate('/login')
+
+        } catch (error) {
+            console.log(error.message)
+
+        }
+       
     }
 
     if (loading) {
