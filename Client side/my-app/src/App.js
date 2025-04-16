@@ -79,7 +79,7 @@ function App() {
           <Route path="/" element={<Home booking={booking} fetchUpdateReservationTable={fetchUpdateReservationTable}  reservationTable={reservationTable} setReservationTable={setReservationTable}/>}/>
           <Route path='/register' element={<Register />}/>
           <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} user={user}/>}/>
-          <Route path='/profile/:id/' element={<Profile booking={booking}  setIsLoggedIn={setIsLoggedIn}/>}/>
+          <Route path='/profile/:id/' element={<Profile booking={booking}  setIsLoggedIn={setIsLoggedIn} user={user}/>}/>
           <Route path='/contact' element={<Contact />}/>
           <Route element={<ProtectedRoute user={user} />}>
             <Route path='/admin' element={<AdminPanel fetchUpdateReservationTable={fetchUpdateReservationTable} setIsLoggedIn={setIsLoggedIn}/>} />

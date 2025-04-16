@@ -151,11 +151,23 @@ function SideBar({setIsLoggedIn}) {
   const handleShowModal = () => setShowModal(true);
   const navigate = useNavigate()
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setIsLoggedIn(false)
-    navigate('/login')
+  const handleLogout = async() => {
+    try { 
+        await fetch('http://localhost:8000/logout', {
+            method: 'POST',
+            credentials: 'include',
+        })
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('booking')
+        setIsLoggedIn(false); 
+        navigate('/login')
+
+    } catch (error) {
+        console.log(error.message)
+
+    }
+   
 }
 
   return (

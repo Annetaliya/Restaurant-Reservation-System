@@ -5,49 +5,76 @@ import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from 'react-router';
 import Spinner from 'react-bootstrap/Spinner';
 
-const Profile = ({ booking, setIsLoggedIn }) => {
+const Profile = ({ booking, setIsLoggedIn, user }) => {
     
 
     const [selectBooking, setSelectedBooking] = useState(null)
-    const [loading, setLoading] = useState(true);
+    
     
    const navigate = useNavigate();
    const { id } = useParams();
    console.log('This is params', id)
-   
+   console.log('user details', user)
 
-    const fetchBookingById = async (bookingId) => {
-        setLoading(true);
-        try {
-            const response = await fetch(`http://localhost:8000/bookings/${bookingId}`)
-            if (!response.ok){
-                throw new Error('Error fetching booking')
+    const fetchBookingByUser = async (userId) => {
+       
+        try { 
+            const response =  await fetch(`http://localhost:8000/bookings/user/${userId}`)
+            if (!response.ok) {
+                throw new Error('error fetching booking')
             }
-            const result = await response.json()
-            console.log('booking for user:', result)
-            console.log('Fetch request ran')
-            if (result && result.data){
-                setSelectedBooking(result.data)
-            }
-            setLoading(false)
+            
+            const result = await response.json() 
+            setSelectedBooking(result.data) 
+           
 
         } catch (error) {
             console.log(error.message)
-
         }
+       
     }
+
+    useEffect(() => {
+        const userInfo = user?.id || id;
+        if (!userInfo) {
+            navigate('/')
+        }
+        fetchBookingByUser(userInfo)
+    }, [user, id])
+   
+
+    // const fetchBookingById = async (bookingId) => {
+    //     setLoading(true);
+    //     try {
+    //         const response = await fetch(`http://localhost:8000/bookings/${bookingId}`)
+    //         if (!response.ok){
+    //             throw new Error('Error fetching booking')
+    //         }
+    //         const result = await response.json()
+    //         console.log('booking for user:', result)
+    //         console.log('Fetch request ran')
+    //         if (result && result.data){
+    //             setSelectedBooking(result.data)
+    //         }
+    //         setLoading(false)
+
+    //     } catch (error) {
+    //         console.log(error.message)
+
+    //     }
+    // }
 
     
       
 
-    useEffect(() => {
-        const bookingId = booking?.bookingId || id;
-        if (!bookingId) {
-            navigate('/')
-        }
-        fetchBookingById(bookingId)
+    // useEffect(() => {
+    //     const bookingId = booking?.bookingId || id;
+    //     if (!bookingId) {
+    //         navigate('/')
+    //     }
+    //     fetchBookingById(bookingId)
   
-    }, [booking, id])
+    // }, [booking, id])
     
     
     
@@ -72,13 +99,7 @@ const Profile = ({ booking, setIsLoggedIn }) => {
        
     }
 
-    if (loading) {
-        return (
-            <Spinner animation="border" role="status">
-                        <span className="visually-hidden">Loading...</span>
-            </Spinner>
-        )
-    }
+  
   return (
     <div className='parent col-6'>
         
@@ -98,7 +119,9 @@ const Profile = ({ booking, setIsLoggedIn }) => {
             </div>
             
             : <div>
-                no data yet
+                <p>Hi {user.firstName}, you dont have a reservation yet.</p>
+                <p>{user.email}</p>
+                <Button onClick={handleLogout}>Logout</Button>
             </div>
             }
             
