@@ -20,7 +20,7 @@ const NavBar = ({ isLoggedIn, user }) => {
 
   function handleToggleMenu() {
     setShowMenu(!showMenu);
-    console.log(showMenu);
+  
   }
   return (
     <nav className="navParentContainer">
