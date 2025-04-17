@@ -49,7 +49,7 @@ const Login = ({ setIsLoggedIn }) => {
         if (result.error === "Email not found") {
           setErrors({ email: "Email not registered" });
         } else if (result.error === "Incorrect password") {
-          setErrors({ password: "Password not found" });
+          setErrors({ password: "Incorrect Password" });
         }
         return;
       }
@@ -62,14 +62,11 @@ const Login = ({ setIsLoggedIn }) => {
       });
       const user = JSON.parse(localStorage.getItem('user'))
       setIsLoggedIn(true);
-      setTimeout(() => {
-        if (user.role === 'admin') {
-          navigate('/admin')
-        } else {
-          navigate('/')
-        }
-
-      }, 3000)
+      if (user.role === 'admin') {
+        navigate('/admin')
+      } else {
+        navigate('/')
+      }
       
     } catch (error) {
       console.log(error, "login failed");
@@ -82,8 +79,7 @@ const Login = ({ setIsLoggedIn }) => {
     } finally {
       setSubmitting(false);
     }
-  };
- 
+  }; 
 
   return (
     <div className="col-6 parent-container">

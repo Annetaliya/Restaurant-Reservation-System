@@ -7,14 +7,11 @@ import Button from "react-bootstrap/Button";
 import Swal from "sweetalert2";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
-import { io } from "socket.io-client";
+
 import { useNavigate } from "react-router";
 import './admin.css';
 
 
-
-
-const socket = io('http://localhost:8000');
 
 function ModalForm({ showModal, handleCloseModal }) {
   const [formData, setFormData] = useState({
@@ -154,11 +151,23 @@ function SideBar({setIsLoggedIn}) {
   const handleShowModal = () => setShowModal(true);
   const navigate = useNavigate()
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setIsLoggedIn(false)
-    navigate('/login')
+  const handleLogout = async() => {
+    try { 
+        await fetch('http://localhost:8000/logout', {
+            method: 'POST',
+            credentials: 'include',
+        })
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('booking')
+        setIsLoggedIn(false); 
+        navigate('/login')
+
+    } catch (error) {
+        console.log(error.message)
+
+    }
+   
 }
 
   return (
@@ -233,18 +242,16 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
       }
     }
     fetchNotifications()
-    socket.on('new booking', (newBooking) => {
-      setNotifications((prev) => [...prev, newBooking])
-      console.log('new booking emited', newBooking)
-      Swal.fire({
-        title: 'New Reservation',
-        text: newBooking.message,
-        icon: 'info',
-      })
-    })
-    return () => {
-      socket.off('new booking')
-    }
+    
+      // setNotifications((prev) => [...prev, newBooking])
+      // console.log('new booking emited', newBooking)
+      // Swal.fire({
+      //   title: 'New Reservation',
+      //   text: newBooking.message,
+      //   icon: 'info',
+      // })
+    
+   
   }, [])
   
   const options = { timeZone: "Africa/Nairobi", hour12: false };

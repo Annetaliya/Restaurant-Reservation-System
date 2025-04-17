@@ -38,15 +38,7 @@ router.post('/', (req, res) => {
 
       
 
-        const newBooking = {
-            message: 'New booking Received',
-            bookingId,
-            userId,
-            reservationId,
-            bookingDate,
-            status
-        }
-        io.emit('new booking', newBooking)
+        
 
         res.status(201).json({
             'message': 'success',
@@ -117,9 +109,32 @@ router.get('/:id', (req, res) => {
         })
     })
 })
+router.get('/user/:id', (req,res) => {
+    const sql = `select booking.id, booking.bookingDate, booking.status,
+                        user.firstName, user.secondName, user.email,
+                        reservations.tableNumber, reservations.guestNumber, reservations.floorLevel
+                FROM booking
+                JOIN user ON booking.userId = user.id
+                JOIN reservations ON booking.reservationId = reservations.id
+                WHERE user.id = ?
+                ORDER BY booking.bookingDate DESC;
+
+     `
+     db.get(sql, [req.params.id], (err,row) => {
+        if (err) {
+            console.log(err)
+            return res.status(500).json({message: 'server error'})
+            
+        }
+        if (!row) {
+            return res.status(400).json({message: 'booking not found'})
+        }
+        res.json({data: row})
+
+     })
+})
 
 router.patch('/:id', (req, res) => {
-    const io = req.app.get('io');
     const { id } = req.params;
     const {status} = req.body;
 
@@ -147,8 +162,7 @@ router.patch('/:id', (req, res) => {
         if (this.changes === 0) {
             return res.status(400).json({error: 'booking not found'})
         }
-        const updatedBooking = {id, status};
-        io.emit('confirmed', updatedBooking)
+
         db.get(`SELECT * FROM booking WHERE id = ?`, [id] , (err, row) => {
             if (err) {
                 console.log(err.message)

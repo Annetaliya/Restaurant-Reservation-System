@@ -13,10 +13,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import Swal from "sweetalert2";
 import Header from '../../Images/restaurant header.jpg';
 
+
+
 const Booking = ({ table }) => {
     
     const user = JSON.parse(localStorage.getItem('user'))
     const [show, setShow] = useState(false);
+    const [bookedData, setBookedData] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null)
     const [formData, setFormData] = useState({
         userId: user ? user.id : '',
@@ -79,15 +82,17 @@ const Booking = ({ table }) => {
                     }))
 
                 }
+                setBookedData(result.data);
+                
                 localStorage.setItem('booking', JSON.stringify(result.data))
                 Swal.fire({
                               title: "Good Job",
                               text: "Reservation successful wait for confirmation!",
                               icon: "success",
                             });
-                const booking = JSON.parse(localStorage.getItem('booking'))
+                const user = JSON.parse(localStorage.getItem('user'))
                 setTimeout(()=> {
-                    navigate(`/profile/${booking.bookingId}`)
+                    navigate(`/profile/${user.id}`)
                 }, 2000)
                 
 

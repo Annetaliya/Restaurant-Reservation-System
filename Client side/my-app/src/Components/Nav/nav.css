@@ -40,6 +40,12 @@ body {
    
     
 }
+.navActive li {
+    border-bottom: solid 2px #E7717D;
+    color: #000;
+    font-weight: 400;
+
+}
 .listcontainer{
     display: flex;
     align-items: center;
