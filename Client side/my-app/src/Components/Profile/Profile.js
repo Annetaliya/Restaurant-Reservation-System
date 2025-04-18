@@ -3,7 +3,7 @@ import './profile.css';
 import { FaUserCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from 'react-router';
-import Spinner from 'react-bootstrap/Spinner';
+
 
 const Profile = ({ booking, setIsLoggedIn, user }) => {
     
@@ -43,41 +43,6 @@ const Profile = ({ booking, setIsLoggedIn, user }) => {
     }, [user, id])
    
 
-    // const fetchBookingById = async (bookingId) => {
-    //     setLoading(true);
-    //     try {
-    //         const response = await fetch(`http://localhost:8000/bookings/${bookingId}`)
-    //         if (!response.ok){
-    //             throw new Error('Error fetching booking')
-    //         }
-    //         const result = await response.json()
-    //         console.log('booking for user:', result)
-    //         console.log('Fetch request ran')
-    //         if (result && result.data){
-    //             setSelectedBooking(result.data)
-    //         }
-    //         setLoading(false)
-
-    //     } catch (error) {
-    //         console.log(error.message)
-
-    //     }
-    // }
-
-    
-      
-
-    // useEffect(() => {
-    //     const bookingId = booking?.bookingId || id;
-    //     if (!bookingId) {
-    //         navigate('/')
-    //     }
-    //     fetchBookingById(bookingId)
-  
-    // }, [booking, id])
-    
-    
-    
 
 
     const handleLogout = async() => {

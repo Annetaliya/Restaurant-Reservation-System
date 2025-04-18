@@ -16,11 +16,10 @@ const navItems = [
 ];
 const NavBar = ({ isLoggedIn, user }) => {
   const [showMenu, setShowMenu] = useState(false);
-  const [selectedNav, setSelectedNav] = useState(0);
+  const [selectedNav, setSelectedNav] = useState(window.location.pathname);
 
   function handleToggleMenu() {
     setShowMenu(!showMenu);
-  
   }
   return (
     <nav className="navParentContainer">
@@ -37,11 +36,21 @@ const NavBar = ({ isLoggedIn, user }) => {
               !["Home", "Profile", "Contact"].includes(element.item)
           )
           .map((element, index) => (
-            <div key={index} className='listcontainer'>
-                <div>{element.icon}</div>
-                <a href={element.path}>
-                  <li>{element.item}</li>
-                </a>
+            <div key={index} className="listcontainer">
+              <div >{element.icon}</div>
+              <a onClick={() => {setSelectedNav(element.path)
+                                  console.log('updated')
+
+                  }}href={element.path}>
+                <li
+                
+                  className={`liststyle ${
+                    selectedNav === element.path ? "navActive" : ""
+                  }`}
+                >
+                  {element.item}
+                </li>
+              </a>
             </div>
           ))}
       </ul>
