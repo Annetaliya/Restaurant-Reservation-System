@@ -7,20 +7,35 @@ import { IoMdNotifications } from "react-icons/io";
 import { CiLogin } from "react-icons/ci";
 import "./nav.css";
 
+const userDetails = JSON.parse(localStorage.getItem('user'));
+
+const userIdDetails = userDetails.id;
+const id = userIdDetails.split('-')[0]
+const regex = /^[A-Za-z]+$/
+let newId = ''
+for (let i = 0; i < id.length; i++) {
+  if (id[i].match(regex) ) {
+    continue
+  } else {
+    newId += id[i]
+  }
+}
+
+
+console.log('id details', newId)
 const navItems = [
   { item: "Home", icon: <FaHome />, path: "/" },
   { item: "Contact", icon: <FaPhoneAlt />, path: "/contact" },
-  { item: "Profile", icon: <FaUser />, path: "/profile/:id" },
+  { item: "Profile", icon: <FaUser />, path: `/profile/:${newId}`},
   { item: "Login", icon: <CiLogin />, path: "/login" },
   { item: "Notify", icon: <IoMdNotifications /> },
 ];
 const NavBar = ({ isLoggedIn, user }) => {
   const [showMenu, setShowMenu] = useState(false);
-  const [selectedNav, setSelectedNav] = useState(0);
+  const [selectedNav, setSelectedNav] = useState(window.location.pathname);
 
   function handleToggleMenu() {
     setShowMenu(!showMenu);
-  
   }
   return (
     <nav className="navParentContainer">
@@ -37,11 +52,21 @@ const NavBar = ({ isLoggedIn, user }) => {
               !["Home", "Profile", "Contact"].includes(element.item)
           )
           .map((element, index) => (
-            <div key={index} className='listcontainer'>
-                <div>{element.icon}</div>
-                <a href={element.path}>
-                  <li>{element.item}</li>
-                </a>
+            <div key={index} className="listcontainer">
+              <div >{element.icon}</div>
+              <a onClick={() => {setSelectedNav(element.path)
+                                  console.log('updated')
+
+                  }}href={element.path}>
+                <li
+                
+                  className={`liststyle ${
+                    selectedNav === element.path ? "navActive" : ""
+                  }`}
+                >
+                  {element.item}
+                </li>
+              </a>
             </div>
           ))}
       </ul>

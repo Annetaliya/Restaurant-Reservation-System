@@ -73,8 +73,9 @@ function App() {
   }, [])
   return (
     <div>
-      <NavBar isLoggedIn={isLoggedIn} user={user}/>
+      
       <Router>
+        <NavBar isLoggedIn={isLoggedIn} user={user}/>
         <Routes>
           <Route path="/" element={<Home booking={booking} fetchUpdateReservationTable={fetchUpdateReservationTable}  reservationTable={reservationTable} setReservationTable={setReservationTable}/>}/>
           <Route path='/register' element={<Register />}/>
@@ -85,8 +86,9 @@ function App() {
             <Route path='/admin' element={<AdminPanel fetchUpdateReservationTable={fetchUpdateReservationTable} setIsLoggedIn={setIsLoggedIn}/>} />
           </Route>   
         </Routes>
+        <Footer />
       </Router>
-      <Footer />
+      
       
       
       

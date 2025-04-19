@@ -15,11 +15,10 @@ import Header from '../../Images/restaurant header.jpg';
 
 
 
-const Booking = ({ table }) => {
+const Booking = ({ table, show, setShow, handleShow}) => {
     
     const user = JSON.parse(localStorage.getItem('user'))
-    const [show, setShow] = useState(false);
-    const [bookedData, setBookedData] = useState(null);
+   
     const [selectedDate, setSelectedDate] = useState(null)
     const [formData, setFormData] = useState({
         userId: user ? user.id : '',
@@ -53,7 +52,7 @@ const Booking = ({ table }) => {
 
     const handeClose = () => setShow(false);
      
-    const handleShow = () => setShow(true);
+   
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -82,7 +81,7 @@ const Booking = ({ table }) => {
                     }))
 
                 }
-                setBookedData(result.data);
+                
                 
                 localStorage.setItem('booking', JSON.stringify(result.data))
                 Swal.fire({
@@ -106,9 +105,9 @@ const Booking = ({ table }) => {
     
   return (
     <div>
-        <Button variant='primary'  className='modalBtn' onClick={handleShow}>
+        {/* <Button variant='primary'  className='modalBtn' onClick={handleShow}>
             Click to Reserve table
-        </Button>
+        </Button> */}
         <Modal show={show} onHide={handeClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Only pick the date</Modal.Title>
@@ -173,7 +172,9 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     const [selectIndex, setSelectedIndex] = useState(0)
     const [table, setTable] = useState(null);
     const [showAlert, setShowAlert] = useState(true)
+    const [show, setShow] = useState(false);
     
+    const handleShow = () => setShow(true);
     
    
 
@@ -236,7 +237,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     <div>
         <img className='headerImg' src={Header} alt='food'/>
         {user && 
-            <h1 className='homeIntro'>Welcome to eatery bay {user.firstName}! 
+            <h1 className='homeIntro'><span>Welcome</span> to eatery bay {user.firstName}! 
             </h1>
             
         }
@@ -264,12 +265,16 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
 
             filterdTables.map((item) => (
             
-                <div key={item.id} className='individualTable' onClick={() => fetchTablebyId(item.id)} >
+                <div key={item.id} className='individualTable' onClick={() => 
+                    {fetchTablebyId(item.id)
+                    handleShow()
+
+                }} >
                     <FaCircle className={`availability ${item.status === 'available' ? 'availability' : 'noAvailability'}`}/>
                     <div className='tableHome'></div>
                     <p className='tableNumber'>Table No.{item.tableNumber}</p>
                     <p className='guestNumber'>Guest Number {item.guestNumber}</p>
-                    <p>${item.price}</p>
+                    <p className='price'> ${item.price}</p>
                 </div>       
                 
             ))
@@ -297,7 +302,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
                     {!showAlert && <Button onClick={() => setShowAlert(true)}>Show Alert</Button>}
                 </div>
             ) : (
-                <Booking table={table} />
+                <Booking table={table} show={show} setShow={setShow} handleShow={handleShow}/>
             )
         ) : (
             ''
