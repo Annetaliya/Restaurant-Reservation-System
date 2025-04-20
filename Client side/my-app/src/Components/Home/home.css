@@ -31,11 +31,13 @@
 .tableNumber {
     font-size: 0.7rem;
     color:rgb(155, 155, 155);
+    margin-bottom: 10px;
 }
 .guestNumber {
     font-size: 0.9rem;
     font-weight: 300;
     color: rgb(155, 155, 155);
+    margin-bottom: 8px;
 }
 .price {
     color: #d1d1d1;
@@ -54,7 +56,7 @@
     background-color: transparent;
 }
 .levelbutton:hover {
-    background-color: #51219E;;
+    background-color: #51219E;
     color: #fff;
     border: none;
 }
@@ -93,6 +95,11 @@
     align-items: center;
     gap: 10px;
     position: relative;
+    background: #252525;
+    padding: 10px 30px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: solid 1px #51219E;
 }
 .modalBtn {
     position: absolute;

@@ -25,6 +25,7 @@
     color: #fff;
     list-style: none;
     padding-bottom: 20px;
+    text-decoration: none;
 }
 .dispayIcons {
     display: flex;
