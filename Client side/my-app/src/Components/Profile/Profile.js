@@ -3,6 +3,7 @@ import './profile.css';
 import { FaUserCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from 'react-router';
+import { LuUserRoundCog } from "react-icons/lu";
 
 
 const Profile = ({ booking, setIsLoggedIn, user }) => {
@@ -66,18 +67,18 @@ const Profile = ({ booking, setIsLoggedIn, user }) => {
 
   
   return (
-    <div className='parent col-6'>
+    <div className='parentProfile col-6'>
         
             {selectBooking && selectBooking.length !== 0 ? 
             <div className='userInfo'>
-                <div className='profileHeader'></div>
-                <div className='profileIcon'><FaUserCircle size={40} /></div>
+                
+                <FaUserCircle size={50} className='profileIcon'/>
                 <p>{selectBooking.firstName} {selectBooking.secondName}</p>
                 <p>{selectBooking.email}</p>
                 <p>Boking Date: {selectBooking.bookingDate.split(' ')[0]}</p>
                 <p>Table No: {selectBooking.tableNumber}</p>
                 <p>No of Guests {selectBooking.guestNumber}</p>
-                <p className='bookingStatus'>Status: {selectBooking.status}</p>
+                <p>Status: {selectBooking.status}</p>
                 <Button className='btn btn-danger mb-3'>Cancel Reservation</Button>
                 <Button onClick={handleLogout}>Logout</Button>
                 

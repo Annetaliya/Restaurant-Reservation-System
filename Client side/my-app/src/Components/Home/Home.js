@@ -237,7 +237,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     <div>
         <img className='headerImg' src={Header} alt='food'/>
         {user && 
-            <h1 className='homeIntro'>Welcome to eatery bay {user.firstName}! 
+            <h1 className='homeIntro'><span>Welcome</span> to eatery bay {user.firstName}! 
             </h1>
             
         }
@@ -274,7 +274,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
                     <div className='tableHome'></div>
                     <p className='tableNumber'>Table No.{item.tableNumber}</p>
                     <p className='guestNumber'>Guest Number {item.guestNumber}</p>
-                    <p>${item.price}</p>
+                    <p className='price'> ${item.price}</p>
                 </div>       
                 
             ))

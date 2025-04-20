@@ -7,10 +7,26 @@ import { IoMdNotifications } from "react-icons/io";
 import { CiLogin } from "react-icons/ci";
 import "./nav.css";
 
+const userDetails = JSON.parse(localStorage.getItem('user'));
+
+const userIdDetails = userDetails.id;
+const id = userIdDetails.split('-')[0]
+const regex = /^[A-Za-z]+$/
+let newId = ''
+for (let i = 0; i < id.length; i++) {
+  if (id[i].match(regex) ) {
+    continue
+  } else {
+    newId += id[i]
+  }
+}
+
+
+console.log('id details', newId)
 const navItems = [
   { item: "Home", icon: <FaHome />, path: "/" },
   { item: "Contact", icon: <FaPhoneAlt />, path: "/contact" },
-  { item: "Profile", icon: <FaUser />, path: "/profile/:id" },
+  { item: "Profile", icon: <FaUser />, path: `/profile/:${newId}`},
   { item: "Login", icon: <CiLogin />, path: "/login" },
   { item: "Notify", icon: <IoMdNotifications /> },
 ];

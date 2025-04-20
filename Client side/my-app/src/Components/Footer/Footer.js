@@ -3,6 +3,7 @@ import './footer.css';
 import { FaFacebook } from "react-icons/fa";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { FaInstagramSquare } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 
 const Footer = () => {
@@ -15,8 +16,9 @@ const Footer = () => {
             <p>Address</p>
         </div>
         <div className='footerElements'>
-          <a href='/contact'>Contact</a>
-            {/* <p>Contact</p> */}
+          {/* <a href='/contact'>Contact</a> */}
+            <Link className='contact' to='/contact'>Contact</Link>
+           
             <p>Blog</p>
             <p>Reviews</p>
         </div>

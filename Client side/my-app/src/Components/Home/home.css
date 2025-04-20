@@ -6,11 +6,16 @@
     padding-top: 4rem;
     font-size: 3rem;
     font-weight: 400;
+    color: #fff;
+}
+.homeIntro span {
+    color: #5A4FCF;
 }
 .headerImg {
     width: 100vw;
     height: 40vh;
     object-fit: cover;
+    
 }
 .alert {
     position: absolute;
@@ -21,13 +26,19 @@
     text-align: center;
     margin-top: 0;
     font-size: 1rem;
+    color: rgb(155, 155, 155);
 }
 .tableNumber {
     font-size: 0.7rem;
+    color:rgb(155, 155, 155);
 }
 .guestNumber {
     font-size: 0.9rem;
     font-weight: 300;
+    color: rgb(155, 155, 155);
+}
+.price {
+    color: #d1d1d1;
 }
 .floorLevels {
     display: flex;
@@ -37,12 +48,13 @@
 }
 .levelbutton {
     padding: 8px 26px;
-    border: 1px solid #E7717D;
+    border: 1px solid #51219E;
     border-radius: 8px;
+    color: #fff;
     background-color: transparent;
 }
 .levelbutton:hover {
-    background-color: #E7717D;
+    background-color: #51219E;;
     color: #fff;
     border: none;
 }
@@ -51,7 +63,7 @@
     padding: 8px 26px;
     border: none;
     border-radius: 8px;
-    background-color: #E7717D;
+    background-color: #51219E;;
 
 }
 .tableItems {
