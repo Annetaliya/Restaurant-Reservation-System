@@ -52,6 +52,15 @@ function ModalForm({ showModal, handleCloseModal }) {
                 text: "You created a table",
                 icon: "success",
               });
+      setFormData({
+        tableNumber: "",
+        guestNumber: "",
+        price: "",
+        status: "",
+        floorLevel: "",
+
+      })
+      
     } catch (error) {
       Swal.fire({
                   title: "Error",
