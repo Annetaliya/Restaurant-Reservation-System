@@ -81,7 +81,7 @@ function App() {
         userVisibility: true,
         applicationServerKey: 'BGQOtwfwG5bzN0Vhyb_hIk_GhMXzkhlnnnk4vMjTBZq5_ZfwY69gcKhGq08TUY0hOtkbVHm1PnqfTVU_ehpBoMQ'
       })
-      await fetch('http://localhost:8000/sbscribe', {
+      await fetch('http://localhost:8000/subscribe', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ function App() {
       })
       console.log('Subscribed to push notification', subscription)
     } else {
-      console.warn('Push manager is not supported')
+      console.log('Push manager is not supported')
     }
   }
 

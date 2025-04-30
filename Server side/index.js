@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const webPush = require('web-push');
 
 const PATH = 8000;
 const userRoutes = require('./Routes/userRoutes.js');
@@ -11,6 +12,15 @@ const bookingRoute = require('./Routes/bookingRoute.js');
 const session = require('express-session')
 require('dotenv').config();
 const SECRET_KEY = process.env.JWT_SECRET;
+const VAPIDKEY = process.env.WEB_PUSH_KEY;
+const PUBLIC_KEY = process.env.PUBLIC_KEY;
+
+webPush.setVapidDetails(
+  'annetaliya@gmail.com',
+  PUBLIC_KEY,
+  VAPIDKEY,
+
+)
 
 //const cookieSession = require('cookie-session');
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -43,4 +53,7 @@ app.use('/bookings', bookingRoute)
 
 
 
+
+
 app.listen(PATH , () => {console.log(`app is listening on port ${PATH}`)})
+module.exports= webPush;

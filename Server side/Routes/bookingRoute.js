@@ -3,8 +3,24 @@ const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
+const { webPush } = require('../index');
 
 
+function notify (payload) {
+    const sql = 'SELECT subscription FROM subscriptions'
+    db.all(sql, [], (err, rows) => {
+        if (err){
+            console.log('Error getting subscriptions')
+            return;
+        }
+        rows.forEach((row) => {
+            const subscription = JSON.stringify(row.subscription)
+            webPush.sendNotification(subscription, JSON.stringify(payload))
+            .then(()=> console.log('Push sent'))
+            .catch((err) => console.log('push error', err.message))
+        })
+    })
+}
 
 router.post('/', (req, res) => {
     const {userId, reservationId, bookingDate} = req.body;
@@ -26,15 +42,7 @@ router.post('/', (req, res) => {
                 
                 db.run (updateReservation, [resId], (err) => {
                     if (err) return reject(err)
-                        const notificationsId = uuidv4()
-        
-                    const notificationSql = `INSERT INTO notifications (id, message, bookingId) VALUES (?,?,?)`;
-                    db.run(notificationSql, [notificationsId, `New booking received`, bookingId], function (err) {
-                        if (err) {
-                            console.error('Error saving notifications', err.message)
-                            return res.status(500).json({error: 'database error'})
-                        }
-                    })
+                        
                     resolve({
                             bookingId,
                             userId,
@@ -43,22 +51,6 @@ router.post('/', (req, res) => {
                             status
                     })
                 })
-               
-        
-              
-        
-                
-        
-                // res.status(201).json({
-                //     'message': 'success',
-                //     'data': {
-                //         bookingId,
-                //         userId,
-                //         reservationId,
-                //         bookingDate,
-                //         status
-                //     }
-                // })
             })
         
 
@@ -80,16 +72,7 @@ router.post('/', (req, res) => {
    
 })
 
-router.get('/notifications', (req, res) => {
-    const sql = `SELECT * FROM notifications ORDER BY createdAt DESC`
-    db.all(sql, [], (err,rows) => {
-        if (err) {
-            console.log(err.message)
-            return res.status(500).json({error: 'database error'})
-        }
-        res.json({ data: rows})
-    })
-})
+
 
 router.get('/', (req, res) => {
     const sql = `SELECT booking.id, booking.bookingDate, booking.status,
