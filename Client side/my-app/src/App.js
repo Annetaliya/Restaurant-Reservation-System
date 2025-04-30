@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import Profile from "./Components/Profile/Profile";
 import Contact from "./Components/Contact/Contact";
 import Footer from "./Components/Footer/Footer";
+import service from '../public/sw'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -70,6 +71,31 @@ function App() {
       setIsLoggedIn(true)
     }
 
+  }, [])
+
+  async function subscribe() {
+    if ('serviceWorker' in navigator && 'pushManager' in window) {
+      const registration = await navigator.serviceWorker.register('../public/sw.js')
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibility: true,
+        applicationServerKey: 'BGQOtwfwG5bzN0Vhyb_hIk_GhMXzkhlnnnk4vMjTBZq5_ZfwY69gcKhGq08TUY0hOtkbVHm1PnqfTVU_ehpBoMQ'
+      })
+      await fetch('http://localhost:8000/sbscribe', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(subscription)
+      })
+      console.log('Subscribed to push notification', subscription)
+    } else {
+      console.warn('Push manager is not supported')
+    }
+  }
+
+  useEffect(() => {
+    subscribe()
   }, [])
   return (
     <div>

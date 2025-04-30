@@ -119,7 +119,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             } else if (row.count === 0) {
               insertReservation(1, 4, 26, 'available', 'Level 1' );
               insertReservation(2, 6, 26, 'available', 'Level 1' );
-              insertReservation(3, 4, 24, 'reserved', 'Level 1' );
+              insertReservation(3, 4, 24, 'available', 'Level 1' );
               insertReservation(4, 2, 20, 'available', 'Level 1');
 
             } else {
