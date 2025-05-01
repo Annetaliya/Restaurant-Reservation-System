@@ -29,6 +29,7 @@ router.post('/', (req, res) => {
         console.log()
         return res.status(400).json({error: 'Missing userId or reservationId'})
     }
+    let bookedTables = []
     const reservationIds = Array.isArray(reservationId) ? reservationId : [reservationId]
     const insertBookings = (resId) => {
         const bookingId = uuidv4();
@@ -42,6 +43,15 @@ router.post('/', (req, res) => {
                 
                 db.run (updateReservation, [resId], (err) => {
                     if (err) return reject(err)
+                    
+                    const getTableNo = `SELECT tableNumber FROM reservations WHERE id = ?`
+                    db.get(getTableNo, [resId], (err, row) => {
+                        if (err) return reject(err)
+                        if (row) {
+                            bookedTables.push(row.tableNumber)
+                        }
+
+                    })
                         
                     resolve({
                             bookingId,
@@ -62,6 +72,11 @@ router.post('/', (req, res) => {
                 message: 'Booking created Succsessfully',
                 data: result
             })
+        const tables = bookedTables.join(', ');
+        notify({
+            title: 'New booking received',
+            body:  `Tables ${tables} booked on ${bookingDate}`
+        })
         })
         .catch(err => {
             console.log('Error creating bookings', err.message)

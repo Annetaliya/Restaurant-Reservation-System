@@ -73,30 +73,7 @@ function App() {
 
   }, [])
 
-  async function subscribe() {
-    if ('serviceWorker' in navigator && 'pushManager' in window) {
-      const registration = await navigator.serviceWorker.register('../public/sw.js')
-
-      const subscription = await registration.pushManager.subscribe({
-        userVisibility: true,
-        applicationServerKey: 'BGQOtwfwG5bzN0Vhyb_hIk_GhMXzkhlnnnk4vMjTBZq5_ZfwY69gcKhGq08TUY0hOtkbVHm1PnqfTVU_ehpBoMQ'
-      })
-      await fetch('http://localhost:8000/subscribe', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(subscription)
-      })
-      console.log('Subscribed to push notification', subscription)
-    } else {
-      console.log('Push manager is not supported')
-    }
-  }
-
-  useEffect(() => {
-    subscribe()
-  }, [])
+  
   return (
     <div>
       

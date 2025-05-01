@@ -204,13 +204,13 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
   const [reservations, setReservations] = useState([]);
   const [todaysReservations, setTodaysReservations] = useState(null);
   const [searchParams, setSearchParams] = useState('');
-  const [notifications, setNotifications] = useState([]);
-  const [showNotifications, setShowNotifications] = useState(false);
+ // const [notifications, setNotifications] = useState([]);
+  //const [showNotifications, setShowNotifications] = useState(false);
 
-  const handleNotificationShow = () => {
-    setShowNotifications(!showNotifications)
-    console.log(showNotifications)
-  }
+  // const handleNotificationShow = () => {
+  //   setShowNotifications(!showNotifications)
+  //   console.log(showNotifications)
+  // }
  
 
 
@@ -238,30 +238,71 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
     
   }, []);
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/bookings/notifications');
-        const result = await response.json()
-        console.log('notification data:', result)
-        setNotifications(result.data)
+  // useEffect(() => {
+  //   const fetchNotifications = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:8000/bookings/notifications');
+  //       const result = await response.json()
+  //       console.log('notification data:', result)
+  //       setNotifications(result.data)
 
-      } catch (error) {
-        console.error('Error fetching notifications', error.message)
-      }
-    }
-    fetchNotifications()
+  //     } catch (error) {
+  //       console.error('Error fetching notifications', error.message)
+  //     }
+  //   }
+  //   fetchNotifications()
     
-      // setNotifications((prev) => [...prev, newBooking])
-      // console.log('new booking emited', newBooking)
-      // Swal.fire({
-      //   title: 'New Reservation',
-      //   text: newBooking.message,
-      //   icon: 'info',
-      // })
+  //     // setNotifications((prev) => [...prev, newBooking])
+  //     // console.log('new booking emited', newBooking)
+  //     // Swal.fire({
+  //     //   title: 'New Reservation',
+  //     //   text: newBooking.message,
+  //     //   icon: 'info',
+  //     // })
     
    
-  }, [])
+  // }, [])
+  const publicKey = 'BGQOtwfwG5bzN0Vhyb_hIk_GhMXzkhlnnnk4vMjTBZq5_ZfwY69gcKhGq08TUY0hOtkbVHm1PnqfTVU_ehpBoMQ'
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
+  
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+  
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
+  
+  async function subscribe() {
+      if ('serviceWorker' in navigator && 'pushManager' in window) {
+        const registration = await navigator.serviceWorker.register('../public/sw.js')
+  
+        const subscription = await registration.pushManager.subscribe({
+          userVisibility: true,
+          applicationServerKey: urlBase64ToUint8Array(publicKey)
+        })
+        await fetch('http://localhost:8000/subscribe', {
+          method: 'POST',
+          headers: {
+          'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(subscription)
+        })
+        console.log('Subscribed to push notification', subscription)
+      } else {
+        console.log('Push manager is not supported')
+      }
+    }
+  
+    useEffect(() => {
+      subscribe()
+    }, [])
   
   const options = { timeZone: "Africa/Nairobi", hour12: false };
   const today = new Date()
