@@ -1,4 +1,4 @@
-self.addEventListener('push', (event) => {
+self.addEventListener('push', function(event) {
     const data = event.data.json();
     const title = data.title;
     const icon = data.icon;
@@ -8,8 +8,10 @@ self.addEventListener('push', (event) => {
         body: body,
         tag: 'unique-tag',
         icon: icon,
-        url: 'http://localhost:8000/bookings'
+        url: 'http://localhost:8000',
     }
     self.registration.showNotification(title, notificationsOptions)
-
 })
+
+
+

@@ -8,18 +8,21 @@ import { CiLogin } from "react-icons/ci";
 import "./nav.css";
 
 const userDetails = JSON.parse(localStorage.getItem('user'));
-
-const userIdDetails = userDetails.id;
-const id = userIdDetails.split('-')[0]
-const regex = /^[A-Za-z]+$/
 let newId = ''
-for (let i = 0; i < id.length; i++) {
-  if (id[i].match(regex) ) {
-    continue
-  } else {
+if (userDetails) {
+  const userIdDetails = userDetails.id;
+  const id = userIdDetails.split('-')[0]
+  const regex = /^[A-Za-z]+$/
+ 
+  for (let i = 0; i < id.length; i++) {
+    if (id[i].match(regex) ) {
+      continue
+    } else {
     newId += id[i]
+    }
   }
 }
+
 
 
 console.log('id details', newId)

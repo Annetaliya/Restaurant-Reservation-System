@@ -9,9 +9,9 @@
 } */
 body {
     font-family: 'Poppins', sans-serif;
-    background: #121212;
-    /* background: rgb(238,174,202);
-    background: linear-gradient(90deg, rgba(238,174,202,1) 0%, rgba(233,178,148,0.11034668994550945) 100%); */
+    /* background: #121212; */
+    background: rgb(238,174,202); 
+    background: linear-gradient(90deg, rgba(238,174,202,1) 0%, rgba(233,178,148,0.11034668994550945) 100%); 
 }
 .navParentContainer {
     display: flex;

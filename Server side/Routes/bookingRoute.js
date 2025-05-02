@@ -3,66 +3,91 @@ const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
+const { webPush } = require('../index');
 
 
+function notify (payload) {
+    const sql = 'SELECT subscription FROM subscriptions'
+    db.all(sql, [], (err, rows) => {
+        if (err){
+            console.log('Error getting subscriptions')
+            return;
+        }
+        rows.forEach((row) => {
+            const subscription = JSON.stringify(row.subscription)
+            webPush.sendNotification(subscription, JSON.stringify(payload))
+            .then(()=> console.log('Push sent'))
+            .catch((err) => console.log('push error', err.message))
+        })
+    })
+}
 
 router.post('/', (req, res) => {
-    const io = req.app.get('io')
     const {userId, reservationId, bookingDate} = req.body;
 
     if (!userId || !reservationId || !bookingDate) {
         console.log()
         return res.status(400).json({error: 'Missing userId or reservationId'})
     }
+    let bookedTables = []
+    const reservationIds = Array.isArray(reservationId) ? reservationId : [reservationId]
+    const insertBookings = (resId) => {
+        const bookingId = uuidv4();
+        const status = 'confirmed';
+        return new Promise((resolve, reject) => {
+            const sql = `INSERT INTO booking (id, userId, reservationId, bookingDate, status) VALUES (?,?,?,?,?)`;
+            const params = [bookingId, userId, resId, bookingDate, status];
+            db.run(sql, params, (err, row) => {
+                if (err) return reject(err)
+                const updateReservation = `UPDATE reservations SET status = 'reserved' WHERE id = ?` 
+                
+                db.run (updateReservation, [resId], (err) => {
+                    if (err) return reject(err)
+                    
+                    const getTableNo = `SELECT tableNumber FROM reservations WHERE id = ?`
+                    db.get(getTableNo, [resId], (err, row) => {
+                        if (err) return reject(err)
+                        if (row) {
+                            bookedTables.push(row.tableNumber)
+                        }
 
-    const bookingId = uuidv4();
-    const status = 'confirmed';
-
-    const sql = `INSERT INTO booking (id, userId, reservationId, bookingDate, status) VALUES (?,?,?,?,?)`;
-    const params = [bookingId, userId, reservationId, bookingDate, status];
-
-    db.run(sql, params, (err, row) => {
-        if (err) {
-            console.log('Error creating booking', err.message);
-            return res.status(500).json({error: 'database error'})
-        }
-        const notificationsId = uuidv4()
-
-        const notificationSql = `INSERT INTO notifications (id, message, bookingId) VALUES (?,?,?)`;
-        db.run(notificationSql, [notificationsId, `New booking received`, bookingId], function (err) {
-            if (err) {
-                console.error('Error saving notifications', err.message)
-                return res.status(500).json({error: 'database error'})
-            }
-        })
-
-      
-
+                    })
+                        
+                    resolve({
+                            bookingId,
+                            userId,
+                            reservationId: resId,
+                            bookingDate,
+                            status
+                    })
+                })
+            })
         
 
-        res.status(201).json({
-            'message': 'success',
-            'data': {
-                bookingId,
-                userId,
-                reservationId,
-                bookingDate,
-                status
-            }
         })
-    })
+    }
+    Promise.all(reservationIds.map(reservationId => insertBookings(reservationId)))
+        .then(result => {
+            res.status(201).json({
+                message: 'Booking created Succsessfully',
+                data: result
+            })
+        const tables = bookedTables.join(', ');
+        notify({
+            title: 'New booking received',
+            body:  `Tables ${tables} booked on ${bookingDate}`
+        })
+        })
+        .catch(err => {
+            console.log('Error creating bookings', err.message)
+            res.status(500).json({ error: 'Database error'})
+        })
+
+   
+   
 })
 
-router.get('/notifications', (req, res) => {
-    const sql = `SELECT * FROM notifications ORDER BY createdAt DESC`
-    db.all(sql, [], (err,rows) => {
-        if (err) {
-            console.log(err.message)
-            return res.status(500).json({error: 'database error'})
-        }
-        res.json({ data: rows})
-    })
-})
+
 
 router.get('/', (req, res) => {
     const sql = `SELECT booking.id, booking.bookingDate, booking.status,
@@ -120,7 +145,7 @@ router.get('/user/:id', (req,res) => {
                 ORDER BY booking.bookingDate DESC;
 
      `
-     db.get(sql, [req.params.id], (err,row) => {
+     db.all(sql, [req.params.id], (err,row) => {
         if (err) {
             console.log(err)
             return res.status(500).json({message: 'server error'})
