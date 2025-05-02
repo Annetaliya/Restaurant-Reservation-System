@@ -281,7 +281,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
   
   async function subscribe() {
       if ('serviceWorker' in navigator && 'pushManager' in window) {
-        const registration = await navigator.serviceWorker.register('../public/sw.js')
+        const registration = await navigator.serviceWorker.register('/sw.js');
   
         const subscription = await registration.pushManager.subscribe({
           userVisibility: true,
@@ -385,7 +385,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
   return (
     <div>
       <SideBar setIsLoggedIn={setIsLoggedIn}/>
-      <div className="notificationContainer">
+      {/* <div className="notificationContainer">
         <span className="notify" onClick={handleNotificationShow}>{notifications.length}</span>
         {notifications.length > 0 && (
           notifications.map((item) => (
@@ -396,7 +396,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
           ))
         )}
 
-      </div>
+      </div> */}
     
       <InputGroup className="w-50 mx-auto mb-5">
         <InputGroup.Text>

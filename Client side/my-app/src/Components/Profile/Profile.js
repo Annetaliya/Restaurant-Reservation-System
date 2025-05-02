@@ -69,6 +69,11 @@ const Profile = ({ setIsLoggedIn, user }) => {
   
   return (
     <div className='parentProfile'>
+        <div className='userInfo'>
+            <FaUserCircle size={50} className='profileIcon'/>
+            <p>{user.firstName} {user.secondName}</p>
+            <Button onClick={handleLogout}>Logout</Button>
+        </div>
           <Table className="col-10 mx-auto table">
             <thead>
                 <tr>
@@ -80,7 +85,9 @@ const Profile = ({ setIsLoggedIn, user }) => {
             </thead>
             <tbody>
                 {selectBooking && selectBooking.length !== 0 ? 
-                selectBooking.map((item) => (
+                selectBooking
+                .filter((element) => element.status !== 'cancelled')
+                .map((item) => (
                     <tr key={item.id}>
                         <td>{item.bookingDate}</td>
                         <td>{item.tableNumber}</td>
@@ -96,31 +103,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
             </tbody>
           </Table>
         
-            {selectBooking && selectBooking.length !== 0 ? 
-            selectBooking.map((item) => (
-                <div className='userInfo'>
-                
-                    <FaUserCircle size={50} className='profileIcon'/>
-                    <p>{item.firstName} {item.secondName}</p>
-                    <p>{item.email}</p>
-                    <p>Booking Date: {item.bookingDate.split(' ')[0]}</p>
-                    <p>Table No: {item.tableNumber}</p>
-                    <p>No of Guests {item.guestNumber}</p>
-                    <p>Status: {item.status}</p>
-                    {/* <Button className='btn btn-danger mb-3'>Cancel Reservation</Button> */}
-                    <Button onClick={handleLogout}>Logout</Button>
-                
-                </div>
-
-            ))
             
-            
-            : <div>
-                <p>Hi {user?.firstName}, you dont have a reservation yet.</p>
-                <p>{user?.email}</p>
-                <Button onClick={handleLogout}>Logout</Button>
-            </div>
-            }
             
 
     </div>

@@ -6,14 +6,14 @@
     text-align: center;
     font-weight: 400;
     margin-bottom: 2rem;
-    color: #fff;
+    /* color: #fff; */
     text-decoration: underline;
     text-decoration-color: #51219E;
     
 }
 .contactIntro{
     padding: 1rem 3rem;
-    color: #d1d1d1;
+    /* color: #d1d1d1; */
     text-align: center;
     line-height: 1.6;
 }
