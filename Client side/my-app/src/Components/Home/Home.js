@@ -236,11 +236,10 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
   return (
     <div>
         <img className='headerImg' src={Header} alt='food'/>
-        {user && 
-            <h1 className='homeIntro'><span>Welcome</span> to eatery bay {user.firstName}! 
-            </h1>
-            
-        }
+        <h1 className='homeIntro'><span>Welcome</span> to eatery bay  {user && 
+           <span>{user.firstName}</span>   
+        }!</h1>
+       
         
         <p className='homeTxt'>Please first choose your prefered floor level</p>
         <div className='floorLevels'>

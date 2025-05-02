@@ -119,7 +119,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             } else if (row.count === 0) {
               insertReservation(1, 4, 26, 'available', 'Level 1' );
               insertReservation(2, 6, 26, 'available', 'Level 1' );
-              insertReservation(3, 4, 24, 'reserved', 'Level 1' );
+              insertReservation(3, 4, 24, 'available', 'Level 1' );
               insertReservation(4, 2, 20, 'available', 'Level 1');
 
             } else {
@@ -148,20 +148,20 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
       }
     );
 
-    db.run(`CREATE TABLE IF NOT EXISTS notifications (
-      id TEXT NOT NULL PRIMARY KEY,
-      message TEXT,
-      bookingId TEXT NOT NULL,
-      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      isRead BOOLEAN DEFAULT 0
+   
+    db.run(`CREATE TABLE IF NOT EXISTS subscriptions (
+      id TEXT PRIMARY KEY,
+      subscription TEXT NOT NULL
+
       )`, (err) => {
         if (err) {
-          console.log('Error creating notifications table', err.message)
+          console.log('Error creating Subscrition Table', err.message)
         } else {
-          console.log('Successfully created notifications Table')
+          console.log('Successfully created the Subscription Table')
         }
       }
-      )
+
+    )
     
   }
 });

@@ -3,10 +3,10 @@ import './profile.css';
 import { FaUserCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from 'react-router';
-import { LuUserRoundCog } from "react-icons/lu";
+import Table from 'react-bootstrap/Table';
 
 
-const Profile = ({ booking, setIsLoggedIn, user }) => {
+const Profile = ({ setIsLoggedIn, user }) => {
     
 
     const [selectBooking, setSelectedBooking] = useState(null)
@@ -26,6 +26,7 @@ const Profile = ({ booking, setIsLoggedIn, user }) => {
             }
             
             const result = await response.json() 
+            console.log('BOOKED DATA FOR USER',result )
             setSelectedBooking(result.data) 
            
 
@@ -67,29 +68,42 @@ const Profile = ({ booking, setIsLoggedIn, user }) => {
 
   
   return (
-    <div className='parentProfile col-6'>
+    <div className='parentProfile'>
+        <div className='userInfo'>
+            <FaUserCircle size={50} className='profileIcon'/>
+            <p>{user.firstName} {user.secondName}</p>
+            <Button onClick={handleLogout}>Logout</Button>
+        </div>
+          <Table className="col-10 mx-auto table">
+            <thead>
+                <tr>
+                    <td>Date</td>
+                    <td>Table No.</td>
+                    <td>Amount</td>
+                    <td>Status</td>
+                </tr>
+            </thead>
+            <tbody>
+                {selectBooking && selectBooking.length !== 0 ? 
+                selectBooking
+                .filter((element) => element.status !== 'cancelled')
+                .map((item) => (
+                    <tr key={item.id}>
+                        <td>{item.bookingDate}</td>
+                        <td>{item.tableNumber}</td>
+                        <td>1</td>
+                        <td>{item.status}</td>
+
+                    </tr>
+                ))
+                : <tr>
+                    <td>No reservation</td>
+                </tr> }
+
+            </tbody>
+          </Table>
         
-            {selectBooking && selectBooking.length !== 0 ? 
-            <div className='userInfo'>
-                
-                <FaUserCircle size={50} className='profileIcon'/>
-                <p>{selectBooking.firstName} {selectBooking.secondName}</p>
-                <p>{selectBooking.email}</p>
-                <p>Boking Date: {selectBooking.bookingDate.split(' ')[0]}</p>
-                <p>Table No: {selectBooking.tableNumber}</p>
-                <p>No of Guests {selectBooking.guestNumber}</p>
-                <p>Status: {selectBooking.status}</p>
-                <Button className='btn btn-danger mb-3'>Cancel Reservation</Button>
-                <Button onClick={handleLogout}>Logout</Button>
-                
-            </div>
             
-            : <div>
-                <p>Hi {user.firstName}, you dont have a reservation yet.</p>
-                <p>{user.email}</p>
-                <Button onClick={handleLogout}>Logout</Button>
-            </div>
-            }
             
 
     </div>
