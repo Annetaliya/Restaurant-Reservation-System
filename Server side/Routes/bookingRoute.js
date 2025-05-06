@@ -3,7 +3,15 @@ const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
-const { webPush } = require('../index');
+const webpush = require('web-push');
+const VAPIDKEY = process.env.WEB_PUSH_KEY;
+
+webpush.setVapidDetails(
+  'mailto:annetaliya@gmail.com',
+  'BGQOtwfwG5bzN0Vhyb_hIk_GhMXzkhlnnnk4vMjTBZq5_ZfwY69gcKhGq08TUY0hOtkbVHm1PnqfTVU_ehpBoMQ',
+  VAPIDKEY,
+
+)
 
 
 function notify (payload) {
@@ -14,8 +22,8 @@ function notify (payload) {
             return;
         }
         rows.forEach((row) => {
-            const subscription = JSON.stringify(row.subscription)
-            webPush.sendNotification(subscription, JSON.stringify(payload))
+            const subscription = JSON.parse(row.subscription)
+            webpush.sendNotification(subscription, JSON.stringify(payload))
             .then(()=> console.log('Push sent'))
             .catch((err) => console.log('push error', err.message))
         })
