@@ -71,7 +71,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
     <div className='parentProfile'>
         <div className='userInfo'>
             <FaUserCircle size={50} className='profileIcon'/>
-            <p>{user.firstName} {user.secondName}</p>
+            <p>{user?.firstName} {user?.secondName}</p>
             <Button onClick={handleLogout}>Logout</Button>
         </div>
           <Table className="col-10 mx-auto table">

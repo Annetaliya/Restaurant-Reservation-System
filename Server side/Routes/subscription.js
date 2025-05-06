@@ -3,7 +3,7 @@ const route = express.Router();
 const db = require('../database.js');
 const { v4: uuidv4 } = require('uuid')
 
-route.post('/subscribe', (req, res) => {
+route.post('/', (req, res) => {
     const subscription = JSON.stringify(req.body);
     const id = uuidv4();
 
@@ -17,3 +17,5 @@ route.post('/subscribe', (req, res) => {
 
     })
 })
+
+module.exports = route
