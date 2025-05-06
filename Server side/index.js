@@ -17,7 +17,7 @@ const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
 webPush.setVapidDetails(
   'mailto:annetaliya@gmail.com',
-  PUBLIC_KEY,
+  'BGQOtwfwG5bzN0Vhyb_hIk_GhMXzkhlnnnk4vMjTBZq5_ZfwY69gcKhGq08TUY0hOtkbVHm1PnqfTVU_ehpBoMQ',
   VAPIDKEY,
 
 )
