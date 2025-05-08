@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 
 const ProtectedRoute = ({ user }) => {
     const navigate = useNavigate();
-    if (!user || user.role !== 'admin') {
+    if (user?.role !== 'admin') {
         Swal.fire('Access denied')
         navigate('/')
     }
