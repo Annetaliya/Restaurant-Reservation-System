@@ -99,7 +99,7 @@ const Login = ({ setIsLoggedIn }) => {
           isSubmitting,
         }) => (
           <Form onSubmit={handleSubmit}>
-            <Form.Group as={Col} md="8" className="mb-2" controlId="email">
+            <Form.Group as={Col} md="10" className="mb-2" controlId="email">
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="text"
@@ -115,7 +115,7 @@ const Login = ({ setIsLoggedIn }) => {
                 {errors.email}
               </Form.Control.Feedback>
             </Form.Group>
-            <InputGroup as={Col} md="8" controlId="password">
+            <InputGroup as={Col} md="6" controlId="password">
               <InputGroupText onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <FaEye /> : <FaEyeSlash />}
               </InputGroupText>

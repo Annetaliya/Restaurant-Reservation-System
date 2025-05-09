@@ -20,6 +20,10 @@
     font-size: 10px;
     background-color: beige;
     display: none;
+    height: 200px;
+}
+.notifyMessage{
+    font-size: 1.1rem;
 }
 .notifyShow {
     display: block;
