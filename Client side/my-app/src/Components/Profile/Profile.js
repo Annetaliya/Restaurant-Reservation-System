@@ -9,13 +9,26 @@ import Table from 'react-bootstrap/Table';
 const Profile = ({ setIsLoggedIn, user }) => {
     
 
-    const [selectBooking, setSelectedBooking] = useState(null)
+    const [selectBooking, setSelectedBooking] = useState([])
+    const [currentBookings, setCurrentBookings] = useState([])
     
+    const options = { timeZone: "Africa/Nairobi", hour12: false };
+    const currentDate = new Date().toLocaleString('en-GB', options).replace(',', '').split(' ')[0]
     
    const navigate = useNavigate();
    const { id } = useParams();
-   console.log('This is params', id)
-   console.log('user details', user)
+   
+ 
+
+   useEffect(() => {
+    const filteredBooking = selectBooking.filter((element) => {
+        return element.bookingDate.split(" ")[0] >= currentDate
+    })
+    setCurrentBookings(filteredBooking)
+
+   }, [selectBooking, currentDate])
+
+   
 
     const fetchBookingByUser = async (userId) => {
        
@@ -26,7 +39,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
             }
             
             const result = await response.json() 
-            console.log('BOOKED DATA FOR USER',result )
+
             setSelectedBooking(result.data) 
            
 
@@ -70,9 +83,10 @@ const Profile = ({ setIsLoggedIn, user }) => {
   return (
     <div className='parentProfile'>
         <div className='userInfo'>
-            <FaUserCircle size={50} className='profileIcon'/>
+            <FaUserCircle size={70} className='profileIcon'/>
             <p>{user?.firstName} {user?.secondName}</p>
-            <Button onClick={handleLogout}>Logout</Button>
+            <p>Hi {user?.firstName} here are your vailable bookings</p>
+            
         </div>
           <Table className="col-10 mx-auto table">
             <thead>
@@ -84,14 +98,14 @@ const Profile = ({ setIsLoggedIn, user }) => {
                 </tr>
             </thead>
             <tbody>
-                {selectBooking && selectBooking.length !== 0 ? 
-                selectBooking
+                {currentBookings && currentBookings.length !== 0 ? 
+                currentBookings
                 .filter((element) => element.status !== 'cancelled')
                 .map((item) => (
                     <tr key={item.id}>
-                        <td>{item.bookingDate}</td>
+                        <td>{item.bookingDate.split(' ')[0]}</td>
                         <td>{item.tableNumber}</td>
-                        <td>1</td>
+                        <td>{item.price}</td>
                         <td>{item.status}</td>
 
                     </tr>
@@ -102,6 +116,11 @@ const Profile = ({ setIsLoggedIn, user }) => {
 
             </tbody>
           </Table>
+          <div className='btnLogout'>
+            <Button onClick={handleLogout}>Logout</Button>
+
+          </div>
+          
         
             
             

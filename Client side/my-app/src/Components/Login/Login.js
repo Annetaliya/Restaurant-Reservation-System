@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import InputGroup from "react-bootstrap/InputGroup";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { MdOutlineAlternateEmail } from "react-icons/md";
 
 const Login = ({ setIsLoggedIn }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -99,8 +100,11 @@ const Login = ({ setIsLoggedIn }) => {
           isSubmitting,
         }) => (
           <Form onSubmit={handleSubmit}>
-            <Form.Group as={Col} md="10" className="mb-2" controlId="email">
-              <Form.Label>Email</Form.Label>
+            <InputGroup as={Col} md="6" controlId="email"className="mb-3">
+            <InputGroupText>
+              <MdOutlineAlternateEmail />
+            </InputGroupText>
+              
               <Form.Control
                 type="text"
                 placeholder="Email"
@@ -114,7 +118,8 @@ const Login = ({ setIsLoggedIn }) => {
               <Form.Control.Feedback type="invalid">
                 {errors.email}
               </Form.Control.Feedback>
-            </Form.Group>
+            </InputGroup>
+            
             <InputGroup as={Col} md="6" controlId="password">
               <InputGroupText onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <FaEye /> : <FaEyeSlash />}

@@ -25,6 +25,7 @@ const Booking = ({ table, show, setShow, handleShow}) => {
         reservationId: table ? table.id :'',
         tableNo: table ? table.tableNumber : '',
         guestNo: table ? table.guestNumber: '',
+        price: table ? table.price: '',
         bookingDate: '',
     })
     const navigate = useNavigate();
@@ -135,14 +136,22 @@ const Booking = ({ table, show, setShow, handleShow}) => {
                         onChange={handleChange}
                         readOnly
                         />
-
+                    </Form.Group>
+                    <Form.Group className='mb-3' controlId='price'>
+                        <Form.Label>Amount</Form.Label>
+                        <Form.Control 
+                        type='text'
+                        name='price'
+                        value={formData.price}
+                        onChange={handleChange}
+                        readOnly
+                        />
                     </Form.Group>
                     <Form.Group>
                         <DatePicker 
                         selected={selectedDate}
                         onChange={handleDateChange}
                         className='form-control mb-3'
-                        
                         showTimeSelect dateFormat="Pp" 
                         placeholderText='click to pick date'
                         />

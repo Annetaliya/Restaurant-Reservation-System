@@ -24,9 +24,26 @@ function notify (payload) {
         rows.forEach((row) => {
             const subscription = JSON.parse(row.subscription)
             webpush.sendNotification(subscription, JSON.stringify(payload))
-            .then(()=> console.log('Push sent'))
-            .catch((err) => console.log('push error', err.message))
+            .then(()=> console.log(`Push sent to subscription ID ${row.id}`))
+            .catch((err) => {
+                console.log('Push error', err.statusCode, err.body)
+                if (err.statusCode === 404 || err.statusCode === 410) {
+                    console.log(`Subscription ${row.id} no longer valid. Deleting...`)
+                    deleteSubscription(row.id)
+
+                }
+            })
         })
+    })
+}
+
+function deleteSubscription(id) {
+    const sql = `DELETE From subscriptions WHERE id = ?`
+    db.run(sql, [id], function(err) {
+        if (err) {
+            console.log('Failed to delete', err.message)
+        }
+        console.log(`Deleted subscription with id ${id}`);
     })
 }
 
@@ -145,7 +162,7 @@ router.get('/:id', (req, res) => {
 router.get('/user/:id', (req,res) => {
     const sql = `select booking.id, booking.bookingDate, booking.status,
                         user.firstName, user.secondName, user.email,
-                        reservations.tableNumber, reservations.guestNumber, reservations.floorLevel
+                        reservations.tableNumber, reservations.guestNumber, reservations.floorLevel, reservations.price
                 FROM booking
                 JOIN user ON booking.userId = user.id
                 JOIN reservations ON booking.reservationId = reservations.id
