@@ -3,8 +3,8 @@
     margin: 0 auto;
     margin-top: 4rem;
     margin-bottom: 3rem;
-    border-radius: 10px;
-    border: 1px solid #5A4FCF;
+    /* border-radius: 10px;
+    border: 1px solid #5A4FCF; */
     /* background: #252525; */
 }
 
@@ -13,6 +13,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+.userInfo p:first-of-type {
+    color: #5A4FCF;
+    font-weight: 400;
+    font-size: 1.5rem;
 }
 
 
@@ -34,4 +39,10 @@
     color: #fff;
     padding: 5px 6px;
     border-radius: 4px;
+}
+.btnLogout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }

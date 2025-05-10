@@ -13,15 +13,8 @@ const subscribe = require('./Routes/subscription.js');
 const session = require('express-session')
 require('dotenv').config();
 const SECRET_KEY = process.env.JWT_SECRET;
-const VAPIDKEY = process.env.WEB_PUSH_KEY;
-const PUBLIC_KEY = process.env.PUBLIC_KEY;
 
-webpush.setVapidDetails(
-  'mailto:annetaliya@gmail.com',
-  'BGQOtwfwG5bzN0Vhyb_hIk_GhMXzkhlnnnk4vMjTBZq5_ZfwY69gcKhGq08TUY0hOtkbVHm1PnqfTVU_ehpBoMQ',
-  VAPIDKEY,
 
-)
 
 //const cookieSession = require('cookie-session');
 app.use(bodyParser.urlencoded({ extended: false }))

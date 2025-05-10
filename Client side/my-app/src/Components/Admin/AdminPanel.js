@@ -204,13 +204,13 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
   const [reservations, setReservations] = useState([]);
   const [todaysReservations, setTodaysReservations] = useState(null);
   const [searchParams, setSearchParams] = useState('');
- // const [notifications, setNotifications] = useState([]);
-  //const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
-  // const handleNotificationShow = () => {
-  //   setShowNotifications(!showNotifications)
-  //   console.log(showNotifications)
-  // }
+  const handleNotificationShow = () => {
+     setShowNotifications(!showNotifications)
+     console.log(showNotifications)
+   }
  
 
 
@@ -247,19 +247,26 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
         try {
           const registration = await navigator.serviceWorker.register('/sw.js');
+          const presentSubscription = await registration.pushManager.getSubscription()
+          if (!presentSubscription) {
+            const subscription = await registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: publicKey
+             })
+            await fetch('http://localhost:8000/subscribe', {
+              method: 'POST',
+              headers: {
+              'Content-Type': 'application/json',
+              },
+             body: JSON.stringify(subscription)
+            })
+            console.log('Subscribed to push notification', subscription)
+            
+          } else {
+            console.log('Already subscribed', presentSubscription);
+          }
   
-          const subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: publicKey
-           })
-          await fetch('http://localhost:8000/subscribe', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-           body: JSON.stringify(subscription)
-          })
-          console.log('Subscribed to push notification', subscription)
+          
 
         } catch (err) {
           console.error('Subscription failed', err);
@@ -274,6 +281,14 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
     useEffect(() => {
       subscribe()
     }, [])
+
+    useEffect(() => {
+      navigator.serviceWorker.addEventListener('message',(event) => {
+        console.log('Messgae received', event.data)
+        setNotifications((prev) => [...prev, event.data])
+      })
+
+    },[])
   
   const options = { timeZone: "Africa/Nairobi", hour12: false };
   const today = new Date()
@@ -356,18 +371,18 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
   return (
     <div>
       <SideBar setIsLoggedIn={setIsLoggedIn}/>
-      {/* <div className="notificationContainer">
+      <div className="notificationContainer">
         <span className="notify" onClick={handleNotificationShow}>{notifications.length}</span>
         {notifications.length > 0 && (
-          notifications.map((item) => (
-            <div key={item.id} className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
-              <p>{item.message}</p>
+          notifications.map((item, index) => (
+            <div key={index} className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
+              <p className="notifyMessage">{item.message}</p>
 
             </div>
           ))
         )}
 
-      </div> */}
+      </div>
     
       <InputGroup className="w-50 mx-auto mb-5">
         <InputGroup.Text>
