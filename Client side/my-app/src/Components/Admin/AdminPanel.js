@@ -283,12 +283,22 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
     }, [])
 
     useEffect(() => {
+      const storedNotification = JSON.parse(localStorage.getItem('updatedNotification')) || []
+      setNotifications(storedNotification)
       navigator.serviceWorker.addEventListener('message',(event) => {
         console.log('Messgae received', event.data)
-        setNotifications((prev) => [...prev, event.data])
+        setNotifications((prev) => {
+          const updated = [...prev, event.data]
+          localStorage.setItem('updatedNotification',JSON.stringify(updated))
+          return updated
+        })
       })
 
     },[])
+    function handleRemoveNotification() {
+      setNotifications([]);
+      localStorage.removeItem('updatedNotification')
+    }
   
   const options = { timeZone: "Africa/Nairobi", hour12: false };
   const today = new Date()
@@ -374,13 +384,16 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
       <div className="notificationContainer">
         <span className="notify" onClick={handleNotificationShow}>{notifications.length}</span>
         {notifications.length > 0 && (
-          notifications.map((item, index) => (
-            <div key={index} className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
-              <p className="notifyMessage">{item.message}</p>
-
-            </div>
-          ))
+          <div className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
+            {notifications.map((item,index) => (
+              <p key={index} className="notifyMessage">{item.message}</p>
+            ))}
+            <Button onClick={handleRemoveNotification}>Clear All</Button>
+          </div>
         )}
+        
+        
+        
 
       </div>
     

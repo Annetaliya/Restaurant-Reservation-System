@@ -15,15 +15,23 @@
 
 .notifyContainer{
     position: absolute;
-    top: 20px;
+    top: 40px;
     right: 20px;
     font-size: 10px;
-    background-color: beige;
+    background-color: #fff;
     display: none;
-    height: 200px;
+    z-index: 1;
+    border-radius: 5px;
+    border: 1px solid #5A4FCF;
+    width: 300px;
+
 }
 .notifyMessage{
     font-size: 1.1rem;
+    padding: 6px 12px;
+    cursor: pointer;
+    background-color: aliceblue;
+    border-radius: 6px;
 }
 .notifyShow {
     display: block;

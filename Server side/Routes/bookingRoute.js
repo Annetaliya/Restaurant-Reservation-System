@@ -84,6 +84,7 @@ router.post('/', (req, res) => {
                             reservationId: resId,
                             bookingDate,
                             status
+                            
                     })
                 })
             })
@@ -97,12 +98,12 @@ router.post('/', (req, res) => {
                 message: 'Booking created Succsessfully',
                 data: result
             })
-        const tables = bookedTables.join(', ');
-        notify({
-            title: 'New booking received',
-            body:  `Tables ${tables} booked on ${bookingDate}`
-        })
-        })
+            const tables = bookedTables.join(', ');
+            notify({
+                title: 'New booking received',
+                body:  `Tables ${tables} booked on ${bookingDate.split(' ')[0]}`
+            })
+            })
         .catch(err => {
             console.log('Error creating bookings', err.message)
             res.status(500).json({ error: 'Database error'})
