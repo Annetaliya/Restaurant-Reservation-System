@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
 
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation} from "react-router";
 import './admin.css';
 
 
@@ -200,12 +200,15 @@ function SideBar({setIsLoggedIn}) {
   );
 }
 
-const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn}) => {
+const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
   const [reservations, setReservations] = useState([]);
   const [todaysReservations, setTodaysReservations] = useState(null);
   const [searchParams, setSearchParams] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  
+
+  
 
   const handleNotificationShow = () => {
      setShowNotifications(!showNotifications)

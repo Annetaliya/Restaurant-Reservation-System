@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Alert from 'react-bootstrap/Alert';
 import { FaCircle } from "react-icons/fa";
 import './home.css';
-
-//import Booking from '../Booking/Booking';
-import { useNavigate } from 'react-router';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
@@ -12,6 +9,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Swal from "sweetalert2";
 import Header from '../../Images/restaurant header.jpg';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 
 
@@ -106,9 +104,7 @@ const Booking = ({ table, show, setShow, handleShow}) => {
     
   return (
     <div>
-        {/* <Button variant='primary'  className='modalBtn' onClick={handleShow}>
-            Click to Reserve table
-        </Button> */}
+       
         <Modal show={show} onHide={handeClose}>
             <Modal.Header closeButton>
                 <Modal.Title>Only pick the date</Modal.Title>
@@ -182,13 +178,21 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     const [table, setTable] = useState(null);
     const [showAlert, setShowAlert] = useState(true)
     const [show, setShow] = useState(false);
+     const user = JSON.parse(localStorage.getItem('user'));
+    const navigate = useNavigate();
+    const location = useLocation();
     
     const handleShow = () => setShow(true);
+     useEffect(() => {
+        if (user.role === 'admin' && location.pathname === '/') {
+          navigate('/admin', {replace: true})
+        }
+    },[user.role])  
     
    
 
-    const user = JSON.parse(localStorage.getItem('user'));
-    const navigate  =  useNavigate()
+   
+    
     
 
     const filterdTables = reservationTable.filter((item) => item.floorLevel === selectedLevel)
