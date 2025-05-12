@@ -206,6 +206,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
   const [searchParams, setSearchParams] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [highlighrow, setHighlightRow] = useState(null);
   
 
   
@@ -352,6 +353,13 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
     }
   };
 
+  function handleHiglited(bookingRef) {
+    setHighlightRow(bookingRef)
+    setTimeout(() => {
+      setHighlightRow(null)
+    }, 3000)
+  }
+
   const handeDeleteReservation = async (id, reservationId) => {
     try {
       const response = await fetch(`http://localhost:8000/bookings/${id}`, {
@@ -389,7 +397,10 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
         {notifications.length > 0 && (
           <div className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
             {notifications.map((item,index) => (
-              <p key={index} className="notifyMessage">{item.message.message}</p>
+              <p key={index}
+              onClick={()=> handleHiglited(item.message.bookingId)} 
+              className="notifyMessage">{item.message.message}
+              </p>
             ))}
             <Button onClick={handleRemoveNotification}>Clear All</Button>
           </div>
@@ -456,7 +467,10 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
             filteredSearchReservations
             .filter((element, index) => element.status !== 'cancelled')
             .map((item) => (
-              <tr key={item.id}>
+              <tr 
+                key={item.id}
+                className={highlighrow === item.id ? 'highlited' : ''}
+              >
                 <td>{item.bookingDate.split(" ")[0]}</td>
                 <td>{item.bookingDate.split(" ")[1]}</td>
                 <td>{item.firstName}</td>
