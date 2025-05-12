@@ -389,7 +389,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
         {notifications.length > 0 && (
           <div className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
             {notifications.map((item,index) => (
-              <p key={index} className="notifyMessage">{item.message}</p>
+              <p key={index} className="notifyMessage">{item.message.message}</p>
             ))}
             <Button onClick={handleRemoveNotification}>Clear All</Button>
           </div>
