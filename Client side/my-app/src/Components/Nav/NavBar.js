@@ -25,7 +25,6 @@ if (userDetails) {
 
 
 
-console.log('id details', newId)
 const navItems = [
   { item: "Home", icon: <FaHome />, path: "/" },
   { item: "Contact", icon: <FaPhoneAlt />, path: "/contact" },

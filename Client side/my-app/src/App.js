@@ -16,6 +16,7 @@ function App() {
   const [reservationTable, setReservationTable] = useState([]);
   const user = JSON.parse(localStorage.getItem('user'));
   const booking = JSON.parse(localStorage.getItem('booking'));
+
  
 
 
@@ -78,6 +79,7 @@ function App() {
     <div>
       
       <Router>
+        
         <NavBar isLoggedIn={isLoggedIn} user={user}/>
         <Routes>
           <Route path="/" element={<Home booking={booking} fetchUpdateReservationTable={fetchUpdateReservationTable}  reservationTable={reservationTable} setReservationTable={setReservationTable}/>}/>
@@ -86,7 +88,7 @@ function App() {
           <Route path='/profile/:id/' element={<Profile booking={booking}  setIsLoggedIn={setIsLoggedIn} user={user}/>}/>
           <Route path='/contact' element={<Contact />}/>
           <Route element={<ProtectedRoute user={user} />}>
-            <Route path='/admin' element={<AdminPanel fetchUpdateReservationTable={fetchUpdateReservationTable} setIsLoggedIn={setIsLoggedIn}/>} />
+            <Route path='/admin' element={<AdminPanel fetchUpdateReservationTable={fetchUpdateReservationTable} setIsLoggedIn={setIsLoggedIn} user={user}/>} />
           </Route>   
         </Routes>
         <Footer />
