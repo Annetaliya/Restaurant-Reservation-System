@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
 
-import { useNavigate, useLocation} from "react-router";
+import { useNavigate } from "react-router";
 import './admin.css';
 
 
@@ -354,11 +354,17 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
   };
 
   function handleHiglited(bookingRef) {
-    setHighlightRow(bookingRef)
-    setTimeout(() => {
-      setHighlightRow(null)
-    }, 3000)
+    const matchingReserv = filteredSearchReservations.find((item) => {
+      return item.id === bookingRef
+    })
+    if (matchingReserv) {
+      console.log('Found and will highlight:', matchingReserv);
+      setHighlightRow(matchingReserv)
+    } else {
+      console.log('No matching reservation found')
+    }
   }
+  // console.log(`row: ${highlighrow} bookingId: ${filteredSearchReservations.bookingId}`)
 
   const handeDeleteReservation = async (id, reservationId) => {
     try {
@@ -436,7 +442,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr className="notHighlight">
               <td>1</td>
               <td>{today}</td>
               <td>Level 1</td>
@@ -469,7 +475,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
             .map((item) => (
               <tr 
                 key={item.id}
-                className={highlighrow === item.id ? 'highlited' : ''}
+                className={`notHighlight ${highlighrow === item.id ? 'highlighted' : ''}`}
               >
                 <td>{item.bookingDate.split(" ")[0]}</td>
                 <td>{item.bookingDate.split(" ")[1]}</td>

@@ -36,7 +36,8 @@
 .notifyShow {
     display: block;
 }
-.highlited{
-    background-color: aqua;
-    transition: background-color 0.5s ease;
+.highlighted {
+    color: aqua !important;
+    transition:  0.5s ease;
 }
+
