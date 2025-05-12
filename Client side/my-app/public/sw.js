@@ -6,6 +6,7 @@ self.addEventListener('push', function(event) {
 
     const notificationsOptions = {
         body: body,
+        data: data,
         tag: 'unique-tag',
         icon: icon,
         url: 'http://localhost:3000/admin',
@@ -14,7 +15,7 @@ self.addEventListener('push', function(event) {
     self.clients.matchAll({type: 'window'}).then(function(clients){
         for (const client of clients) {
             console.log('posting message to client', client)
-            client.postMessage({id: Date.now(), message: data.body})
+            client.postMessage({id: Date.now(), message: data.body, bookingId: data.data})
         }
 
     })

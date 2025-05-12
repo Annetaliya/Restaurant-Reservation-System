@@ -101,7 +101,11 @@ router.post('/', (req, res) => {
             const tables = bookedTables.join(', ');
             notify({
                 title: 'New booking received',
-                body:  `Tables ${tables} booked on ${bookingDate.split(' ')[0]}`
+                body:  `Tables ${tables} booked on ${bookingDate.split(' ')[0]}`,
+                data: {
+                    bookingId,
+                    tableNumber,
+                }
             })
             })
         .catch(err => {
