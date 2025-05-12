@@ -186,10 +186,10 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
 
 
     useEffect(() => {
-        if (user.role === 'admin' && location.pathname === '/') {
+        if (user?.role === 'admin' && location.pathname === '/') {
           navigate('/admin', {replace: true})
         }
-    },[user.role])  
+    },[user?.role])  
     
    
 
