@@ -212,7 +212,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
   const handleNotificationShow = () => {
      setShowNotifications(!showNotifications)
-     console.log(showNotifications)
+     
    }
  
 

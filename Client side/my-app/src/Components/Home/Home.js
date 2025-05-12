@@ -13,7 +13,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 
 
-const Booking = ({ table, show, setShow, handleShow}) => {
+const Booking = ({ table, show, setShow }) => {
     
     const user = JSON.parse(localStorage.getItem('user'))
    
@@ -67,7 +67,7 @@ const Booking = ({ table, show, setShow, handleShow}) => {
                 body: JSON.stringify(payload)
                 
                 });
-                console.log('this is the booking payload:', payload)
+                
                 if (!response.ok) {
                     throw new Error('Failed to create booking')
                 }
@@ -183,7 +183,9 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     const location = useLocation();
     
     const handleShow = () => setShow(true);
-     useEffect(() => {
+
+
+    useEffect(() => {
         if (user.role === 'admin' && location.pathname === '/') {
           navigate('/admin', {replace: true})
         }
@@ -206,7 +208,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
             }
             const result =  await response.json();
             setReservationTable(result.data)
-            console.log(result)
+            
 
         } catch (err) {
             console.log(err.message)

@@ -13,6 +13,7 @@ import InputGroupText from "react-bootstrap/esm/InputGroupText";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
+  
   const validate = (values) => {
     const errors = {};
     if (!values.firstName) {
