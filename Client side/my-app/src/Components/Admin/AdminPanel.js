@@ -289,7 +289,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
       const storedNotification = JSON.parse(localStorage.getItem('updatedNotification')) || []
       setNotifications(storedNotification)
       navigator.serviceWorker.addEventListener('message',(event) => {
-        console.log('Messgae received', event.data)
+        console.log('Message received', event.data)
         setNotifications((prev) => {
           const updated = [...prev, event.data]
           localStorage.setItem('updatedNotification',JSON.stringify(updated))
