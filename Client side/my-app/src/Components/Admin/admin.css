@@ -36,3 +36,10 @@
 .notifyShow {
     display: block;
 }
+tr.highlighted td{
+    background-color: red;
+    transition:  0.5s ease;
+}
+tr.notNotify td{
+    background-color: red;
+}

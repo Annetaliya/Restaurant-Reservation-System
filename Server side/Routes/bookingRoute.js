@@ -98,10 +98,15 @@ router.post('/', (req, res) => {
                 message: 'Booking created Succsessfully',
                 data: result
             })
+            const bookingId = result[0].bookingId
             const tables = bookedTables.join(', ');
             notify({
                 title: 'New booking received',
-                body:  `Tables ${tables} booked on ${bookingDate.split(' ')[0]}`
+                body: {
+                    message: `Tables ${tables} booked on ${bookingDate.split(' ')[0]}`,
+                    bookingId: bookingId
+                }
+                
             })
             })
         .catch(err => {

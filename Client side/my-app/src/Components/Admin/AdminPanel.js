@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { IoSearchSharp } from "react-icons/io5";
@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
 
-import { useNavigate, useLocation} from "react-router";
+import { useNavigate } from "react-router";
 import './admin.css';
 
 
@@ -206,6 +206,8 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
   const [searchParams, setSearchParams] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [highlighrow, setHighlightRow] = useState(null);
+  const rowRefs = useRef({});
   
 
   
@@ -289,7 +291,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
       const storedNotification = JSON.parse(localStorage.getItem('updatedNotification')) || []
       setNotifications(storedNotification)
       navigator.serviceWorker.addEventListener('message',(event) => {
-        console.log('Messgae received', event.data)
+        console.log('Message received', event.data)
         setNotifications((prev) => {
           const updated = [...prev, event.data]
           localStorage.setItem('updatedNotification',JSON.stringify(updated))
@@ -352,6 +354,18 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
     }
   };
 
+  function handleHiglited(bookingRef) {
+   const row = rowRefs.current[bookingRef];
+   if (row) {
+    row.scrollIntoView({behavior : 'smooth', block: 'center'})
+    setHighlightRow(bookingRef)
+    setTimeout(()=> setHighlightRow(null), 3000)
+   } else {
+    console.log('row not found for bookingId:', bookingRef)
+   }
+  }
+  // console.log(`row: ${highlighrow} bookingId: ${filteredSearchReservations.bookingId}`)
+
   const handeDeleteReservation = async (id, reservationId) => {
     try {
       const response = await fetch(`http://localhost:8000/bookings/${id}`, {
@@ -389,7 +403,10 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
         {notifications.length > 0 && (
           <div className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
             {notifications.map((item,index) => (
-              <p key={index} className="notifyMessage">{item.message}</p>
+              <p key={index}
+               onClick={()=> handleHiglited(item.bookingId)} 
+                className="notifyMessage">{item.message}
+              </p>
             ))}
             <Button onClick={handleRemoveNotification}>Clear All</Button>
           </div>
@@ -418,14 +435,14 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
         <Table className="w-50 mx-auto mt-2">
           <thead>
             <tr>
-              <th>#</th>
+              <th className="success">#</th>
               <th>Date</th>
               <th>Floor Level</th>
               <th>No of Bookings</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr className="notNotify">
               <td>1</td>
               <td>{today}</td>
               <td>Level 1</td>
@@ -454,9 +471,13 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
         <tbody>
           {filteredSearchReservations.length !== 0 ? (
             filteredSearchReservations
-            .filter((element, index) => element.status !== 'cancelled')
+            .filter((element) => element.status !== 'cancelled')
             .map((item) => (
-              <tr key={item.id}>
+              <tr 
+                key={item.id}
+                ref={(el) => (rowRefs.current[item.id] = el)}
+                className={`${highlighrow === item.id ? 'highlighted' : ''}`}
+              >
                 <td>{item.bookingDate.split(" ")[0]}</td>
                 <td>{item.bookingDate.split(" ")[1]}</td>
                 <td>{item.firstName}</td>
