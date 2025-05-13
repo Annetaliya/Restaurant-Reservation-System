@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { IoSearchSharp } from "react-icons/io5";
@@ -207,6 +207,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [highlighrow, setHighlightRow] = useState(null);
+  const rowRefs = useRef({});
   
 
   
@@ -354,15 +355,14 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
   };
 
   function handleHiglited(bookingRef) {
-    const matchingReserv = filteredSearchReservations.find((item) => {
-      return item.id === bookingRef
-    })
-    if (matchingReserv) {
-      console.log('Found and will highlight:', matchingReserv);
-      setHighlightRow(matchingReserv)
-    } else {
-      console.log('No matching reservation found')
-    }
+   const row = rowRefs.current[bookingRef];
+   if (row) {
+    row.scrollIntoView({behavior : 'smooth', block: 'center'})
+    setHighlightRow(bookingRef)
+    setTimeout(()=> setHighlightRow(null), 3000)
+   } else {
+    console.log('row not found for bookingId:', bookingRef)
+   }
   }
   // console.log(`row: ${highlighrow} bookingId: ${filteredSearchReservations.bookingId}`)
 
@@ -404,8 +404,8 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
           <div className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
             {notifications.map((item,index) => (
               <p key={index}
-              onClick={()=> handleHiglited(item.bookingId)} 
-              className="notifyMessage">{item.message}
+               onClick={()=> handleHiglited(item.bookingId)} 
+                className="notifyMessage">{item.message}
               </p>
             ))}
             <Button onClick={handleRemoveNotification}>Clear All</Button>
@@ -471,11 +471,12 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
         <tbody>
           {filteredSearchReservations.length !== 0 ? (
             filteredSearchReservations
-            .filter((element, index) => element.status !== 'cancelled')
+            .filter((element) => element.status !== 'cancelled')
             .map((item) => (
               <tr 
                 key={item.id}
-                className={`${highlighrow === item.id ? 'bg-primary' : ''}`}
+                ref={(el) => (rowRefs.current[item.id] = el)}
+                className={`${highlighrow === item.id ? 'highlighted' : ''}`}
               >
                 <td>{item.bookingDate.split(" ")[0]}</td>
                 <td>{item.bookingDate.split(" ")[1]}</td>
