@@ -404,8 +404,8 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
           <div className={`notifyContainer ${showNotifications ? 'notifyShow' : ''}`}>
             {notifications.map((item,index) => (
               <p key={index}
-              onClick={()=> handleHiglited(item.message.bookingId)} 
-              className="notifyMessage">{item.message.message}
+              onClick={()=> handleHiglited(item.bookingId)} 
+              className="notifyMessage">{item.message}
               </p>
             ))}
             <Button onClick={handleRemoveNotification}>Clear All</Button>
@@ -435,14 +435,14 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
         <Table className="w-50 mx-auto mt-2">
           <thead>
             <tr>
-              <th>#</th>
+              <th className="success">#</th>
               <th>Date</th>
               <th>Floor Level</th>
               <th>No of Bookings</th>
             </tr>
           </thead>
           <tbody>
-            <tr className="notHighlight">
+            <tr className="notNotify">
               <td>1</td>
               <td>{today}</td>
               <td>Level 1</td>
@@ -475,7 +475,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
             .map((item) => (
               <tr 
                 key={item.id}
-                className={`notHighlight ${highlighrow === item.id ? 'highlighted' : ''}`}
+                className={`${highlighrow === item.id ? 'bg-primary' : ''}`}
               >
                 <td>{item.bookingDate.split(" ")[0]}</td>
                 <td>{item.bookingDate.split(" ")[1]}</td>
