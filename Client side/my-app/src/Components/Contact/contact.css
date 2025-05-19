@@ -1,0 +1,35 @@
+.contactContainer{
+    height: 100vh;
+}
+.contactTitle{
+    margin-top: 3rem;
+    text-align: center;
+    font-weight: 400;
+    margin-bottom: 2rem;
+    /* color: #fff; */
+    text-decoration: underline;
+    text-decoration-color: #51219E;
+    
+}
+.contactIntro{
+    padding: 1rem 3rem;
+    /* color: #d1d1d1; */
+    text-align: center;
+    line-height: 1.6;
+}
+
+.contactIntro span {
+    font-size: 2.5rem;
+}
+.contactInfoIcons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background-color: #252525;
+    max-width: 300px;
+    margin-left: 10rem;
+    padding: 10px;
+    border-radius: 6px;
+    border: solid 1px #51219E;
+}

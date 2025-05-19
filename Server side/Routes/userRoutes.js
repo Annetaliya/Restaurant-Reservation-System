@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
     })
 })
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', (req, res) => {
     const sql = 'select * from user where id = ?'
     const params = [req.params.id]
     db.get(sql, params, (err, row) => {

@@ -6,6 +6,9 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 const db = require('../database.js')
 
+
+
+
 router.post('/', (req,res) => {
     const { email, password }  = req.body;
 
@@ -29,6 +32,11 @@ router.post('/', (req,res) => {
                 SECRET_KEY,
                 {expiresIn: '2h'}
             )
+            req.session.user = {
+                id: user.id,
+                token: token,
+                role: user.role
+            }
             res.json({
                 'message': 'login successfully',
                 token, 
@@ -43,6 +51,17 @@ router.post('/', (req,res) => {
             })
         }
     )
+})
+
+router.post('/logout', (req, res) => {
+    req.session.destroy(err =>{
+        if (err) {
+            console.log(err)
+            return res.status(500).json({message: 'Logout failed'})
+        }
+        res.clearCookie('connect.sid')
+        res.json({message: 'Logout successful'})
+    })
 })
 
 function authenticateToken (req, res, next) {

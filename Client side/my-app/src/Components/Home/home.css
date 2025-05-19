@@ -6,11 +6,42 @@
     padding-top: 4rem;
     font-size: 3rem;
     font-weight: 400;
+
+}
+.homeIntro span {
+    color: #5A4FCF;
+}
+.headerImg {
+    width: 100vw;
+    height: 40vh;
+    object-fit: cover;
+    
+}
+.alert {
+    position: absolute;
+    bottom: 0;
+    width: 40vw
 }
 .homeTxt {
     text-align: center;
     margin-top: 0;
     font-size: 1rem;
+    color: rgb(53, 53, 53);
+}
+.tableNumber {
+    font-size: 0.7rem;
+    color:rgb(52, 52, 52);
+    margin-bottom: 10px;
+}
+.guestNumber {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: rgb(51, 51, 51);
+    margin-bottom: 8px;
+}
+.price {
+    color: #292929;
+    font-weight: 500;
 }
 .floorLevels {
     display: flex;
@@ -18,16 +49,25 @@
     justify-content: center;
     gap: 40px;
 }
-.floorLevels button {
+.levelbutton {
     padding: 8px 26px;
-    border: 1px solid #E7717D;
+    border: 1px solid #51219E;
     border-radius: 8px;
+    color: #fff;
     background-color: transparent;
 }
-.floorLevels button:hover {
-    background-color: #E7717D;
+.levelbutton:hover {
+    background-color: #51219E;
     color: #fff;
     border: none;
+}
+
+.active {
+    padding: 8px 26px;
+    border: none;
+    border-radius: 8px;
+    background-color: #51219E;;
+
 }
 .tableItems {
     margin-top: 2rem;
@@ -39,17 +79,33 @@
 
 }
 
-.table {
+.tableHome {
     height: 80px;
     width: 80px;
     background-color: white;
     border-radius: 15px;
+    transition: transform 0.3s ease-in-out;
+}
+.tableHome:hover {
+    cursor: pointer;
+    transform: scale(1.1);
 }
 .individualTable {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    position: relative;
+    background: tranparent;
+    padding: 10px 30px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: solid 1px #51219E;
+}
+.modalBtn {
+    position: absolute;
+    bottom: 0;
+    right: 50%;
 }
 .availability {
     fill: green;

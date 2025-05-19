@@ -9,15 +9,19 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@novu/node": "^2.6.6",
     "bcryptjs": "^3.0.2",
     "cookie-session": "^2.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
     "md5": "^2.3.0",
     "sequelize": "^6.37.6",
+    "socket.io": "^4.8.1",
     "sqlite3": "^5.1.7",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "web-push": "^3.6.7"
   }
 }

@@ -1,0 +1,45 @@
+.table {
+    transform: none !important;
+}
+.notify {
+    background-color: red;
+    border-radius: 50%;
+    padding: 4px 10px;
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    font-size: 10px;
+    color: aliceblue;
+    cursor: pointer;
+}
+
+.notifyContainer{
+    position: absolute;
+    top: 40px;
+    right: 20px;
+    font-size: 10px;
+    background-color: #fff;
+    display: none;
+    z-index: 1;
+    border-radius: 5px;
+    border: 1px solid #5A4FCF;
+    width: 300px;
+
+}
+.notifyMessage{
+    font-size: 1.1rem;
+    padding: 6px 12px;
+    cursor: pointer;
+    background-color: aliceblue;
+    border-radius: 6px;
+}
+.notifyShow {
+    display: block;
+}
+tr.highlighted td{
+    background-color: red;
+    transition:  0.5s ease;
+}
+tr.notNotify td{
+    background-color: red;
+}

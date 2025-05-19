@@ -1,0 +1,38 @@
+.parentFooter {
+    /* background-color: #5A4FCF;
+    background-image: linear-gradient(315deg, #5A4FCF 0%, #242124 74%); */
+    background: #020024;
+    background: linear-gradient(90deg,rgba(2, 0, 36, 1) 35%, rgba(81, 33, 158, 1) 63%, rgba(33, 190, 222, 1) 100%);
+    margin-bottom: 0;
+    padding-bottom: 0;
+    height: 30vh;
+    display: flex;
+    align-items: center;
+    gap: 80px;
+    justify-content: right;
+}
+.footerElements p {
+    color: #fff;
+    font-weight: 300;
+    
+}
+.iconsContact {
+    fill: #fff;
+    padding-right: 20px;
+    cursor: pointer;
+}
+.contact {
+    color: #fff;
+    list-style: none;
+    padding-bottom: 20px;
+    text-decoration: none;
+}
+.dispayIcons {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease-in-out;
+
+}
+.displayIcons:hover{
+    transform: scale(1.1);
+}

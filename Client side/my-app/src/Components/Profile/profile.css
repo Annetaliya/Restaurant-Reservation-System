@@ -1,0 +1,48 @@
+.parentProfile {
+    padding: 25px;
+    margin: 0 auto;
+    margin-top: 4rem;
+    margin-bottom: 3rem;
+    /* border-radius: 10px;
+    border: 1px solid #5A4FCF; */
+    /* background: #252525; */
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.userInfo p:first-of-type {
+    color: #5A4FCF;
+    font-weight: 400;
+    font-size: 1.5rem;
+}
+
+
+.profileHeader{
+    width: 300px;
+    height: 40px;
+    background-color:#E7717D;
+
+    border-radius: 5px;
+}
+.profileIcon {
+    margin-top: 10px;
+    fill: #fff;
+    padding-bottom: 20px;
+
+}
+.bookingStatus {
+    background-color: rgb(59, 59, 243);
+    color: #fff;
+    padding: 5px 6px;
+    border-radius: 4px;
+}
+.btnLogout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}

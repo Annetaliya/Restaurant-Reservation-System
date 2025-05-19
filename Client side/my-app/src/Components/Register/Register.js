@@ -4,11 +4,16 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import "./register.css";
-import { Formik, Field } from "formik";
+import { Formik } from "formik";
 import Swal from "sweetalert2";
 import { Link, useNavigate } from "react-router";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import InputGroup from "react-bootstrap/InputGroup";
+import InputGroupText from "react-bootstrap/esm/InputGroupText";
 
 const Register = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  
   const validate = (values) => {
     const errors = {};
     if (!values.firstName) {
@@ -57,7 +62,7 @@ const Register = () => {
     confirmPassword: "",
     phone: "",
   };
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       const response = await fetch("http://localhost:8000/users", {
@@ -69,13 +74,14 @@ const Register = () => {
       });
       const result = await response.json();
       if (response.ok) {
+
         Swal.fire({
           title: "Good Job",
           text: "Registration successful!",
           icon: "success",
         });
         resetForm();
-        navigate('/login')
+        navigate("/login");
       } else {
         alert(result.message || "Something went wrong!");
       }
@@ -157,10 +163,14 @@ const Register = () => {
               </Form.Group>
             </Row>
             <Row className="mb-3">
-              <Form.Group as={Col} md="6" controlId="password">
-                <Form.Label>Password</Form.Label>
+              <InputGroup as={Col} md="6" controlId="password">
+                
+                <InputGroupText onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <FaEye/> : <FaEyeSlash/>}
+                </InputGroupText>
+
                 <Form.Control
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="Enter Password"
                   value={values.password}
@@ -168,14 +178,15 @@ const Register = () => {
                   onChange={handleChange}
                   isInvalid={touched.password && errors.password}
                 />
+
                 <Form.Control.Feedback type="invalid">
                   {errors.password}
                 </Form.Control.Feedback>
-              </Form.Group>
-              <Form.Group as={Col} controlId="confirmPassword">
-                <Form.Label>confirm Password</Form.Label>
+              </InputGroup>
+              < InputGroup as={Col} controlId="confirmPassword">
+                <InputGroupText onClick={() => setShowPassword(!showPassword)}>{showPassword ? <FaEye/> : <FaEyeSlash/>}</InputGroupText>
                 <Form.Control
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   name="confirmPassword"
                   placeholder="Confirm password"
                   value={values.confirmPassword}
@@ -186,7 +197,7 @@ const Register = () => {
                 <Form.Control.Feedback type="invalid">
                   {errors.confirmPassword}
                 </Form.Control.Feedback>
-              </Form.Group>
+              </InputGroup>
             </Row>
             <Form.Group as={Col} md="3" className="mb-3" controlId="phone">
               <Form.Label>Phone</Form.Label>
@@ -211,8 +222,10 @@ const Register = () => {
         )}
       </Formik>
       <p>
-        Already have an Account? 
-        <span><Link to='/login'>Login</Link></span>
+        Already have an Account?
+        <span>
+          <Link to="/login">Login</Link>
+        </span>
       </p>
     </div>
   );
