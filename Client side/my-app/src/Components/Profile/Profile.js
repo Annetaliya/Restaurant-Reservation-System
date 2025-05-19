@@ -85,7 +85,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
         <div className='userInfo'>
             <FaUserCircle size={70} className='profileIcon'/>
             <p>{user?.firstName} {user?.secondName}</p>
-            <p>Hi {user?.firstName} here are your vailable bookings</p>
+            <p>Hi {user?.firstName} here are your available bookings</p>
             
         </div>
           <Table className="col-10 mx-auto table">

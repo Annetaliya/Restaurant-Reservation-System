@@ -11,74 +11,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
   } else {
     console.log("Connected to the SQLite database");
     db.run("PRAGMA foreign_keys = ON")
-    db.run(
-      `CREATE TABLE IF NOT EXISTS user (
-            id TEXT PRIMARY KEY,
-            firstName TEXT,
-            secondName TEXT,
-            email TEXT UNIQUE,
-            password TEXT,
-            phone TEXT UNIQUE,
-            role TEXT DEFAULT 'user',
-            CONSTRAINT email__phone_unique UNIQUE (email, phone)
-            )`,
-      (err) => {
-        if (err) {
-          console.log("Error in creating user table", err.message);
-        } else {
-          console.log("User table was created successfully");
-
-          
-          function insertUser(firstName, secondName, email, password, phone, role='user') {
-  
-            db.get(
-              'SELECT COUNT(*) AS count FROM user WHERE email = ? OR phone = ?',
-              [email, phone],
-              (err, row) => {
-                if(err) {
-                  console.error('Error checking for existing user:', err.message)
-                } else if(row) {
-                  console.log('user already exists', email, phone)
-                } else {
-                  
-                  const insert =
-                 "INSERT INTO user(id, firstName, secondName, email, password, phone, role) VALUES (?,?,?,?,?,?,?)";
-                 db.run(insert, [
-                  uuidv4(),
-                  firstName,
-                  secondName,
-                  email,
-                  md5(password),
-                  phone,
-                  role,
-
-                 ], (err) => {
-                  if (err) {
-                    console.log(`Error in inserting ${firstName} ${err.message}`)
-                  } else {
-                    console.log('${firstName} created succsesfully')
-                  }
-                 })
-                }
-              }
-            )
-
-          }
-          db.get("SELECT COUNT(*) AS  count FROM user," , (err,row) => {
-            if (err) {
-              console.log('Error checking user', err.message)
-            } else if (row.count === 0) {
-              insertUser('Emeli', 'Sande', 'sandeadmin@example.com', 'sande12345', '0745600911', 'admin');
-              insertUser('first', 'admin', 'admin@example.com', 'admin1235', '0723456790', 'user')
-              insertUser('Annette', 'Aliya', 'aliya@example.com', 'aliya678', '0723456797', 'user')
-            } else {
-              console.log('Users aready exist, skipping insertion')
-            }
-          })
-          
-        }
-      }
-    );
+   
     
 
     db.run(
@@ -159,6 +92,25 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         } else {
           console.log('Successfully created the Subscription Table')
         }
+      }
+
+    )
+    db.run(`CREATE TABLE IF NOT EXISTS user (
+      id TEXT PRIMARY KEY,
+      firstName TEXT,
+      secondName TEXT,
+      email TEXT UNIQUE,
+      password TEXT,
+      phone TEXT UNIQUE,
+      role TEXT DEFAULT 'user',
+      CONSTRAINT email__phone_unique UNIQUE (email, phone)
+      )`, (err) => {
+        if (err) {
+          console.log('Error creating user table', err.message)
+        } else {
+          console.log('User Table was created')
+        }
+
       }
 
     )

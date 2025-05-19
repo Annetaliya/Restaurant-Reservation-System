@@ -72,7 +72,7 @@ const Booking = ({ table, show, setShow }) => {
                     throw new Error('Failed to create booking')
                 }
                 const result =  await response.json();
-                console.log('booking data', result)
+                
                 if (result.data) {
                     setFormData((prev) => ({
                         ...prev,

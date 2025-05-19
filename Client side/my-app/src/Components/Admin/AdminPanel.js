@@ -231,7 +231,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
         console.log("Error fetching the reservations");
       }
       const result = await response.json();
-      console.log("RESERVATIONS ON ADMIN PANEL:", result);
+      
       setReservations(result.data);
     } catch (error) {
       console.log("error fetching", error.message);
@@ -364,7 +364,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
     console.log('row not found for bookingId:', bookingRef)
    }
   }
-  // console.log(`row: ${highlighrow} bookingId: ${filteredSearchReservations.bookingId}`)
+  
 
   const handeDeleteReservation = async (id, reservationId) => {
     try {
@@ -377,7 +377,6 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
       const tablesLeft = reservations.filter((element) => element.id !== id);
       setReservations(tablesLeft);
       const result = await response.json();
-      console.log('response of delete function', result)
       localStorage.removeItem("booking");
       
       await fetchUpdateReservationTable( reservationId, "available")
