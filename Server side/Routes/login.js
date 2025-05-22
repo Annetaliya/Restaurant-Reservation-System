@@ -13,7 +13,7 @@ router.post('/', async (req,res) => {
     const { email, password }  = req.body;
     const db = getDB();
     try {
-        const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email])
+        const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
         if (rows.length === 0) {
             return res.status(400).json({error: 'Email not found'})
         }
