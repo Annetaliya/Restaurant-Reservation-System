@@ -49,7 +49,7 @@ const dbConfig = {
          reservationId VARCHAR(255) NOT NULL,
          bookingDate DATETIME DEFAULT CURRENT_TIMESTAMP,
          status ENUM('pending','confirmed', 'cancelled' ) NOT NULL DEFAULT 'confirmed',
-         FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE,
+         FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
          FOREIGN KEY (reservationId) REFERENCES reservations(id) ON DELETE CASCADE
          );
       `;
