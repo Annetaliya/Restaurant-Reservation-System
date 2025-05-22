@@ -4,53 +4,56 @@ const SECRET_KEY = process.env.JWT_SECRET;
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
-const db = require('../database.js')
+const { getDB } = require('../database2.js')
 
 
 
 
-router.post('/', (req,res) => {
+router.post('/', async (req,res) => {
     const { email, password }  = req.body;
+    const db = getDB();
+    try {
+        const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email])
+        if (rows.length === 0) {
+            return res.status(400).json({error: 'Email not found'})
+        }
+        const user = rows[0];
 
-    db.get('SELECT * FROM user WHERE email = ?',
-        [email], (err, user) => {
-            if (err) {
-                console.log(err)
-                return res.status(500).json({error: 'Database error'})
-                
-            }
-            if (!user) {
-                return res.status(400).json({error: 'Email not found'})
-            }
-            
-            if (password !== user.password) {
-                console.log(err)
-                return res.status(400).json({error: 'Incorrect password'})
-            }
-            const token = jwt.sign(
-                {id: user.id, email: user.email, role: user.role},
-                SECRET_KEY,
-                {expiresIn: '2h'}
-            )
-            req.session.user = {
+        if (password !== user.password) {
+            return res.status(400).json({ error: 'Incorrect password' })
+        }
+
+        const token = jwt.sign(
+            {id: user.id, email: user.email, role: user.role},
+            SECRET_KEY,
+            { expiresIn: '2h' }
+        );
+
+        req.session.user = {
+            id: user.id,
+            token: token,
+            role: user.role
+        }
+        res.json({
+            message: 'Login successfully',
+            token,
+            user: {
                 id: user.id,
-                token: token,
+                firstName: user.firstName,
+                secondName: user.secondName,
+                email: user.email,
+                phone: user.phone,
                 role: user.role
             }
-            res.json({
-                'message': 'login successfully',
-                token, 
-                user: {
-                    id: user.id,
-                    firstName: user.firstName,
-                    secondName: user.secondName,
-                    email: user.email,
-                    phone: user.phone,
-                    role: user.role,
-                }
-            })
-        }
-    )
+
+        })
+
+    } catch (err) {
+        console.error('Login error:', err)
+        res.status(500).json({ error: 'Database error' });
+
+    }
+
 })
 
 router.post('/logout', (req, res) => {
