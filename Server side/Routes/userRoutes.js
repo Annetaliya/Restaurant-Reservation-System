@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getDB } = require('../database2.js')
 const { v4: uuidv4 } = require('uuid')
+const bcrypt = require('bcryptjs');
 
 
 
@@ -46,8 +47,9 @@ router.post('/', async (req, res) => {
      
     try {
         const db = getDB();
+        const hashedPassword = await bcrypt.hash(password, 10)
         const sql = 'INSERT INTO users (id, firstname, secondName, email, password, phone, role) values(?,?,?,?,?,?,?)';
-        const params = [userId, firstName, secondName, email, password, phone, userRole]
+        const params = [userId, firstName, secondName, email, hashedPassword, phone, userRole]
         await db.execute(sql, params);
         res.json({message: 'successs', id: userId})
 
