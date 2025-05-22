@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const webpush = require('web-push');
+
 
 const PATH = 8000;
 const userRoutes = require('./Routes/userRoutes.js');
@@ -32,11 +32,6 @@ app.use(session({
     saveUninitialized: true,
     cookie: {secure: false}
 }))
-
-
-
-
-
 
 
 app.use('/users', userRoutes);

@@ -1,42 +1,38 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database2.js')
+const { getDB } = require('../database2.js')
 const { v4: uuidv4 } = require('uuid')
 
 
 
-router.get('/', (req, res) => {
-    const sql = 'select * from user';
-    const params = [];
-    db.all(sql, params, (err, rows) => {
-        if (err) {
-            res.status(400).json({'error':err.message})
-            return;
-        }
-        res.json({
-            "message": "ok",
-            "data": rows
-        })
-    })
+router.get('/', async (req, res) => {
+    try {
+        const db = getDB();
+        const [rows] = await db.execute('SELECT * FROM users');
+        res.json({message: 'ok', data: rows})
+
+    } catch (error) {
+        res.status(500).json({error: error.message})
+
+    }
+   
 })
 
-router.get('/:id', (req, res) => {
-    const sql = 'select * from user where id = ?'
-    const params = [req.params.id]
-    db.get(sql, params, (err, row) => {
-        if (err) {
-            res.status(400).json({"error":err.message})
-            return;
-        }
-        res.json({
-            "message": "ok",
-            "data": row
-        })
-    })
+router.get('/:id', async (req, res) => {
+    try {
+        const db = getDB();
+        const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [req.params.id])
+        res.json({message: 'ok', data: rows[0]})
+
+    } catch (err) {
+        res.status(500).json({ error: err.message})
+
+    }
+    
 })
 
 
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res) => {
 
     const {firstName, secondName, email, password, confirmPassword, phone, role} = req.body
     const userRole  = role || 'user';
@@ -47,36 +43,29 @@ router.post('/', (req, res, next) => {
         return res.status(400).json({message: 'password does not match'})
     }
     const userId = uuidv4();
+     
+    try {
+        const db = getDB();
+        const sql = 'INSERT INTO users (id, firstname, secondName, email, password, phone, role) values(?,?,?,?,?,?,?)';
+        const params = [userId, firstName, secondName, email, password, phone, userRole]
+        await db.execute(sql, params);
+        res.json({message: 'successs', id: userId})
 
-    const sql = 'INSERT INTO user (id, firstname, secondName, email, password, phone, role) values(?,?,?,?,?,?,?)';
-    const params = [userId, firstName, secondName, email, password, phone, userRole]
-    db.run(sql, params, (err, result) => {
-        if(err){
-            res.status(500).json({"error": err.message})
-            return;
-        }
-        res.json({
-            "message":"success",
-            "id": userId
+    } catch (err) {
+        res.status(500).json({ error: err.message})
 
-        })
-    })
+    }
 })
 
-router.delete('/id:', (req, res, next) => {
-    db.run(
-        'DELETE FROM user WHERE id = ?',
-        req.params.id,
-        function(error, result) {
-            if (error) {
-                res.status(400).json({"error": error.message})
-                return;
-            }
-            res.json({
-                "message": "user deleted",
-                changes: this.changes
-            })
-        }
-    )
+router.delete('/id:', async (req, res) => {
+    try {
+        const db = getDB();
+        const [result] = await db.execute('DELETE FROM users WHERE id = ?', [req.params.id])
+        res.json({message: "user deleted", affectedRows: result.affectedRows})
+
+    } catch (err) {
+        res.status(500).json({error: err.message})
+    }
+    
 })
 module.exports = router
