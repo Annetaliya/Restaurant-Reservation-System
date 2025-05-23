@@ -1,4 +1,4 @@
-const db =  require('../database');
+
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
@@ -6,7 +6,7 @@ require('dotenv').config();
 const webpush = require('web-push');
 const VAPIDKEY = process.env.WEB_PUSH_KEY;
 const { getDB } = require('../database2.js');
-const database2 = require('../database2.js');
+
 
 webpush.setVapidDetails(
   'mailto:annetaliya@gmail.com',
