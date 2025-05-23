@@ -1,10 +1,12 @@
-const db =  require('../database');
+
 const express = require('express');
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const webpush = require('web-push');
 const VAPIDKEY = process.env.WEB_PUSH_KEY;
+const { getDB } = require('../database2.js');
+
 
 webpush.setVapidDetails(
   'mailto:annetaliya@gmail.com',
@@ -14,269 +16,273 @@ webpush.setVapidDetails(
 )
 
 
-function notify (payload) {
-    const sql = 'SELECT subscription FROM subscriptions'
-    db.all(sql, [], (err, rows) => {
-        if (err){
-            console.log('Error getting subscriptions')
-            return;
-        }
-        rows.forEach((row) => {
-            const subscription = JSON.parse(row.subscription)
-            webpush.sendNotification(subscription, JSON.stringify(payload))
-            .then(()=> console.log(`Push sent to subscription ID ${row.id}`))
-            .catch((err) => {
-                console.log('Push error', err.statusCode, err.body)
+async function notify (payload) {
+    const db = getDB();
+    try {
+        const [rows] = db.execute('SELECT id, subscriptions FROM subscriptions')
+        for (const row of rows) {
+            const subscription = JSON.parse(row.subscription);
+            try {
+                await webpush.sendNotification(subscription, JSON.stringify(payload))
+                console.log(`Push sent to subscription ID ${row.id}`)
+
+            } catch (err) {
+                console.log('Push error', err.status, err.body)
                 if (err.statusCode === 404 || err.statusCode === 410) {
-                    console.log(`Subscription ${row.id} no longer valid. Deleting...`)
-                    deleteSubscription(row.id)
-
+                    console.log(`Subscription ${row.id} no longer available`)
+                    await deleteSubscription(row.id)
                 }
-            })
-        })
-    })
-}
-
-function deleteSubscription(id) {
-    const sql = `DELETE From subscriptions WHERE id = ?`
-    db.run(sql, [id], function(err) {
-        if (err) {
-            console.log('Failed to delete', err.message)
+            }
         }
-        console.log(`Deleted subscription with id ${id}`);
-    })
+    } catch (err) {
+        console.error('Error getting subscriptions', err);
+    }
+   
 }
 
-router.post('/', (req, res) => {
+async function deleteSubscription(id) {
+    const db = getDB();
+    try {
+        await db.execute('DELETE FROM subscriptions WHERE id = ?', [id])
+        console.log(`Deleted subscription with id ${id}`);
+
+    } catch (error) {
+         console.log('Failed to delete', error.message)
+    }
+}
+
+router.post('/', async (req, res) => {
+    const parseBookingDate = (dateStr) => {
+        const [day, month, yearAndTime] =  dateStr.split('/');
+        const [year, time] = yearAndTime.split(' ')
+        return `${year}-${month}-${day} ${time}`;
+    }
+
     const {userId, reservationId, bookingDate} = req.body;
+    const formattedDate = parseBookingDate(bookingDate)
 
     if (!userId || !reservationId || !bookingDate) {
-        console.log()
+
         return res.status(400).json({error: 'Missing userId or reservationId'})
     }
-    let bookedTables = []
+
+    const db = getDB();
+    const connection = await db.getConnection();
     const reservationIds = Array.isArray(reservationId) ? reservationId : [reservationId]
-    const insertBookings = (resId) => {
-        const bookingId = uuidv4();
-        const status = 'confirmed';
-        return new Promise((resolve, reject) => {
-            const sql = `INSERT INTO booking (id, userId, reservationId, bookingDate, status) VALUES (?,?,?,?,?)`;
-            const params = [bookingId, userId, resId, bookingDate, status];
-            db.run(sql, params, (err, row) => {
-                if (err) return reject(err)
-                const updateReservation = `UPDATE reservations SET status = 'reserved' WHERE id = ?` 
-                
-                db.run (updateReservation, [resId], (err) => {
-                    if (err) return reject(err)
-                    
-                    const getTableNo = `SELECT tableNumber FROM reservations WHERE id = ?`
-                    db.get(getTableNo, [resId], (err, row) => {
-                        if (err) return reject(err)
-                        if (row) {
-                            bookedTables.push(row.tableNumber)
-                        }
 
-                    })
-                        
-                    resolve({
-                            bookingId,
-                            userId,
-                            reservationId: resId,
-                            bookingDate,
-                            status
-                            
-                    })
-                })
+    let bookedTables = [];
+    let results = [];
+    try {
+        await connection.beginTransaction();
+
+        for (const resId of reservationIds) {
+            const bookingId = uuidv4();
+            const status = 'confirmed';
+
+            const insertSql =  `INSERT INTO booking (id, userId, reservationId, bookingDate, status) VALUES (?,?,?,?,?)`;
+            await connection.execute(insertSql, [bookingId, userId, resId, formattedDate, status])
+
+            //update reservation status
+            const updateSql = `UPDATE reservations SET status = 'reserved' WHERE id  = ?`
+            await connection.execute(updateSql, [resId])
+
+            //table number
+            const [rows] = await connection.execute(`SELECT tableNumber FROM reservations WHERE id = ?`, [resId])
+            if (rows.length > 0) {
+                bookedTables.push(rows[0].tableNumber)
+
+            }
+
+            results.push({
+                bookingId,
+                userId,
+                reservationId: resId,
+                bookingDate: formattedDate,
+                status
             })
-        
-
+        }
+        await connection.commit()
+        res.status(201).json({
+            message: 'Booking created successfully',
+            data: results
         })
+        const tables = bookedTables.join(', ');
+        const bookingId = results[0].bookingId;
+
+        await notify({
+            title: 'New booking received',
+            body: {
+                message: `Tables ${tables} booKed on ${formattedDate.split(' ')[0]}`,
+                bookingId
+            }
+        })
+
+    } catch (error) {
+        await connection.rollback();
+        console.log('Error creating bookings', error.message)
+        res.status(500).json({ error: 'Database error'})
+
+    } finally {
+        connection.release()
     }
-    Promise.all(reservationIds.map(reservationId => insertBookings(reservationId)))
-        .then(result => {
-            res.status(201).json({
-                message: 'Booking created Succsessfully',
-                data: result
-            })
-            const bookingId = result[0].bookingId
-            const tables = bookedTables.join(', ');
-            notify({
-                title: 'New booking received',
-                body: {
-                    message: `Tables ${tables} booked on ${bookingDate.split(' ')[0]}`,
-                    bookingId: bookingId
-                }
-                
-            })
-            })
-        .catch(err => {
-            console.log('Error creating bookings', err.message)
-            res.status(500).json({ error: 'Database error'})
-        })
-
-   
-   
+      
 })
 
 
 
-router.get('/', (req, res) => {
-    const sql = `SELECT booking.id, booking.bookingDate, booking.status,
-                        user.firstName, user.secondName, user.email, reservations.tableNumber,
+router.get('/', async (req, res) => {
+    const db = getDB();
+    try {
+        const sql = `SELECT booking.id, booking.bookingDate, booking.status,
+                        users.firstName, users.secondName, users.email, reservations.tableNumber,
                         reservations.guestNumber, reservations.floorLevel
                 FROM booking
-                JOIN user ON booking.userId = user.id
+                JOIN users ON booking.userId = users.id
                 JOIN reservations ON booking.reservationId = reservations.id
 
-    `;
-    db.all(sql, [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({error: err.message})
-        }
+        `;
+        const [rows] = await db.execute(sql);
         res.json({
-            'data': rows
+            data: rows
+
         })
-    })
+
+        
+    } catch (error) {
+        res.status(500).json({error: error.message})
+
+    }
 })
 
-router.get('/:id', (req, res) => {
-    const sql = `select booking.id, booking.bookingDate, booking.status,
-                        user.firstName, user.secondName, user.email,
+router.get('/:id', async (req, res) => {
+
+    const db = getDB();
+    try {
+        const sql = `select booking.id, booking.bookingDate, booking.status,
+                        users.firstName, users.secondName, users.email,
                         reservations.tableNumber, reservations.guestNumber, reservations.floorLevel
                 FROM booking
-                JOIN user ON booking.userId = user.id
+                JOIN users ON booking.userId = users.id
                 JOIN reservations ON booking.reservationId = reservations.id
                 WHERE booking.id = ?
                 ORDER BY booking.bookingDate DESC;
-     `
+        `
+        const [rows] = await db.execute(sql, [req.params.id])
 
-    const params = [req.params.id]
-    db.get(sql, params, (err, row) => {
-        if (err) {
-            res.status(400).json({"error":err.message})
-            return;
+        if (rows.length === 0) {
+           return res.status(404).json({
+                "error": "Booking not found" 
+            })
         }
-        if (!row) {
-            return res.status(404).json({ "error": "Booking not found" }); 
-        }
-        res.json({
-            "message": "ok",
-            "data": row
+         res.json({
+            message: "ok",
+            "data": rows[0]
         })
-    })
+
+    } catch (error) {
+        res.status(500).json({error: error.message})
+
+    }
+    
 })
-router.get('/user/:id', (req,res) => {
-    const sql = `select booking.id, booking.bookingDate, booking.status,
-                        user.firstName, user.secondName, user.email,
+router.get('/user/:id', async (req,res) => {
+    const db = getDB();
+    try {
+        const sql = `select booking.id, booking.bookingDate, booking.status,
+                        users.firstName, users.secondName, users.email,
                         reservations.tableNumber, reservations.guestNumber, reservations.floorLevel, reservations.price
                 FROM booking
-                JOIN user ON booking.userId = user.id
+                JOIN users ON booking.userId = users.id
                 JOIN reservations ON booking.reservationId = reservations.id
-                WHERE user.id = ?
+                WHERE users.id = ?
                 ORDER BY booking.bookingDate DESC;
 
-     `
-     db.all(sql, [req.params.id], (err,row) => {
-        if (err) {
-            console.log(err)
-            return res.status(500).json({message: 'server error'})
-            
-        }
-        if (!row) {
-            return res.status(400).json({message: 'booking not found'})
-        }
-        res.json({data: row})
+        `
+        const [rows] = await db.execute(sql, [req.params.id])
 
-     })
+        if (rows.length === 0) {
+            return res.status(404).json({message: 'booking not found'})
+        }
+        res.json({
+            data: rows
+        })
+
+    } catch (error) {
+        res.status(500).json({error: error.message})
+
+    }
+    
+    
 })
 
-router.patch('/:id', (req, res) => {
+router.patch('/:id', async (req, res) => {
+    const db = getDB();
     const { id } = req.params;
     const {status} = req.body;
 
     if (!status) {
         return res.status(400).json({error: 'no fields to update'})
     }
+     try {
+        const updateSql = `UPDATE booking SET status = ? WHERE id = ? `
+        const [updatedResult] = await db.execute(updateSql, [status, id]);
 
-    let fieldsToUpdate = [];
-    let params = [];
-
-    if (status) {
-        fieldsToUpdate.push('status = ?')
-        params.push(status)
-    }
-    params.push(id);
-    const sql = `UPDATE booking SET ${fieldsToUpdate.join(', ')} WHERE id = ?`
-
-    db.run(sql, params, function (err) {
-        if (err) {
-            console.log(err.message)
-            return res.status(500).json({error: 'Database error'})
-            
+        if (updatedResult.affectedRows === 0) {
+            return res.status(404).json({error: 'Booking not found'})
         }
 
-        if (this.changes === 0) {
-            return res.status(400).json({error: 'booking not found'})
-        }
-
-        db.get(`SELECT * FROM booking WHERE id = ?`, [id] , (err, row) => {
-            if (err) {
-                console.log(err.message)
-                return res.status(500).json({error: 'Error fetching updated bookings'})
-            }
-            
-            res.json({
-                message: 'updated booking successfuly',
-                data: row
-            })
-        }
-    )
-       
-       
-    }
-
-    )
-})
-
-router.delete('/:id', (req, res) =>{
-   const bookingId = req.params.id;
-
-   const getReservationSql = `SELECT reservationId, userId FROM booking WHERE id = ?`
-
-   db.get(getReservationSql, [bookingId], (err, row) => {
-    if (err) {
-        console.error('Error fetching reservationId', err.message);
-        return res.status(500).json({error: 'database error'})
-    }
-    if (!row) {
-        return res.status(404).json({message: 'booking not found'})
-    }
-    const { reservationId, userId } = row
-    const updateStatusSql = `UPDATE booking SET status = 'cancelled' WHERE id = ?`
-
-   // const sql = `DELETE FROM booking WHERE reservationId = ? AND userId = ?`
-    db.run(updateStatusSql, [bookingId], function (err) {
-        if (err) {
-            console.error('Error deleting bookind')
-            return res.status(500).json({error: 'database error'})
-        }
-
-        if (this.changes === 0) {
-            return res.status(400).json({message: 'booking not found'})
-        }
-
-        const reservationSql = `UPDATE reservations SET status = 'available' WHERE id = ?`
-
-        db.run(reservationSql, [reservationId], function (err) {
-            if (err) {
-                console.error('Error updating reservation status', err.message)
-                res.status(500).json({error: 'database error'})
-            }
-            res.json({message: 'Booking deleted', 'data': row})
+        //fetch updated booking
+        const currentSql = `SELECT * FROM bookng WHERE id = ?`
+        const [rows] = await db.execute(currentSql, [id])
+        res.json({
+            message: 'updated booking successfuly',
+            data: rows[0]
         })
 
+     } catch (error) {
+        console.error('Database error:', error.message)
+        res.status(500).json({error: 'Dtabase error'})
+
+     }
+
+})
+
+router.delete('/:id', async (req, res) =>{
+    const db = getDB();
+   const bookingId = req.params.id;
+
+   try {
+    //getting the reservation id and user id
+    const getReservationSql =  `SELECT reservationId, userId, FROM booking WHERE id = ?`;
+    const [rows] = await db.execute(getReservationSql, [bookingId])
+    if (rows.length === 0) {
+        return res.status(404).json({message: 'Booking not found'})
+    }
+
+    const { reservationId, userId} = rows[0];
+
+    const updateBookingSql = `UPDATE booking SET status = 'cancelled' WHERE id = ?`
+    const [updateResult] =  await db.execute(updateBookingSql, [bookingId])
+
+    if (updateResult.affectedRows === 0) {
+        return res.status(400).json({message: 'booking not found'})
+    }
+
+    //update the reservation table as available after cancellation of booking
+
+    const updateReservationSql = `UPDATE reservations SET status='available' WHERE id = ?`
+    await db.execute(updateReservationSql, [reservationId])
+
+    res.json({
+        message: 'Booking deleted',
+        data: { reservationId, userId}
     })
-   })
+
+   } catch (error) {
+        console.error('Error in deleting booking:', err.message);
+        res.status(500).json({ error: 'Database error' });
+
+   }
 })
 
 
