@@ -134,10 +134,10 @@ router.get('/', async (req, res) => {
     const db = getDB();
     try {
         const sql = `SELECT booking.id, booking.bookingDate, booking.status,
-                        user.firstName, user.secondName, user.email, reservations.tableNumber,
+                        users.firstName, users.secondName, users.email, reservations.tableNumber,
                         reservations.guestNumber, reservations.floorLevel
                 FROM booking
-                JOIN user ON booking.userId = user.id
+                JOIN users ON booking.userId = users.id
                 JOIN reservations ON booking.reservationId = reservations.id
 
         `;

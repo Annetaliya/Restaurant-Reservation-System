@@ -98,8 +98,8 @@ const Profile = ({ setIsLoggedIn, user }) => {
                 </tr>
             </thead>
             <tbody>
-                {currentBookings && currentBookings.length !== 0 ? 
-                currentBookings
+                {selectBooking && selectBooking.length !== 0 ? 
+                selectBooking
                 .filter((element) => element.status !== 'cancelled')
                 .map((item) => (
                     <tr key={item.id}>
