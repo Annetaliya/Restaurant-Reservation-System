@@ -112,7 +112,7 @@ router.post('/', async (req, res) => {
 
     } catch (error) {
         await connection.rollback();
-        console.log('Error creating bookings', err.message)
+        console.log('Error creating bookings', error.message)
         res.status(500).json({ error: 'Database error'})
 
     } finally {

@@ -1,15 +1,18 @@
 const mysql = require('mysql2/promise')
 
-const dbConfig = {
+const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: 'Annette',
   database: 'ebay',
-};
- let db;
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+ 
  async function initDB() {
    try {
-      db = await mysql.createConnection(dbConfig)
+     const connection  = await pool.getConnection()
       console.log('connected to mysql Database')
 
       const usersTable = 
@@ -24,7 +27,7 @@ const dbConfig = {
         CONSTRAINT email__phone_unique UNIQUE (email, phone)
          );
       `;
-      await db.execute(usersTable)
+      await connection.execute(usersTable)
       console.log('User table was successfully created')
 
 
@@ -39,7 +42,7 @@ const dbConfig = {
 
          );
       `;
-      await db.execute(reservationsTable)
+      await connection.execute(reservationsTable)
       console.log('Successfully created reservations table')
 
       const bookingTable = `
@@ -53,7 +56,7 @@ const dbConfig = {
          FOREIGN KEY (reservationId) REFERENCES reservations(id) ON DELETE CASCADE
          );
       `;
-      await db.execute(bookingTable)
+      await connection.execute(bookingTable)
       console.log('Created booking table successfully')
 
       const sqlQuery = `
@@ -62,7 +65,7 @@ const dbConfig = {
          subscriptions VARCHAR(255) NOT NULL
          );
       `;
-      await db.execute(sqlQuery) 
+      await connection.execute(sqlQuery) 
       console.log('Created subscription table successfully')
 
 
@@ -79,7 +82,7 @@ initDB()
 
 
   module.exports = {
-   getDB: ()=> db,
+   getDB: ()=> pool,
   };
 
  
