@@ -19,7 +19,7 @@ webpush.setVapidDetails(
 async function notify (payload) {
     const db = getDB();
     try {
-        const [rows] = db.execute('SELECT id, subscription FROM subscriptions')
+        const [rows] = db.execute('SELECT id, subscriptions FROM subscriptions')
         for (const row of rows) {
             const subscription = JSON.parse(row.subscription);
             try {
@@ -52,7 +52,14 @@ async function deleteSubscription(id) {
 }
 
 router.post('/', async (req, res) => {
+    const parseBookingDate = (dateStr) => {
+        const [day, month, yearAndTime] =  dateStr.split('/');
+        const [year, time] = yearAndTime.split(' ')
+        return `${year}-${month}-${day} ${time}`;
+    }
+
     const {userId, reservationId, bookingDate} = req.body;
+    const formattedDate = parseBookingDate(bookingDate)
 
     if (!userId || !reservationId || !bookingDate) {
 
@@ -73,7 +80,7 @@ router.post('/', async (req, res) => {
             const status = 'confirmed';
 
             const insertSql =  `INSERT INTO booking (id, userId, reservationId, bookingDate, status) VALUES (?,?,?,?,?)`;
-            await connection.execute(insertSql, [bookingId, userId, resId, bookingDate, status])
+            await connection.execute(insertSql, [bookingId, userId, resId, formattedDate, status])
 
             //update reservation status
             const updateSql = `UPDATE reservations SET status = 'reserved' WHERE id  = ?`
@@ -90,7 +97,7 @@ router.post('/', async (req, res) => {
                 bookingId,
                 userId,
                 reservationId: resId,
-                bookingDate,
+                bookingDate: formattedDate,
                 status
             })
         }
@@ -105,7 +112,7 @@ router.post('/', async (req, res) => {
         await notify({
             title: 'New booking received',
             body: {
-                message: `Tables ${tables} booKed on ${bookingDate.split(' ')[0]}`,
+                message: `Tables ${tables} booKed on ${formattedDate.split(' ')[0]}`,
                 bookingId
             }
         })

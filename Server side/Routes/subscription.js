@@ -5,12 +5,12 @@ const { getDB } = require('../database2.js');
 
 
 route.post('/', async (req, res) => {
-    const subscription = JSON.stringify(req.body);
+    const subscriptions = JSON.stringify(req.body);
     const id = uuidv4();
     const db = getDB();
 
     try {
-        await db.execute(`INSERT INTO subscriptions (id, subscription) VALUES (?,?)`, [id, subscription])
+        await db.execute(`INSERT INTO subscriptions (id, subscriptions) VALUES (?,?)`, [id, subscriptions])
         res.json({
             message: 'Subscription Saved'
 
