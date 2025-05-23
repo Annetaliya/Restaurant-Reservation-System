@@ -178,8 +178,10 @@ router.get('/:id', async (req, res) => {
     }
     
 })
-router.get('/user/:id', (req,res) => {
-    const sql = `select booking.id, booking.bookingDate, booking.status,
+router.get('/user/:id', async (req,res) => {
+    const db = getDB();
+    try {
+        const sql = `select booking.id, booking.bookingDate, booking.status,
                         user.firstName, user.secondName, user.email,
                         reservations.tableNumber, reservations.guestNumber, reservations.floorLevel, reservations.price
                 FROM booking
@@ -188,67 +190,54 @@ router.get('/user/:id', (req,res) => {
                 WHERE user.id = ?
                 ORDER BY booking.bookingDate DESC;
 
-     `
-     db.all(sql, [req.params.id], (err,row) => {
-        if (err) {
-            console.log(err)
-            return res.status(500).json({message: 'server error'})
-            
-        }
-        if (!row) {
-            return res.status(400).json({message: 'booking not found'})
-        }
-        res.json({data: row})
+        `
+        const [rows] = await db.execute(sql, [req.params.id])
 
-     })
+        if (rows.length === 0) {
+            return res.status(404).json({message: 'booking not found'})
+        }
+        res.json({
+            data: rows
+        })
+
+    } catch (error) {
+        res.status(500).json({error: error.message})
+
+    }
+    
+    
 })
 
-router.patch('/:id', (req, res) => {
+router.patch('/:id', async (req, res) => {
+    const db = getDB();
     const { id } = req.params;
     const {status} = req.body;
 
     if (!status) {
         return res.status(400).json({error: 'no fields to update'})
     }
+     try {
+        const updateSql = `UPDATE booking SET status = ? WHERE id = ? `
+        const [updatedResult] = await db.execute(updateSql, [status, id]);
 
-    let fieldsToUpdate = [];
-    let params = [];
-
-    if (status) {
-        fieldsToUpdate.push('status = ?')
-        params.push(status)
-    }
-    params.push(id);
-    const sql = `UPDATE booking SET ${fieldsToUpdate.join(', ')} WHERE id = ?`
-
-    db.run(sql, params, function (err) {
-        if (err) {
-            console.log(err.message)
-            return res.status(500).json({error: 'Database error'})
-            
+        if (updatedResult.affectedRows === 0) {
+            return res.status(404).json({error: 'Booking not found'})
         }
 
-        if (this.changes === 0) {
-            return res.status(400).json({error: 'booking not found'})
-        }
+        //fetch updated booking
+        const currentSql = `SELECT * FROM bookng WHERE id = ?`
+        const [rows] = await db.execute(currentSql, [id])
+        res.json({
+            message: 'updated booking successfuly',
+            data: rows[0]
+        })
 
-        db.get(`SELECT * FROM booking WHERE id = ?`, [id] , (err, row) => {
-            if (err) {
-                console.log(err.message)
-                return res.status(500).json({error: 'Error fetching updated bookings'})
-            }
-            
-            res.json({
-                message: 'updated booking successfuly',
-                data: row
-            })
-        }
-    )
-       
-       
-    }
+     } catch (error) {
+        console.error('Database error:', error.message)
+        res.status(500).json({error: 'Dtabase error'})
 
-    )
+     }
+
 })
 
 router.delete('/:id', (req, res) =>{
