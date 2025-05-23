@@ -240,45 +240,42 @@ router.patch('/:id', async (req, res) => {
 
 })
 
-router.delete('/:id', (req, res) =>{
+router.delete('/:id', async (req, res) =>{
+    const db = getDB();
    const bookingId = req.params.id;
 
-   const getReservationSql = `SELECT reservationId, userId FROM booking WHERE id = ?`
-
-   db.get(getReservationSql, [bookingId], (err, row) => {
-    if (err) {
-        console.error('Error fetching reservationId', err.message);
-        return res.status(500).json({error: 'database error'})
+   try {
+    //getting the reservation id and user id
+    const getReservationSql =  `SELECT reservationId, userId, FROM booking WHERE id = ?`;
+    const [rows] = await db.execute(getReservationSql, [bookingId])
+    if (rows.length === 0) {
+        return res.status(404).json({message: 'Booking not found'})
     }
-    if (!row) {
-        return res.status(404).json({message: 'booking not found'})
+
+    const { reservationId, userId} = rows[0];
+
+    const updateBookingSql = `UPDATE booking SET status = 'cancelled' WHERE id = ?`
+    const [updateResult] =  await db.execute(updateBookingSql, [bookingId])
+
+    if (updateResult.affectedRows === 0) {
+        return res.status(400).json({message: 'booking not found'})
     }
-    const { reservationId, userId } = row
-    const updateStatusSql = `UPDATE booking SET status = 'cancelled' WHERE id = ?`
 
-   // const sql = `DELETE FROM booking WHERE reservationId = ? AND userId = ?`
-    db.run(updateStatusSql, [bookingId], function (err) {
-        if (err) {
-            console.error('Error deleting bookind')
-            return res.status(500).json({error: 'database error'})
-        }
+    //update the reservation table as available after cancellation of booking
 
-        if (this.changes === 0) {
-            return res.status(400).json({message: 'booking not found'})
-        }
+    const updateReservationSql = `UPDATE reservations SET status='available' WHERE id = ?`
+    await db.execute(updateReservationSql, [reservationId])
 
-        const reservationSql = `UPDATE reservations SET status = 'available' WHERE id = ?`
-
-        db.run(reservationSql, [reservationId], function (err) {
-            if (err) {
-                console.error('Error updating reservation status', err.message)
-                res.status(500).json({error: 'database error'})
-            }
-            res.json({message: 'Booking deleted', 'data': row})
-        })
-
+    res.json({
+        message: 'Booking deleted',
+        data: { reservationId, userId}
     })
-   })
+
+   } catch (error) {
+        console.error('Error in deleting booking:', err.message);
+        res.status(500).json({ error: 'Database error' });
+
+   }
 })
 
 
