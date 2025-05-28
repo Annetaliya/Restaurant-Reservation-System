@@ -15,9 +15,10 @@ route.post('/', async (req, res) => {
             message: 'Subscription Saved'
 
         })
+        console.log('Subscription received:', req.body);
 
     } catch (error) {
-        console.log(error.message)
+        console.log('Subscription insert failed:', error.message)
         return res.status(500).json({error: 'Database Error'})
     }
 

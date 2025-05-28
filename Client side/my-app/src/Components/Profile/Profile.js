@@ -41,6 +41,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
             const result = await response.json() 
 
             setSelectedBooking(result.data) 
+            console.log(result.data)
            
 
         } catch (error) {
@@ -103,7 +104,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
                 .filter((element) => element.status !== 'cancelled')
                 .map((item) => (
                     <tr key={item.id}>
-                        <td>{item.bookingDate.split(' ')[0]}</td>
+                        <td>{item.bookingDate.split('T')[0]}</td>
                         <td>{item.tableNumber}</td>
                         <td>{item.price}</td>
                         <td>{item.status}</td>

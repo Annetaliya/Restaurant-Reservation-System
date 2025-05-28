@@ -62,7 +62,7 @@ const pool = mysql.createPool({
       const sqlQuery = `
          CREATE TABLE IF NOT EXISTS subscriptions(
          id VARCHAR(255) PRIMARY KEY,
-         subscriptions VARCHAR(255) NOT NULL
+         subscriptions TEXT NOT NULL
          );
       `;
       await connection.execute(sqlQuery) 

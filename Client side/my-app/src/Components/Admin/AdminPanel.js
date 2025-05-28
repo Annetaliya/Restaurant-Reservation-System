@@ -264,8 +264,9 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
               'Content-Type': 'application/json',
               },
              body: JSON.stringify(subscription)
+
             })
-            console.log('Subscribed to push notification', subscription)
+            
             
           } else {
             console.log('Already subscribed', presentSubscription);
