@@ -19,9 +19,10 @@ webpush.setVapidDetails(
 async function notify (payload) {
     const db = getDB();
     try {
-        const [rows] = db.execute('SELECT id, subscriptions FROM subscriptions')
+        const [rows] = await db.execute('SELECT id, subscriptions FROM subscriptions')
+        console.log(`🧾 Subscriptions fetched from DB: ${rows.length}`);
         for (const row of rows) {
-            const subscription = JSON.parse(row.subscription);
+            const subscription = JSON.parse(row.subscriptions);
             try {
                 await webpush.sendNotification(subscription, JSON.stringify(payload))
                 console.log(`Push sent to subscription ID ${row.id}`)
@@ -253,7 +254,7 @@ router.delete('/:id', async (req, res) =>{
 
    try {
     //getting the reservation id and user id
-    const getReservationSql =  `SELECT reservationId, userId, FROM booking WHERE id = ?`;
+    const getReservationSql =  `SELECT reservationId, userId FROM booking WHERE id = ?`;
     const [rows] = await db.execute(getReservationSql, [bookingId])
     if (rows.length === 0) {
         return res.status(404).json({message: 'Booking not found'})
@@ -279,7 +280,7 @@ router.delete('/:id', async (req, res) =>{
     })
 
    } catch (error) {
-        console.error('Error in deleting booking:', err.message);
+        console.error('Error in deleting booking:', error.message);
         res.status(500).json({ error: 'Database error' });
 
    }

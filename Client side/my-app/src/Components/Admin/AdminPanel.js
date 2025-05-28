@@ -264,8 +264,9 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
               'Content-Type': 'application/json',
               },
              body: JSON.stringify(subscription)
+
             })
-            console.log('Subscribed to push notification', subscription)
+            
             
           } else {
             console.log('Already subscribed', presentSubscription);
@@ -477,8 +478,8 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
                 ref={(el) => (rowRefs.current[item.id] = el)}
                 className={`${highlighrow === item.id ? 'highlighted' : ''}`}
               >
-                <td>{item.bookingDate.split(" ")[0]}</td>
-                <td>{item.bookingDate.split(" ")[1]}</td>
+                <td>{item.bookingDate.split("T")[0]}</td>
+                <td>{item.bookingDate.split("T")[1]}</td>
                 <td>{item.firstName}</td>
                 <td>{item.id.split("-")[0]}</td>
                 <td>{item.tableNumber}</td>
