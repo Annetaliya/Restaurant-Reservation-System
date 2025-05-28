@@ -12,8 +12,15 @@ const Profile = ({ setIsLoggedIn, user }) => {
     const [selectBooking, setSelectedBooking] = useState([])
     const [currentBookings, setCurrentBookings] = useState([])
     
-    const options = { timeZone: "Africa/Nairobi", hour12: false };
-    const currentDate = new Date().toLocaleString('en-GB', options).replace(',', '').split(' ')[0]
+    function toMySQLDateTime(date) {
+     const pad = n => n.toString().padStart(2, '0');
+     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ` +
+         `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    }
+    
+    const currentDate = new Date()
+    const now = toMySQLDateTime(currentDate);
+   
     
    const navigate = useNavigate();
    const { id } = useParams();
@@ -22,11 +29,11 @@ const Profile = ({ setIsLoggedIn, user }) => {
 
    useEffect(() => {
     const filteredBooking = selectBooking.filter((element) => {
-        return element.bookingDate.split(" ")[0] >= currentDate
+        return element.bookingDate.split("T")[0] >= now.split(' ')[0];
     })
     setCurrentBookings(filteredBooking)
 
-   }, [selectBooking, currentDate])
+   }, [selectBooking])
 
    
 
@@ -41,6 +48,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
             const result = await response.json() 
 
             setSelectedBooking(result.data) 
+            console.log(result.data)
            
 
         } catch (error) {
@@ -103,7 +111,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
                 .filter((element) => element.status !== 'cancelled')
                 .map((item) => (
                     <tr key={item.id}>
-                        <td>{item.bookingDate.split(' ')[0]}</td>
+                        <td>{item.bookingDate.split('T')[0]}</td>
                         <td>{item.tableNumber}</td>
                         <td>{item.price}</td>
                         <td>{item.status}</td>
