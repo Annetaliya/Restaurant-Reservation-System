@@ -4,7 +4,6 @@ const SECRET_KEY = process.env.JWT_SECRET;
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
-const { getDB } = require('../database2.js')
 const supabase = require('../supaBaseClient.js');
 
 
@@ -12,7 +11,6 @@ const supabase = require('../supaBaseClient.js');
 
 router.post('/', async (req,res) => {
     const { email, password }  = req.body;
-    const db = getDB();
     try {
         const { data, error } = await supabase
                 .from('users')
