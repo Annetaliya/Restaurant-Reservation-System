@@ -5,6 +5,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
 const { getDB } = require('../database2.js')
+const supabase = require('../supaBaseClient.js');
 
 
 
@@ -13,11 +14,15 @@ router.post('/', async (req,res) => {
     const { email, password }  = req.body;
     const db = getDB();
     try {
-        const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
-        if (rows.length === 0) {
+        const { data, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('email', email)
+                .single();
+        if (error || !data) {
             return res.status(400).json({error: 'Email not found'})
         }
-        const user = rows[0];
+        const user = data;
 
         const isMatch = await bcrypt.compare(password, user.password)
         if (!isMatch) {
