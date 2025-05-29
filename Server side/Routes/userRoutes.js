@@ -1,16 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const { getDB } = require('../database2.js')
 const { v4: uuidv4 } = require('uuid')
 const bcrypt = require('bcryptjs');
+const supabase = require('../supaBaseClient.js');
 
 
 
 router.get('/', async (req, res) => {
     try {
-        const db = getDB();
-        const [rows] = await db.execute('SELECT * FROM users');
-        res.json({message: 'ok', data: rows})
+        const { data, error } = await supabase.from('users').select('*');
+        if (error) {
+            throw new Error(error.message)
+        }
+        res.json({message: 'ok', data})
 
     } catch (error) {
         res.status(500).json({error: error.message})
@@ -21,9 +23,15 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     try {
-        const db = getDB();
-        const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [req.params.id])
-        res.json({message: 'ok', data: rows[0]})
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', req.params.id)
+            .single();
+        if (error) {
+            throw new Error(error.message)
+        }
+        res.json({message: 'ok', data})
 
     } catch (err) {
         res.status(500).json({ error: err.message})
@@ -46,11 +54,22 @@ router.post('/', async (req, res) => {
     const userId = uuidv4();
      
     try {
-        const db = getDB();
         const hashedPassword = await bcrypt.hash(password, 10)
-        const sql = 'INSERT INTO users (id, firstname, secondName, email, password, phone, role) values(?,?,?,?,?,?,?)';
-        const params = [userId, firstName, secondName, email, hashedPassword, phone, userRole]
-        await db.execute(sql, params);
+        const { error } =  await supabase.from('users').insert([
+            {
+                id: userId,
+                firstName: firstName,
+                secondName: secondName,
+                email,
+                password: hashedPassword,
+                phone,
+                role: userRole
+            }
+        ])
+        if (error) {
+            throw new Error(error.message)
+        }
+        
         res.json({message: 'successs', id: userId})
 
     } catch (err) {
@@ -62,8 +81,17 @@ router.post('/', async (req, res) => {
 router.delete('/id:', async (req, res) => {
     try {
         const db = getDB();
-        const [result] = await db.execute('DELETE FROM users WHERE id = ?', [req.params.id])
-        res.json({message: "user deleted", affectedRows: result.affectedRows})
+        const {data, error } = await supabase
+                .from('users')
+                .delete()
+                .eq('id', req.params.id);
+        
+        if (error) {
+            throw new Error(error.message)
+
+        }
+        
+        res.json({message: "user deleted", data})
 
     } catch (err) {
         res.status(500).json({error: err.message})
