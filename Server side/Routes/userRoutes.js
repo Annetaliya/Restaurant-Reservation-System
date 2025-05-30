@@ -43,9 +43,9 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
 
-    const {firstName, secondName, email, password, confirmPassword, phone, role} = req.body
+    const {first_name, second_name, email, password, confirmPassword, phone, role} = req.body
     const userRole  = role || 'user';
-    if (!firstName || !email|| !password || !phone ) {
+    if (!first_name || !email|| !password || !phone ) {
         res.status(400).json({"error": "Missing the required fields"})
     }
     if (password !== confirmPassword) {
@@ -58,8 +58,8 @@ router.post('/', async (req, res) => {
         const { error } =  await supabase.from('users').insert([
             {
                 id: userId,
-                firstName: firstName,
-                secondName: secondName,
+                first_name: first_name,
+                second_name: second_name,
                 email,
                 password: hashedPassword,
                 phone,

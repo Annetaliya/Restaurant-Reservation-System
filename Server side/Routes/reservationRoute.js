@@ -48,9 +48,9 @@ route.get('/:id', async (req, res) => {
 })
 
 route.post('/', async (req, res) => {
-    const {tableNumber, guestNumber,status, price, floorLevel} = req.body;
+    const {table_number, guest_number,status, price, floor_level} = req.body;
     
-    if (!tableNumber || !guestNumber || !status || !floorLevel) {
+    if (!table_number || !guest_number || !status || !floor_level) {
         return res.status(400).json({"Error": "Error missing required field"})
     } 
     const reservationsid = uuidv4();
@@ -61,11 +61,11 @@ route.post('/', async (req, res) => {
                 .insert([
                     {
                         id: reservationsid,
-                        tableNumber,
-                        guestNumber,
+                        table_number,
+                        guest_number,
                         price,
                         status,
-                        floorLevel
+                        floor_level
                     }
                 ])
         if (error) {
