@@ -33,21 +33,37 @@ function ModalForm({ showModal, handleCloseModal }) {
   const handleSubmitTable = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8000/reservations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) {
-        console.log("error posting a table", response.statusText);
-        return;
+      const { data, error } = await supabase.from('reservations').insert([
+        {
+          table_number: formData.table_number,
+          guest_number: formData.guest_number,
+          price: formData.price,
+          status: formData.status || 'available',
+          floor_level: formData.floor_level
+        }
+
+      ])
+      // const response = await fetch("http://localhost:8000/reservations", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(formData),
+      // });
+
+      if (error) {
+        console.error('superbase insert error:', error.message)
+        Swal.fire({
+                  title: "Error",
+                  text: "Something went wrong",
+                  icon: "error",
+                });
       }
-      const result = await response.json();
+      
+      
       setFormData((prev) => ({
         ...prev,
-        ...result.data,
+        ...data[0],
       }));
       Swal.fire({
                 text: "You created a table",
