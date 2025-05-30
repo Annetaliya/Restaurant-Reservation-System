@@ -60,17 +60,17 @@ router.post('/', async (req, res) => {
         return `${year}-${month}-${day} ${time}`;
     }
 
-    const {userId, reservationId, bookingDate} = req.body;
-    const formattedDate = parseBookingDate(bookingDate)
+    const {user_id, reservation_id, booking_date} = req.body;
+    const formattedDate = parseBookingDate(booking_date)
 
-    if (!userId || !reservationId || !bookingDate) {
+    if (!user_id || !reservation_id || !booking_date) {
 
-        return res.status(400).json({error: 'Missing userId or reservationId'})
+        return res.status(400).json({error: 'Missing user_id or reservation_id'})
     }
 
-    const db = getDB();
-    const connection = await db.getConnection();
-    const reservationIds = Array.isArray(reservationId) ? reservationId : [reservationId]
+   
+   
+    const reservationIds = Array.isArray(reservation_id) ? reservation_id : [reservation_id]
 
     let bookedTables = [];
     let results = [];
@@ -79,14 +79,14 @@ router.post('/', async (req, res) => {
 
         for (const resId of reservationIds) {
             const bookingId = uuidv4();
-            const status = 'confirmed';
+            
 
             const { error: insertError } = await supabase.from('booking').insert([
                 {
                     id: bookingId,
-                    userId,
-                    reservationId: resId,
-                    bookingDate, formattedDate,
+                    user_id,
+                    reservation_id: resId,
+                    booking_date, formattedDate,
                     status: 'confirmed'
                 }
             ])
@@ -97,21 +97,21 @@ router.post('/', async (req, res) => {
 
             const { data: reservationData } = await supabase
                 .from('resevations')
-                .select('tableNumber')
+                .select('table_number')
                 .eq('id', resId)
                 .single();
 
 
             //table number
             if (reservationData) {
-                bookedTables.push(reservationData.tableNumber)
+                bookedTables.push(reservationData.table_number)
             }
 
             results.push({
                 bookingId,
-                userId,
-                reservationId: resId,
-                bookingDate: formattedDate,
+                user_id,
+                reservation_id: resId,
+                booking_date: formattedDate,
                 status: 'confirmed'
             })
         }
@@ -147,7 +147,7 @@ router.get('/', async (req, res) => {
     try {
         const { data, error } = await supabase
             .from('booking')
-            .select(`id, bookingDate, status, users(firstName, secondName, email), reservations(tableNumber, guestNumber, floorLevel)`)
+            .select(`id, booking_date, status, users(first_name, second_name, email), reservations(table_number, guest_number, floor_level)`)
    
         if (error) {
             throw new Error(error.message)
@@ -163,7 +163,7 @@ router.get('/:id', async (req, res) => {
     try {
         const { data, error } =  await supabase
             .from('booking')
-            .select(`id, bookingDtae, status, users(firstName, secondName, email), reservations(tableNumber, guestNumber, floorLevel)`)
+            .select(`id, booking_date, status, users(first_name, second_name, email), reservations(table_number, guest_number, floor_level)`)
             .eq('id', req.params.id)
             .single();
         
@@ -190,9 +190,9 @@ router.get('/user/:id', async (req,res) => {
     try {
        const {data, error} = await supabase
         .from('booking')
-        .select(`id, bookingDate, status, users(firstName, secondName, email), reservations(tableNumber, guestNumber, floorLevel, price)`)
-        .eq('userId', req.params.id)
-        .order('bookingDate', { ascending: false });
+        .select(`id, booking_date, status, users(first_name, second_name, email), reservations(table_number, guest_number, floor_level, price)`)
+        .eq('user_id', req.params.id)
+        .order('booking_date', { ascending: false });
 
         if (error) {
             throw new Error(error.message)
@@ -209,7 +209,7 @@ router.get('/user/:id', async (req,res) => {
 })
 
 router.patch('/:id', async (req, res) => {
-    const db = getDB();
+    
     const { id } = req.params;
     const {status} = req.body;
 
@@ -246,12 +246,10 @@ router.delete('/:id', async (req, res) =>{
     //getting the reservation id and user id
     const {data: booking, error: findError} = await supabase
         .from('booking')
-        .select('reservationId, userId')
+        .select('reservation_id, user_id')
         .eq('id', bookingId)
         .single()
     
-    const getReservationSql =  `SELECT reservationId, userId FROM booking WHERE id = ?`;
-    const [rows] = await db.execute(getReservationSql, [bookingId])
     if (findError) {
         return res.status(404).json({message: 'Booking not found'})
     }
@@ -268,7 +266,7 @@ router.delete('/:id', async (req, res) =>{
     }
 
     //update the reservation table as available after cancellation of booking
-    (await supabase.from('reservations').update({ status: 'available'})).eq('id', booking.reservationId)
+    (await supabase.from('reservations').update({ status: 'available'})).eq('id', booking.reservation_id)
 
    
 
