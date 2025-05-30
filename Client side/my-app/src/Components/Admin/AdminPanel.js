@@ -7,6 +7,7 @@ import Button from "react-bootstrap/Button";
 import Swal from "sweetalert2";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
+import { supabase } from "../../superBaseClient";
 
 import { useNavigate } from "react-router";
 import './admin.css';
@@ -15,11 +16,11 @@ import './admin.css';
 
 function ModalForm({ showModal, handleCloseModal }) {
   const [formData, setFormData] = useState({
-    tableNumber: "",
-    guestNumber: "",
+    table_number: "",
+    guest_number: "",
     price: "",
     status: "",
-    floorLevel: "",
+    floor_level: "",
   });
 
   const handleChange = (e) => {
@@ -53,11 +54,11 @@ function ModalForm({ showModal, handleCloseModal }) {
                 icon: "success",
               });
       setFormData({
-        tableNumber: "",
-        guestNumber: "",
+        table_number: "",
+        guest_number: "",
         price: "",
         status: "",
-        floorLevel: "",
+        floor_level: "",
 
       })
       
@@ -80,18 +81,18 @@ function ModalForm({ showModal, handleCloseModal }) {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmitTable}>
-            <Form.Group className="mb-3" controlId="tableNumber">
+            <Form.Group className="mb-3" controlId="table_number">
               <Form.Label>Table Number</Form.Label>
               <Form.Control
                 type="text"
-                name="tableNumber"
-                value={formData.tableNumber}
+                name="table_number"
+                value={formData.table_number}
                 onChange={handleChange}
               />
             </Form.Group>
             <Form.Select 
-              name="guestNumber"
-              value={formData.guestNumber}
+              name="guest_number"
+              value={formData.guest_number}
               onChange={handleChange}
               aria-label="Default select example" 
               className="mb-3"
@@ -122,8 +123,8 @@ function ModalForm({ showModal, handleCloseModal }) {
               <option value="reserved">Reserved</option>
             </Form.Select>
             <Form.Select 
-              name='floorLevel'
-              value={formData.floorLevel}
+              name='floor_level'
+              value={formData.floor_level}
               onChange={handleChange}
               aria-label="Default select example"
             >
@@ -220,7 +221,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
 
   const filteredSearchReservations = reservations.filter((element) => 
-    element.firstName?.toLowerCase().includes(searchParams.toLowerCase()) || 
+    element.first_name?.toLowerCase().includes(searchParams.toLowerCase()) || 
     element.id?.includes(searchParams)
   )
 
@@ -314,7 +315,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
   useEffect(() => {
     const filterdReservation = reservations.filter((element) => {
-      const reservationDate = element.bookingDate.split(" ")[0];
+      const reservationDate = element.booking_date.split(" ")[0];
       return reservationDate === today;
     });
     setTodaysReservations(filterdReservation);
@@ -322,29 +323,33 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
   const handleUpdateReservation = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8000/bookings/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: "confirmed" }),
-      });
-      if (response.ok) {
-        setReservations((prevReservations) =>
-          prevReservations.map((item) =>
-            item.id === id ? { ...item, status: "confirmed" } : item
-          )
-        );
-        const result = await response.json();
-        console.log("Admin changed result", result);
-        localStorage.setItem("booking", JSON.stringify(result.data));
-        Swal.fire({
-          text: "Update successful!",
-          icon: "success",
-        });
-      } else {
-        throw new Error("Failed to update status");
+      const { data, error } = await supabase
+        .from('booking')
+        .update({ status: 'confirmed' })
+        .eq('id', id)
+      // const response = await fetch(`http://localhost:8000/bookings/${id}`, {
+      //   method: "PATCH",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ status: "confirmed" }),
+      // });
+      if (error) {
+        throw new Error(error.message)
       }
+      setReservations((prevReservations) =>
+        prevReservations.map((item) =>
+          item.id === id ? { ...item, status: "confirmed" } : item
+        )
+      );
+        // const result = await response.json();
+      console.log("Admin changed result", data[0]);
+      localStorage.setItem("booking", JSON.stringify(data[0]));
+      Swal.fire({
+        text: "Update successful!",
+        icon: "success",
+      });
+      
     } catch (error) {
       console.log(error.message);
       Swal.fire({
@@ -478,16 +483,16 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
                 ref={(el) => (rowRefs.current[item.id] = el)}
                 className={`${highlighrow === item.id ? 'highlighted' : ''}`}
               >
-                <td>{item.bookingDate.split("T")[0]}</td>
-                <td>{item.bookingDate.split("T")[1]}</td>
-                <td>{item.firstName}</td>
+                <td>{item.booking_date.split("T")[0]}</td>
+                <td>{item.booking_date.split("T")[1]}</td>
+                <td>{item.first_name}</td>
                 <td>{item.id.split("-")[0]}</td>
-                <td>{item.tableNumber}</td>
-                <td>{item.guestNumber}</td>
+                <td>{item.table_number}</td>
+                <td>{item.guest_number}</td>
                 <td>{item.status}</td>
                 <td>
                   <Button
-                    onClick={() => handleUpdateReservation(item.id, item.reservationId)}
+                    onClick={() => handleUpdateReservation(item.id, item.reservation_id)}
                     disabled={item.status === "confirmed"}
                   >
                     Confirm
