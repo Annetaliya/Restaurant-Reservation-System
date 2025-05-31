@@ -54,14 +54,23 @@ router.post('/', async (req, res) => {
     const userId = uuidv4();
      
     try {
-        const hashedPassword = await bcrypt.hash(password, 10)
+        const { data, error: signUpError } =  await supabase.auth.signUp({
+            email,
+            password,
+        })
+
+        if (signUpError) {
+            throw new Error(signUpError.message)
+        }
+        
+        const userId = data.user.id;
         const { error } =  await supabase.from('users').insert([
             {
                 id: userId,
-                first_name: first_name,
-                second_name: second_name,
+                first_name,
+                second_name,
                 email,
-                password: hashedPassword,
+                password,
                 phone,
                 role: userRole
             }

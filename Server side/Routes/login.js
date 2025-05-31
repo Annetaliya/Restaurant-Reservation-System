@@ -12,46 +12,34 @@ const supabase = require('../supaBaseClient.js');
 router.post('/', async (req,res) => {
     const { email, password }  = req.body;
     try {
-        const { data, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('email', email)
-                .single();
-        if (error || !data) {
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+                
+        if (authError) {
             return res.status(400).json({error: 'Email not found'})
         }
-        const user = data;
+        const userId = authData.user.id;
 
-        const isMatch = await bcrypt.compare(password, user.password)
-        if (!isMatch) {
-            return res.status(400).json({ error: 'Incorrect password' })
+        const {data: userProfile, error: profileError } = await supabase
+            .from('users')
+            .select('id, first_name, second_name, email, phone, role')
+            .eq('id,', userId)
+            .single();
 
+        if (profileError) {
+            return res.status(500).json({ error: 'Could not fetch user profile'})
         }
 
-        const token = jwt.sign(
-            {id: user.id, email: user.email, role: user.role},
-            SECRET_KEY,
-            { expiresIn: '2h' }
-        );
+       res.json({
+        message: 'Login successful',
+        user: userProfile,
+        token: authData.session.access_token,
+       
+       })
 
-        req.session.user = {
-            id: user.id,
-            token: token,
-            role: user.role
-        }
-        res.json({
-            message: 'Login successfully',
-            token,
-            user: {
-                id: user.id,
-                first_name: user.first_name,
-                second_name: user.second_name,
-                email: user.email,
-                phone: user.phone,
-                role: user.role
-            }
-
-        })
+       
 
     } catch (err) {
         console.error('Login error:', err)
