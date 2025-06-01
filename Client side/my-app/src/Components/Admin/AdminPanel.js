@@ -179,10 +179,14 @@ function SideBar({setIsLoggedIn}) {
 
   const handleLogout = async() => {
     try { 
-        await fetch('http://localhost:8000/logout', {
-            method: 'POST',
-            credentials: 'include',
-        })
+        // await fetch('http://localhost:8000/logout', {
+        //     method: 'POST',
+        //     credentials: 'include',
+        // })
+        const { error } =  await supabase.auth.signOut()
+        if (error) {
+          throw error;
+        }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('booking')
@@ -243,13 +247,24 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
   const fetchReservations = async () => {
     try {
-      const response = await fetch("http://localhost:8000/bookings");
-      if (!response.ok) {
-        console.log("Error fetching the reservations");
+      const { data, error } = await supabase
+        .from('booking')
+        .select(`
+          id,
+          booking_date,
+          status,
+          user_id,
+          reservation_id,
+          users(first_name, second_name, email),
+          reservations (table_number, floor_level)
+          
+          `);
+      if (error) {
+        console.error('Error fetcing reservations:', error.message)
       }
-      const result = await response.json();
       
-      setReservations(result.data);
+      
+      setReservations(data);
     } catch (error) {
       console.log("error fetching", error.message);
     }
@@ -275,6 +290,9 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
               userVisibleOnly: true,
               applicationServerKey: publicKey
              })
+             const { endpoint, keys } = subscription.toJSON();
+
+             
             await fetch('http://localhost:8000/subscribe', {
               method: 'POST',
               headers: {

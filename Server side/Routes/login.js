@@ -25,7 +25,7 @@ router.post('/', async (req,res) => {
         const {data: userProfile, error: profileError } = await supabase
             .from('users')
             .select('id, first_name, second_name, email, phone, role')
-            .eq('id,', userId)
+            .eq('id', userId)
             .single();
 
         if (profileError) {
