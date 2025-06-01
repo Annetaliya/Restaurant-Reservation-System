@@ -290,17 +290,27 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
               userVisibleOnly: true,
               applicationServerKey: publicKey
              })
-             const { endpoint, keys } = subscription.toJSON();
+             const { endpoint, keys } = subscription
+
+             const { error } = await supabase
+              .from('subscriptions')
+              .insert([{ endpoint, keys }])
+
+            if (error){
+              console.log('Failed to subscribe')
+            } else {
+              console.log('Subscription saved to supabase')
+            }
 
              
-            await fetch('http://localhost:8000/subscribe', {
-              method: 'POST',
-              headers: {
-              'Content-Type': 'application/json',
-              },
-             body: JSON.stringify(subscription)
+            // await fetch('http://localhost:8000/subscribe', {
+            //   method: 'POST',
+            //   headers: {
+            //   'Content-Type': 'application/json',
+            //   },
+            //  body: JSON.stringify(subscription)
 
-            })
+            // })
             
             
           } else {
