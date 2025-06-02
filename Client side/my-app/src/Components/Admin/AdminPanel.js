@@ -418,15 +418,23 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
   const handeDeleteReservation = async (id, reservationId) => {
     try {
-      const response = await fetch(`http://localhost:8000/bookings/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error(`Error deleting reservation: ${response.statusText}`);
-      }
+      const { error } =  await supabase
+        .from('booking')
+        .delete()
+        .eq('id', id);
+
+        if (error) {
+          throw new Error(`Error deleting reservation: ${error.message}`)
+        }
+      // const response = await fetch(`http://localhost:8000/bookings/${id}`, {
+      //   method: "DELETE",
+      // });
+      // if (!response.ok) {
+      //   throw new Error(`Error deleting reservation: ${response.statusText}`);
+      // }
       const tablesLeft = reservations.filter((element) => element.id !== id);
       setReservations(tablesLeft);
-      const result = await response.json();
+      //const result = await response.json();
       localStorage.removeItem("booking");
       
       await fetchUpdateReservationTable( reservationId, "available")
