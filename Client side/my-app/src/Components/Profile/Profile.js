@@ -4,6 +4,7 @@ import { FaUserCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from 'react-router';
 import Table from 'react-bootstrap/Table';
+import { supabase } from '../../superBaseClient';
 
 
 const Profile = ({ setIsLoggedIn, user }) => {
@@ -29,7 +30,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
 
    useEffect(() => {
     const filteredBooking = selectBooking.filter((element) => {
-        return element.bookingDate.split("T")[0] >= now.split(' ')[0];
+        return element.booking_date.split("T")[0] >= now.split(' ')[0];
     })
     setCurrentBookings(filteredBooking)
 
@@ -40,15 +41,28 @@ const Profile = ({ setIsLoggedIn, user }) => {
     const fetchBookingByUser = async (userId) => {
        
         try { 
-            const response =  await fetch(`http://localhost:8000/bookings/user/${userId}`)
-            if (!response.ok) {
-                throw new Error('error fetching booking')
-            }
-            
-            const result = await response.json() 
+            const { data, error} =  await supabase
+                .from('booking')
+                .select(`
+                    id,
+                    booking_data,
+                    status,
+                    reservations(table_number, guest_number, floor_level)
+                    `)
+                .eq('user_Id', userId)
 
-            setSelectedBooking(result.data) 
-            console.log(result.data)
+            if (error) {
+                throw new Error('Error fetching booking:', error.message)
+            }
+           // const response =  await fetch(`http://localhost:8000/bookings/user/${userId}`)
+            // if (!response.ok) {
+            //     throw new Error('error fetching booking')
+            // }
+            
+            // const result = await response.json() 
+
+            setSelectedBooking(data) 
+            console.log('Booking data:',data)
            
 
         } catch (error) {
@@ -70,10 +84,19 @@ const Profile = ({ setIsLoggedIn, user }) => {
 
     const handleLogout = async() => {
         try { 
-            await fetch('http://localhost:8000/logout', {
-                method: 'POST',
-                credentials: 'include',
-            })
+            // await fetch('http://localhost:8000/logout', {
+            //     method: 'POST',
+            //     credentials: 'include',
+            // })
+            // localStorage.removeItem('token');
+            // localStorage.removeItem('user');
+            // localStorage.removeItem('booking')
+            // setIsLoggedIn(false); 
+            // navigate('/login')
+             const { error } =  await supabase.auth.signOut()
+             if (error) {
+                throw error;
+            }
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             localStorage.removeItem('booking')
@@ -92,8 +115,8 @@ const Profile = ({ setIsLoggedIn, user }) => {
     <div className='parentProfile'>
         <div className='userInfo'>
             <FaUserCircle size={70} className='profileIcon'/>
-            <p>{user?.firstName} {user?.secondName}</p>
-            <p>Hi {user?.firstName} here are your available bookings</p>
+            <p>{user?.first_name} {user?.second_name}</p>
+            <p>Hi {user?.first_name} here are your available bookings</p>
             
         </div>
           <Table className="col-10 mx-auto table">
@@ -111,8 +134,8 @@ const Profile = ({ setIsLoggedIn, user }) => {
                 .filter((element) => element.status !== 'cancelled')
                 .map((item) => (
                     <tr key={item.id}>
-                        <td>{item.bookingDate.split('T')[0]}</td>
-                        <td>{item.tableNumber}</td>
+                        <td>{item.booking_date.split('T')[0]}</td>
+                        <td>{item.table_number}</td>
                         <td>{item.price}</td>
                         <td>{item.status}</td>
 
