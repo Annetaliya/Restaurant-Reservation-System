@@ -10,6 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Swal from "sweetalert2";
 import Header from '../../Images/restaurant header.jpg';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '../../superBaseClient';
 
 
 
@@ -19,12 +20,12 @@ const Booking = ({ table, show, setShow }) => {
    
     const [selectedDate, setSelectedDate] = useState(null)
     const [formData, setFormData] = useState({
-        userId: user ? user.id : '',
-        reservationId: table ? table.id :'',
-        tableNo: table ? table.tableNumber : '',
-        guestNo: table ? table.guestNumber: '',
+        user_id: user ? user.id : '',
+        reservation_id: table ? table.id :'',
+        tableNo: table ? table.table_number : '',
+        guestNo: table ? table.guest_number: '',
         price: table ? table.price: '',
-        bookingDate: '',
+        booking_date: '',
     })
     const navigate = useNavigate();
 
@@ -42,7 +43,7 @@ const Booking = ({ table, show, setShow }) => {
         setSelectedDate(date);
         setFormData((prev) => ({
             ...prev,
-            bookingDate: formattedDate
+            booking_date: formattedDate
         }))
 
     }
@@ -57,31 +58,46 @@ const Booking = ({ table, show, setShow }) => {
         e.preventDefault();
         try {
            
-            const {userId, reservationId, bookingDate} = formData;
-            const payload = {userId, reservationId, bookingDate};
-            const response  =  await fetch('http://localhost:8000/bookings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
+            const {user_id, reservation_id, booking_date} = formData;
+            const { data, error } = await supabase
+                .from('booking')
+                .insert([
+                    {
+                        user_id,
+                        reservation_id,
+                        booking_date
+                    }
+                ])
+                .select()
+                .single();
+
+            if (error) {
+                throw new Error('Failed to create booking:', error.message)
+            }
+            // const payload = {user_id, reservation_id, booking_date};
+            // const response  =  await fetch('http://localhost:8000/bookings', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify(payload)
                 
-                });
+            //     });
                 
-                if (!response.ok) {
-                    throw new Error('Failed to create booking')
-                }
-                const result =  await response.json();
-                if (result.data) {
+                // if (!response.ok) {
+                //     throw new Error('Failed to create booking')
+                // }
+               // const result =  await response.json();
+                if (data) {
                     setFormData((prev) => ({
                         ...prev,
-                        ...result.data
+                        ...data
                     }))
 
                 }
                 
                 
-                localStorage.setItem('booking', JSON.stringify(result.data))
+                localStorage.setItem('booking', JSON.stringify(data))
                 Swal.fire({
                               title: "Good Job",
                               text: "Reservation successful wait for confirmation!",
@@ -201,12 +217,20 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     const fetchReservationTables = async () => {
         
         try {
-            const response =  await fetch('http://localhost:8000/reservations');
-            if (!response.ok) {
-                throw new Error (`Response status ${response.status}`)
+            const {data, error} = await supabase
+                .from('reservations')
+                .select('*')
+
+            if (error) {
+                throw new Error('Filed geting reservation table:', error.message)
             }
-            const result =  await response.json();
-            setReservationTable(result.data)
+            console.log('Table:', data)
+            // const response =  await fetch('http://localhost:8000/reservations');
+            // if (!response.ok) {
+            //     throw new Error (`Response status ${response.status}`)
+            // }
+            // const result =  await response.json();
+            setReservationTable(data)
             
 
         } catch (err) {
@@ -222,13 +246,22 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
         
         setLoading(true)
         try {
-            const response = await fetch(`http://localhost:8000/reservations/${id}`)
-            if (!response.ok) {
-                console.log('Error fetching table')
-            }
-            const result = await response.json();
+            const { data, error } = await supabase
+                .from('reservations')
+                .select('*')
+                .eq('id', id)
+                .single()
+
+            if (error) {
+                throw new Error('Failed to get table:', error.message)
+             }
+            // const response = await fetch(`http://localhost:8000/reservations/${id}`)
+            // if (!response.ok) {
+            //     console.log('Error fetching table')
+            // }
+            // const result = await response.json();
             if (user) {
-                setTable(result.data)
+                setTable(data)
                 setLoading(false)
             } else {
                 navigate('/login')
@@ -242,8 +275,8 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
 
   
     useEffect(() => {
-        if (booking && booking.reservationId) {
-            fetchUpdateReservationTable(booking.reservationId);
+        if (booking && booking.reservation_id) {
+            fetchUpdateReservationTable(booking.reservation_id);
         }
     }, [booking]);
    
@@ -251,7 +284,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     <div>
         <img className='headerImg' src={Header} alt='food'/>
         <h1 className='homeIntro'><span>Welcome</span> to eatery bay  {user && 
-           <span>{user.firstName}</span>   
+           <span>{user.first_name}</span>   
         }!</h1>
        
         
@@ -285,8 +318,8 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
                 }} >
                     <FaCircle className={`availability ${item.status === 'available' ? 'availability' : 'noAvailability'}`}/>
                     <div className='tableHome'></div>
-                    <p className='tableNumber'>Table No.{item.tableNumber}</p>
-                    <p className='guestNumber'>Guest Number {item.guestNumber}</p>
+                    <p className='table_number'>Table No.{item.table_number}</p>
+                    <p className='guest_number'>Guest Number {item.guest_number}</p>
                     <p className='price'> ${item.price}</p>
                 </div>       
                 
