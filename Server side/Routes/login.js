@@ -17,8 +17,8 @@ router.post('/', async (req,res) => {
             password
         });
                 
-        if (authError) {
-            return res.status(400).json({error: 'Email not found'})
+        if (authError || !authData.session) {
+            return res.status(400).json({error: 'Invalid email or password'})
         }
         const userId = authData.user.id;
 
@@ -32,10 +32,12 @@ router.post('/', async (req,res) => {
             return res.status(500).json({ error: 'Could not fetch user profile'})
         }
 
+        const customToken = jwt.sign(userProfile, SECRET_KEY, { expiresIn: '1h' })
+
        res.json({
         message: 'Login successful',
         user: userProfile,
-        token: authData.session.access_token,
+        token: customToken,
        
        })
 
