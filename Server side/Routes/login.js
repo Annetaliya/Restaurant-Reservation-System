@@ -16,9 +16,12 @@ router.post('/', async (req,res) => {
             email,
             password
         });
+        if (authError) {
+            console.log("Supabase auth error:", authError.message);
+        }
                 
-        if (authError || !authData.session) {
-            return res.status(400).json({error: 'Invalid email or password'})
+        if (!authData.session) {
+            console.log("No session returned. Auth data:", authData);
         }
         const userId = authData.user.id;
 

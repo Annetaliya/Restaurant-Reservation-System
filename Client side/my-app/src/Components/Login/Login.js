@@ -39,52 +39,59 @@ const Login = ({ setIsLoggedIn }) => {
   //submit login form
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      const {data: authData, error: authError} =  await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      })
+      // const {data: authData, error: authError} =  await supabase.auth.signInWithPassword({
+      //   email: values.email,
+      //   password: values.password,
+      // })
 
-      if (authError) {
-        if (authError.message.includes('Invalid login credentials')) {
-          setErrors({ password: 'Incorrect Password'})
-        } else if (authError.message.includes('user not found')) {
-          setErrors({ email: 'Email not registered'})
-        } else {
-          Swal.fire('Error', authError.message, 'error')
-        }
-        return;
-      }
-      // const response = await fetch("http://localhost:8000/login", {
-      //   method: "POST",
-      //   headers: {
-      //     "content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(values),
-      // });
-      //const result = await response.json();
-      // if (!response.ok) {
-      //   if (result.error === "Email not found") {
-      //     setErrors({ email: "Email not registered" });
-      //   } else if (result.error === "Incorrect password") {
-      //     setErrors({ password: "Incorrect Password" });
+      // if (authError) {
+      //   if (authError.message.includes('Invalid login credentials')) {
+      //     setErrors({ password: 'Incorrect Password'})
+      //   } else if (authError.message.includes('user not found')) {
+      //     setErrors({ email: 'Email not registered'})
+      //   } else {
+      //     Swal.fire('Error', authError.message, 'error')
       //   }
       //   return;
       // }
-      const userId = authData.user.id;
-      const { data: userProfile, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-        if (profileError) {
-          console.error('Profile fetch error:', profileError);
-          Swal.fire('Error', 'Could not retrieve user profile', 'error')
-          return;
-
+      const response = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: {
+          "content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        if (result.error.includes('Invalid email')) {
+          setErrors({ email: "Email not registered" });
+        } else if (result.error.includes("password")) {
+          setErrors({ password: "Incorrect Password" });
+        } else {
+          Swal.fire('Error', result.error, 'error')
         }
-      localStorage.setItem("token", authData.session.access_token);
-      localStorage.setItem("user", JSON.stringify(userProfile));
+        
+        return;
+      }
+
+    
+
+     
+      // const userId = authData.user.id;
+      // const { data: userProfile, error: profileError } = await supabase
+      //   .from('users')
+      //   .select('*')
+      //   .eq('id', userId)
+      //   .single();
+
+      //   if (profileError) {
+      //     console.error('Profile fetch error:', profileError);
+      //     Swal.fire('Error', 'Could not retrieve user profile', 'error')
+      //     return;
+
+      //   }
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("user", JSON.stringify(result.user));
       Swal.fire({
         title: "Good Job",
         text: "Login successful!",
@@ -92,7 +99,7 @@ const Login = ({ setIsLoggedIn }) => {
       });
       //const user = JSON.parse(localStorage.getItem('user'))
       setIsLoggedIn(true);
-      if (userProfile.role === 'admin') {
+      if (result.user.role === 'admin') {
         navigate('/admin')
       } else {
         navigate('/')
