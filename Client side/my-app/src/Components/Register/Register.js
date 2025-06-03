@@ -66,25 +66,50 @@ const Register = () => {
   const navigate = useNavigate();
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data: signData, error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
       })
+      console.log(signData)
 
-      if (authError) {
+      if (signUpError) {
         Swal.fire({
           title: 'Error',
-          text: authError.message,
+          text: signUpError.message,
           icon: 'error',
         })
+        setSubmitting(false)
         return;
       }
 
-      const user = authData.user;
+      if (!signData.user) {
+        Swal.fire({
+          title: 'Error',
+          text: 'User registration failed',
+          icon: 'error'
+        })
+        setSubmitting(false)
+        return;
+      }
+      const session = signData.session;
+
+//  If session is null, you can't make authenticated calls
+      if (!session) {
+        Swal.fire({
+          title: 'Error',
+          text: 'Sign-up succeeded but user is not logged in. Please verify your email first.',
+          icon: 'warning',
+        });
+        return;
+      }
+
+      
+
+      //const user = authData.user;
 
       const { error: insertError } = await supabase.from('users').insert([
         {
-          id: user.id,
+          id: signData.user.id,
           first_name: values.first_name,
           second_name: values.second_name,
           email: values.email,
@@ -101,19 +126,23 @@ const Register = () => {
         })
         return;
       }
-  
-      if (response.ok) {
-
-        Swal.fire({
+      Swal.fire({
           title: "Good Job",
           text: "Registration successful!",
           icon: "success",
         });
         resetForm();
-        navigate("/login");
-      } else {
-        alert(result.message || "Something went wrong!");
-      }
+        if (signData.session) {
+          navigate('/')
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: 'please confirm email',
+            icon: 'error'
+          })
+        }
+        //navigate("/login");
+  
     } catch (error) {
       console.log("Error submitting form:", error);
       Swal.fire({
