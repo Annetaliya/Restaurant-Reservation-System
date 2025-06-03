@@ -64,96 +64,53 @@ const Register = () => {
     phone: "",
   };
   const navigate = useNavigate();
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    try {
-      const { data: signData, error: signUpError } = await supabase.auth.signUp({
+ const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+  try {
+    const response = await fetch('http://localhost:8000/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        first_name: values.first_name,
+        second_name: values.second_name,
         email: values.email,
         password: values.password,
-      })
-      console.log(signData)
+        confirmPassword: values.confirmPassword,
+        phone: values.phone,
+      }),
+    });
 
-      if (signUpError) {
-        Swal.fire({
-          title: 'Error',
-          text: signUpError.message,
-          icon: 'error',
-        })
-        setSubmitting(false)
-        return;
-      }
+    const result = await response.json();
 
-      if (!signData.user) {
-        Swal.fire({
-          title: 'Error',
-          text: 'User registration failed',
-          icon: 'error'
-        })
-        setSubmitting(false)
-        return;
-      }
-      const session = signData.session;
-
-//  If session is null, you can't make authenticated calls
-      if (!session) {
-        Swal.fire({
-          title: 'Error',
-          text: 'Sign-up succeeded but user is not logged in. Please verify your email first.',
-          icon: 'warning',
-        });
-        return;
-      }
-
-      
-
-      //const user = authData.user;
-
-      const { error: insertError } = await supabase.from('users').insert([
-        {
-          id: signData.user.id,
-          first_name: values.first_name,
-          second_name: values.second_name,
-          email: values.email,
-          phone: values.phone,
-          role: 'user',
-        },
-      ]);
-
-      if (insertError) {
-        Swal.fire({
-          title: 'Error',
-          text: 'Failed to saver user profile' + insertError.message,
-          icon: 'error'
-        })
-        return;
-      }
+    if (!response.ok) {
       Swal.fire({
-          title: "Good Job",
-          text: "Registration successful!",
-          icon: "success",
-        });
-        resetForm();
-        if (signData.session) {
-          navigate('/')
-        } else {
-          Swal.fire({
-            title: 'Error',
-            text: 'please confirm email',
-            icon: 'error'
-          })
-        }
-        //navigate("/login");
-  
-    } catch (error) {
-      console.log("Error submitting form:", error);
-      Swal.fire({
-        title: "Error",
-        text: "Failed to connect to the server",
-        icon: "error",
+        title: 'Error',
+        text: result.error || 'Registration failed',
+        icon: 'error',
       });
-    } finally {
-      setSubmitting(false);
+      return;
     }
-  };
+
+    Swal.fire({
+      title: 'Success',
+      text: 'Registration successful!',
+      icon: 'success',
+    });
+
+    resetForm();
+    navigate('/login'); // redirect to login page
+  } catch (error) {
+    Swal.fire({
+      title: 'Error',
+      text: 'Something went wrong. Please try again.',
+      icon: 'error',
+    });
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <div className="col-6 parent-container">

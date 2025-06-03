@@ -51,12 +51,15 @@ router.post('/', async (req, res) => {
     if (password !== confirmPassword) {
         return res.status(400).json({message: 'password does not match'})
     }
+
+
     const userId = uuidv4();
      
     try {
-        const { data, error: signUpError } =  await supabase.auth.signUp({
+        const { data, error: signUpError } =  await supabase.auth.admin.createUser({
             email,
             password,
+            email_confirm: false
         })
 
         if (signUpError) {
