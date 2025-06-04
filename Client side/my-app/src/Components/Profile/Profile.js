@@ -41,28 +41,15 @@ const Profile = ({ setIsLoggedIn, user }) => {
     const fetchBookingByUser = async (userId) => {
        
         try { 
-            const { data, error} =  await supabase
-                .from('booking')
-                .select(`
-                    id,
-                    booking_data,
-                    status,
-                    reservations(table_number, guest_number, floor_level)
-                    `)
-                .eq('user_Id', userId)
-
-            if (error) {
-                throw new Error('Error fetching booking:', error.message)
+            const response =  await fetch(`http://localhost:8000/bookings/user/${userId}`)
+            if (!response.ok) {
+                throw new Error('error fetching booking')
             }
-           // const response =  await fetch(`http://localhost:8000/bookings/user/${userId}`)
-            // if (!response.ok) {
-            //     throw new Error('error fetching booking')
-            // }
             
-            // const result = await response.json() 
+            const result = await response.json() 
 
-            setSelectedBooking(data) 
-            console.log('Booking data:',data)
+            setSelectedBooking(result.data) 
+            console.log(result.data)
            
 
         } catch (error) {
@@ -135,8 +122,8 @@ const Profile = ({ setIsLoggedIn, user }) => {
                 .map((item) => (
                     <tr key={item.id}>
                         <td>{item.booking_date.split('T')[0]}</td>
-                        <td>{item.table_number}</td>
-                        <td>{item.price}</td>
+                        <td>{item.reservations.table_number}</td>
+                        <td>{item.reservations.price}</td>
                         <td>{item.status}</td>
 
                     </tr>
