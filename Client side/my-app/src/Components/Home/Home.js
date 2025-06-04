@@ -217,20 +217,21 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     const fetchReservationTables = async () => {
         
         try {
-            const {data, error} = await supabase
-                .from('reservations')
-                .select('*')
+            // const {data, error} = await supabase
+            //     .from('reservations')
+            //     .select('*')
 
-            if (error) {
-                throw new Error('Filed geting reservation table:', error.message)
-            }
-            console.log('Table:', data)
-            // const response =  await fetch('http://localhost:8000/reservations');
-            // if (!response.ok) {
-            //     throw new Error (`Response status ${response.status}`)
+            // if (error) {
+            //     throw new Error('Filed geting reservation table:', error.message)
             // }
-            // const result =  await response.json();
-            setReservationTable(data)
+            // console.log('Table:', data)
+            const response =  await fetch('http://localhost:8000/reservations');
+            if (!response.ok) {
+                throw new Error (`Response status ${response.status}`)
+            }
+            const result =  await response.json();
+            console.log(result)
+            setReservationTable(result.data)
             
 
         } catch (err) {
@@ -246,22 +247,23 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
         
         setLoading(true)
         try {
-            const { data, error } = await supabase
-                .from('reservations')
-                .select('*')
-                .eq('id', id)
-                .single()
+            // const { data, error } = await supabase
+            //     .from('reservations')
+            //     .select('*')
+            //     .eq('id', id)
+            //     .single()
 
-            if (error) {
-                throw new Error('Failed to get table:', error.message)
-             }
-            // const response = await fetch(`http://localhost:8000/reservations/${id}`)
-            // if (!response.ok) {
-            //     console.log('Error fetching table')
-            // }
-            // const result = await response.json();
+            // if (error) {
+            //     throw new Error('Failed to get table:', error.message)
+            //  }
+            const response = await fetch(`http://localhost:8000/reservations/${id}`)
+            if (!response.ok) {
+                console.log('Error fetching table')
+            }
+            const result = await response.json();
+            console.log()
             if (user) {
-                setTable(data)
+                setTable(result.data)
                 setLoading(false)
             } else {
                 navigate('/login')
