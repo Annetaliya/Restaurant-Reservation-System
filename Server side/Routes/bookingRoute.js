@@ -18,12 +18,15 @@ webpush.setVapidDetails(
 
 
 async function notify (payload) {
-    const db = getDB();
     try {
-        const {data: subscriptions, error } = await supabase.from('subscriptions').select('id, subscriptions');
-        console.log(`🧾 Subscriptions fetched from DB: ${rows.length}`);
+        const {data: subscriptions, error } = await supabase.from('subscriptions').select('id, endpoint, keys');
+        
+        if (error) {
+            throw error
+        }
+        console.log(`🧾 Subscriptions fetched from DB: ${subscriptions.length}`);
         for (const sub of subscriptions) {
-            const subscription = JSON.parse(row.subscriptions);
+            const subscription = {endpont: sub.endpoint, keys: sub.keys}
             try {
                 await webpush.sendNotification(subscription, JSON.stringify(payload))
                 console.log(`Push sent to subscription ID ${sub.id}`)
@@ -86,7 +89,7 @@ router.post('/', async (req, res) => {
                     id: bookingId,
                     user_id,
                     reservation_id: resId,
-                    booking_date, formattedDate,
+                    booking_date: formattedDate,
                     status: 'confirmed'
                 }
             ])
@@ -96,7 +99,7 @@ router.post('/', async (req, res) => {
             await supabase.from('resevations').update({ status: 'reserved'}).eq('id', resId)
 
             const { data: reservationData } = await supabase
-                .from('resevations')
+                .from('reservations')
                 .select('table_number')
                 .eq('id', resId)
                 .single();

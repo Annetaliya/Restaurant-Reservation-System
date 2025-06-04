@@ -53,7 +53,6 @@ router.post('/', async (req, res) => {
     }
 
 
-    const userId = uuidv4();
      
     try {
         const { data, error: signUpError } =  await supabase.auth.admin.createUser({

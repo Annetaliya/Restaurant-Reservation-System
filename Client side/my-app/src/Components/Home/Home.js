@@ -52,52 +52,35 @@ const Booking = ({ table, show, setShow }) => {
 
     const handeClose = () => setShow(false);
      
-   
-
-    const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
         e.preventDefault();
         try {
            
             const {user_id, reservation_id, booking_date} = formData;
-            const { data, error } = await supabase
-                .from('booking')
-                .insert([
-                    {
-                        user_id,
-                        reservation_id,
-                        booking_date
-                    }
-                ])
-                .select()
-                .single();
-
-            if (error) {
-                throw new Error('Failed to create booking:', error.message)
-            }
-            // const payload = {user_id, reservation_id, booking_date};
-            // const response  =  await fetch('http://localhost:8000/bookings', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify(payload)
+            const payload = {user_id, reservation_id, booking_date};
+            const response  =  await fetch('http://localhost:8000/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
                 
-            //     });
+                });
                 
-                // if (!response.ok) {
-                //     throw new Error('Failed to create booking')
-                // }
-               // const result =  await response.json();
-                if (data) {
+                if (!response.ok) {
+                    throw new Error('Failed to create booking')
+                }
+                const result =  await response.json();
+                if (result.data) {
                     setFormData((prev) => ({
                         ...prev,
-                        ...data
+                        ...result.data
                     }))
 
                 }
                 
                 
-                localStorage.setItem('booking', JSON.stringify(data))
+                localStorage.setItem('booking', JSON.stringify(result.data))
                 Swal.fire({
                               title: "Good Job",
                               text: "Reservation successful wait for confirmation!",

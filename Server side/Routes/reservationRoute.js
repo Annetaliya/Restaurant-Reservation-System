@@ -96,7 +96,7 @@ route.patch('/:id', async (req, res) => {
   
     try {
         const { error, data } = await supabase
-                .from('rervations')
+                .from('reservations')
                 .update({status})
                 .eq('id', id)
         if (error) throw error;

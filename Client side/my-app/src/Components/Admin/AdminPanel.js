@@ -29,41 +29,24 @@ function ModalForm({ showModal, handleCloseModal }) {
       [e.target.name]: e.target.value,
     }));
   };
-
   const handleSubmitTable = async (e) => {
     e.preventDefault();
     try {
-      const { data, error } = await supabase.from('reservations').insert([
-        {
-          table_number: formData.table_number,
-          guest_number: formData.guest_number,
-          price: formData.price,
-          status: formData.status || 'available',
-          floor_level: formData.floor_level
-        }
-
-      ])
-      // const response = await fetch("http://localhost:8000/reservations", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(formData),
-      // });
-
-      if (error) {
-        console.error('superbase insert error:', error.message)
-        Swal.fire({
-                  title: "Error",
-                  text: "Something went wrong",
-                  icon: "error",
-                });
+      const response = await fetch("http://localhost:8000/reservations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) {
+        console.log("error posting a table", response.statusText);
+        return;
       }
-      
-      
+      const result = await response.json();
       setFormData((prev) => ({
         ...prev,
-        ...data[0],
+        ...result.data,
       }));
       Swal.fire({
                 text: "You created a table",
@@ -87,6 +70,9 @@ function ModalForm({ showModal, handleCloseModal }) {
       console.error('Fetching error',error.message);
     }
   };
+
+
+
 
 
   return (
@@ -244,31 +230,21 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
     element.first_name?.toLowerCase().includes(searchParams.toLowerCase()) || 
     element.id?.includes(searchParams)
   )
-
   const fetchReservations = async () => {
     try {
-      const { data, error } = await supabase
-        .from('booking')
-        .select(`
-          id,
-          booking_date,
-          status,
-          user_id,
-          reservation_id,
-          users(first_name, second_name, email),
-          reservations (table_number, floor_level)
-          
-          `);
-      if (error) {
-        console.error('Error fetcing reservations:', error.message)
+      const response = await fetch("http://localhost:8000/bookings");
+      if (!response.ok) {
+        console.log("Error fetching the reservations");
       }
+      const result = await response.json();
       
-      
-      setReservations(data);
+      setReservations(result.data);
     } catch (error) {
       console.log("error fetching", error.message);
     }
   };
+
+ 
 
   useEffect(() => {
     fetchReservations();
@@ -280,7 +256,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
  
   
-  async function subscribe() {
+   async function subscribe() {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
         try {
           const registration = await navigator.serviceWorker.register('/sw.js');
@@ -290,27 +266,14 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
               userVisibleOnly: true,
               applicationServerKey: publicKey
              })
-             const { endpoint, keys } = subscription
+            await fetch('http://localhost:8000/subscribe', {
+              method: 'POST',
+              headers: {
+              'Content-Type': 'application/json',
+              },
+             body: JSON.stringify(subscription)
 
-             const { error } = await supabase
-              .from('subscriptions')
-              .insert([{ endpoint, keys }])
-
-            if (error){
-              console.log('Failed to subscribe')
-            } else {
-              console.log('Subscription saved to supabase')
-            }
-
-             
-            // await fetch('http://localhost:8000/subscribe', {
-            //   method: 'POST',
-            //   headers: {
-            //   'Content-Type': 'application/json',
-            //   },
-            //  body: JSON.stringify(subscription)
-
-            // })
+            })
             
             
           } else {
