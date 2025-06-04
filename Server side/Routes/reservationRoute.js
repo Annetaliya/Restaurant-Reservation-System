@@ -32,8 +32,8 @@ route.get('/:id', async (req, res) => {
                 .eq('id', req.params.id)
                 .single();
 
-        if (error) {
-            throw new Error(error.message) 
+        if (error || !data) {
+            return res.status(404).json({error: 'reservation not found'})
         }
         res.json({message: 'success', data})
 

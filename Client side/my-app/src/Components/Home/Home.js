@@ -212,7 +212,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     
     
 
-    const filterdTables = reservationTable.filter((item) => item.floorLevel === selectedLevel)
+   
 
     const fetchReservationTables = async () => {
         
@@ -230,7 +230,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
                 throw new Error (`Response status ${response.status}`)
             }
             const result =  await response.json();
-            console.log(result)
+            console.log(result.data)
             setReservationTable(result.data)
             
 
@@ -242,6 +242,8 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     useEffect(() => {
         fetchReservationTables()
     }, [])
+
+    const filterdTables = reservationTable.filter((item) => item.floor_level === selectedLevel)
 
     const fetchTablebyId = async (id) => {
         
@@ -261,7 +263,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
                 console.log('Error fetching table')
             }
             const result = await response.json();
-            console.log()
+            console.log('table data:', result.data)
             if (user) {
                 setTable(result.data)
                 setLoading(false)
