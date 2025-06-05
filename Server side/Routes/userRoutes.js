@@ -91,7 +91,6 @@ router.post('/', async (req, res) => {
 
 router.delete('/id:', async (req, res) => {
     try {
-        const db = getDB();
         const {data, error } = await supabase
                 .from('users')
                 .delete()

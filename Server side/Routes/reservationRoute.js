@@ -6,7 +6,6 @@ const supabase = require('../supaBaseClient.js');
 route.get('/', async (req, res) => {
     
     try {
-        const db = getDB();
        const {data, error }=  await supabase.from('reservations').select('*')
        if (error) {
         throw new Error(error.message)

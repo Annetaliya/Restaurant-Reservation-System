@@ -45,16 +45,7 @@ async function notify (payload) {
    
 }
 
-async function deleteSubscription(id) {
-    const db = getDB();
-    try {
-        await db.execute('DELETE FROM subscriptions WHERE id = ?', [id])
-        console.log(`Deleted subscription with id ${id}`);
 
-    } catch (error) {
-         console.log('Failed to delete', error.message)
-    }
-}
 
 router.post('/', async (req, res) => {
     const parseBookingDate = (dateStr) => {
