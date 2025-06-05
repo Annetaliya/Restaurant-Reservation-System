@@ -189,14 +189,6 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
         }
     },[user?.role])  
     
-   
-
-   
-    
-    
-
-   
-
     const fetchReservationTables = async () => {
         
         try {
