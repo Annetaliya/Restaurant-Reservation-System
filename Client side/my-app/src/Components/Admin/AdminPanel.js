@@ -163,28 +163,13 @@ function SideBar({setIsLoggedIn}) {
   const handleShowModal = () => setShowModal(true);
   const navigate = useNavigate()
 
-  const handleLogout = async() => {
-    try { 
-        // await fetch('http://localhost:8000/logout', {
-        //     method: 'POST',
-        //     credentials: 'include',
-        // })
-        // const { error } =  await supabase.auth.signOut()
-        // if (error) {
-        //   throw error;
-        // }
-        // localStorage.removeItem('token');
-        // localStorage.removeItem('user');
-        // localStorage.removeItem('booking')
-        // setIsLoggedIn(false); 
+  function handleLogout () {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('booking')
+        setIsLoggedIn(false); 
         navigate('/login')
-
-    } catch (error) {
-        console.log(error.message)
-
-    }
-   
-}
+   }
 
   return (
     <>
