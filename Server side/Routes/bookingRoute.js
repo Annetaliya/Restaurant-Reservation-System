@@ -5,7 +5,8 @@ const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const webpush = require('web-push');
 const VAPIDKEY = process.env.WEB_PUSH_KEY;
-const { getDB } = require('../database2.js');
+
+const supabase = require('../supaBaseClient.js')
 
 
 webpush.setVapidDetails(
@@ -17,21 +18,24 @@ webpush.setVapidDetails(
 
 
 async function notify (payload) {
-    const db = getDB();
     try {
-        const [rows] = await db.execute('SELECT id, subscriptions FROM subscriptions')
-        console.log(`🧾 Subscriptions fetched from DB: ${rows.length}`);
-        for (const row of rows) {
-            const subscription = JSON.parse(row.subscriptions);
+        const {data: subscriptions, error } = await supabase.from('subscriptions').select('id, endpoint, keys');
+        
+        if (error) {
+            throw error
+        }
+        console.log(`🧾 Subscriptions fetched from DB: ${subscriptions.length}`);
+        for (const sub of subscriptions) {
+            const subscription = {endpoint: sub.endpoint, keys: sub.keys}
             try {
                 await webpush.sendNotification(subscription, JSON.stringify(payload))
-                console.log(`Push sent to subscription ID ${row.id}`)
+                console.log(`Push sent to subscription ID ${sub.id}`)
 
             } catch (err) {
                 console.log('Push error', err.status, err.body)
                 if (err.statusCode === 404 || err.statusCode === 410) {
-                    console.log(`Subscription ${row.id} no longer available`)
-                    await deleteSubscription(row.id)
+                    console.log(`Subscription ${sub.id} no longer available`)
+                    await supabase.from('subscriptions').delete().eq('id', sub.id)
                 }
             }
         }
@@ -41,16 +45,7 @@ async function notify (payload) {
    
 }
 
-async function deleteSubscription(id) {
-    const db = getDB();
-    try {
-        await db.execute('DELETE FROM subscriptions WHERE id = ?', [id])
-        console.log(`Deleted subscription with id ${id}`);
 
-    } catch (error) {
-         console.log('Failed to delete', error.message)
-    }
-}
 
 router.post('/', async (req, res) => {
     const parseBookingDate = (dateStr) => {
@@ -59,72 +54,82 @@ router.post('/', async (req, res) => {
         return `${year}-${month}-${day} ${time}`;
     }
 
-    const {userId, reservationId, bookingDate} = req.body;
-    const formattedDate = parseBookingDate(bookingDate)
+    const {user_id, reservation_id, booking_date} = req.body;
+    const formattedDate = parseBookingDate(booking_date)
 
-    if (!userId || !reservationId || !bookingDate) {
+    if (!user_id || !reservation_id || !booking_date) {
 
-        return res.status(400).json({error: 'Missing userId or reservationId'})
+        return res.status(400).json({error: 'Missing user_id or reservation_id'})
     }
 
-    const db = getDB();
-    const connection = await db.getConnection();
-    const reservationIds = Array.isArray(reservationId) ? reservationId : [reservationId]
+   
+   
+    const reservationIds = Array.isArray(reservation_id) ? reservation_id : [reservation_id]
 
     let bookedTables = [];
     let results = [];
+    const trx = supabase.rpc('begin')
     try {
-        await connection.beginTransaction();
 
         for (const resId of reservationIds) {
             const bookingId = uuidv4();
-            const status = 'confirmed';
+            
 
-            const insertSql =  `INSERT INTO booking (id, userId, reservationId, bookingDate, status) VALUES (?,?,?,?,?)`;
-            await connection.execute(insertSql, [bookingId, userId, resId, formattedDate, status])
+            const { error: insertError } = await supabase.from('booking').insert([
+                {
+                    id: bookingId,
+                    user_id,
+                    reservation_id: resId,
+                    booking_date: formattedDate,
+                    status: 'confirmed'
+                }
+            ])
 
-            //update reservation status
-            const updateSql = `UPDATE reservations SET status = 'reserved' WHERE id  = ?`
-            await connection.execute(updateSql, [resId])
+            if (insertError) throw insertError;
+
+            await supabase.from('reservations').update({ status: 'reserved'}).eq('id', resId)
+
+            const { data: reservationData } = await supabase
+                .from('reservations')
+                .select('table_number')
+                .eq('id', resId)
+                .single();
+
 
             //table number
-            const [rows] = await connection.execute(`SELECT tableNumber FROM reservations WHERE id = ?`, [resId])
-            if (rows.length > 0) {
-                bookedTables.push(rows[0].tableNumber)
-
+            if (reservationData) {
+                bookedTables.push(reservationData.table_number)
             }
 
             results.push({
                 bookingId,
-                userId,
-                reservationId: resId,
-                bookingDate: formattedDate,
-                status
+                user_id,
+                reservation_id: resId,
+                booking_date: formattedDate,
+                status: 'confirmed'
             })
         }
-        await connection.commit()
+   
         res.status(201).json({
             message: 'Booking created successfully',
             data: results
         })
         const tables = bookedTables.join(', ');
-        const bookingId = results[0].bookingId;
+
 
         await notify({
             title: 'New booking received',
             body: {
-                message: `Tables ${tables} booKed on ${formattedDate.split(' ')[0]}`,
-                bookingId
+                message: `Tables ${tables} booKed on ${formattedDate.split('T')[0]}`,
+                bookingId: results[0].bookingId
             }
         })
 
     } catch (error) {
-        await connection.rollback();
+        
         console.log('Error creating bookings', error.message)
         res.status(500).json({ error: 'Database error'})
 
-    } finally {
-        connection.release()
     }
       
 })
@@ -132,52 +137,40 @@ router.post('/', async (req, res) => {
 
 
 router.get('/', async (req, res) => {
-    const db = getDB();
+    
     try {
-        const sql = `SELECT booking.id, booking.bookingDate, booking.status,
-                        users.firstName, users.secondName, users.email, reservations.tableNumber,
-                        reservations.guestNumber, reservations.floorLevel
-                FROM booking
-                JOIN users ON booking.userId = users.id
-                JOIN reservations ON booking.reservationId = reservations.id
-
-        `;
-        const [rows] = await db.execute(sql);
-        res.json({
-            data: rows
-
-        })
-
-        
+        const { data, error } = await supabase
+            .from('booking')
+            .select(`id, booking_date, status, users(first_name, second_name, email), reservations(table_number, guest_number, floor_level)`)
+   
+        if (error) {
+            throw new Error(error.message)
+        }
+        res.json({ data })
     } catch (error) {
-        res.status(500).json({error: error.message})
-
+         res.status(500).json({error: error.message})
     }
+    
 })
 
 router.get('/:id', async (req, res) => {
-
-    const db = getDB();
     try {
-        const sql = `select booking.id, booking.bookingDate, booking.status,
-                        users.firstName, users.secondName, users.email,
-                        reservations.tableNumber, reservations.guestNumber, reservations.floorLevel
-                FROM booking
-                JOIN users ON booking.userId = users.id
-                JOIN reservations ON booking.reservationId = reservations.id
-                WHERE booking.id = ?
-                ORDER BY booking.bookingDate DESC;
-        `
-        const [rows] = await db.execute(sql, [req.params.id])
-
-        if (rows.length === 0) {
-           return res.status(404).json({
+        const { data, error } =  await supabase
+            .from('booking')
+            .select(`id, booking_date, status, users(first_name, second_name, email), reservations(table_number, guest_number, floor_level)`)
+            .eq('id', req.params.id)
+            .single();
+        
+        if (error) {
+            return res.status(404).json({
                 "error": "Booking not found" 
             })
         }
+
+        
          res.json({
             message: "ok",
-            "data": rows[0]
+            data
         })
 
     } catch (error) {
@@ -187,26 +180,19 @@ router.get('/:id', async (req, res) => {
     
 })
 router.get('/user/:id', async (req,res) => {
-    const db = getDB();
+    
     try {
-        const sql = `select booking.id, booking.bookingDate, booking.status,
-                        users.firstName, users.secondName, users.email,
-                        reservations.tableNumber, reservations.guestNumber, reservations.floorLevel, reservations.price
-                FROM booking
-                JOIN users ON booking.userId = users.id
-                JOIN reservations ON booking.reservationId = reservations.id
-                WHERE users.id = ?
-                ORDER BY booking.bookingDate DESC;
+       const {data, error} = await supabase
+        .from('booking')
+        .select(`id, booking_date, status, users(first_name, second_name, email), reservations(table_number, guest_number, floor_level, price)`)
+        .eq('user_id', req.params.id)
+        .order('booking_date', { ascending: false });
 
-        `
-        const [rows] = await db.execute(sql, [req.params.id])
-
-        if (rows.length === 0) {
-            return res.status(404).json({message: 'booking not found'})
+        if (error) {
+            throw new Error(error.message)
         }
-        res.json({
-            data: rows
-        })
+       
+        res.json({ data })
 
     } catch (error) {
         res.status(500).json({error: error.message})
@@ -217,7 +203,7 @@ router.get('/user/:id', async (req,res) => {
 })
 
 router.patch('/:id', async (req, res) => {
-    const db = getDB();
+    
     const { id } = req.params;
     const {status} = req.body;
 
@@ -225,19 +211,18 @@ router.patch('/:id', async (req, res) => {
         return res.status(400).json({error: 'no fields to update'})
     }
      try {
-        const updateSql = `UPDATE booking SET status = ? WHERE id = ? `
-        const [updatedResult] = await db.execute(updateSql, [status, id]);
+        const {data, error} = await supabase
+            .from('booking')
+            .update({ status })
+            .eq('id', req.params.id)
+            .select()
+            .single()
 
-        if (updatedResult.affectedRows === 0) {
-            return res.status(404).json({error: 'Booking not found'})
-        }
-
-        //fetch updated booking
-        const currentSql = `SELECT * FROM bookng WHERE id = ?`
-        const [rows] = await db.execute(currentSql, [id])
+         if (error) return res.status(404).json({ error: 'Booking not found' });
+      
         res.json({
             message: 'updated booking successfuly',
-            data: rows[0]
+            data
         })
 
      } catch (error) {
@@ -249,34 +234,47 @@ router.patch('/:id', async (req, res) => {
 })
 
 router.delete('/:id', async (req, res) =>{
-    const db = getDB();
    const bookingId = req.params.id;
 
    try {
     //getting the reservation id and user id
-    const getReservationSql =  `SELECT reservationId, userId FROM booking WHERE id = ?`;
-    const [rows] = await db.execute(getReservationSql, [bookingId])
-    if (rows.length === 0) {
+    const {data: booking, error: findError} = await supabase
+        .from('booking')
+        .select('reservation_id, user_id')
+        .eq('id', bookingId)
+        .single()
+    
+    if (findError) {
         return res.status(404).json({message: 'Booking not found'})
     }
 
-    const { reservationId, userId} = rows[0];
+    const { error: cancelError } = await supabase
+        .from('booking')
+        .update({ status: 'cancelled' })
+        .eq('id', bookingId)
 
-    const updateBookingSql = `UPDATE booking SET status = 'cancelled' WHERE id = ?`
-    const [updateResult] =  await db.execute(updateBookingSql, [bookingId])
 
-    if (updateResult.affectedRows === 0) {
-        return res.status(400).json({message: 'booking not found'})
+
+    if (cancelError) {
+        return res.status(500).json({error: cancelError.message})
     }
+    const { error: reservationError } = await supabase
+        .from('reservations')
+        .update({ status: 'available'})
+        .eq('id', booking.reservation_id)
+
+        if (reservationError) {
+            return res.status(500).json({ error: reservationError.message})
+        }
 
     //update the reservation table as available after cancellation of booking
+   // (await supabase.from('reservations').update({ status: 'available'})).eq('id', booking.reservation_id)
 
-    const updateReservationSql = `UPDATE reservations SET status='available' WHERE id = ?`
-    await db.execute(updateReservationSql, [reservationId])
+   
 
     res.json({
         message: 'Booking deleted',
-        data: { reservationId, userId}
+        data: booking
     })
 
    } catch (error) {

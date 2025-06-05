@@ -11,20 +11,21 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import InputGroup from "react-bootstrap/InputGroup";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
 
+
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   
   const validate = (values) => {
     const errors = {};
-    if (!values.firstName) {
-      errors.firstName = "Required";
-    } else if (values.firstName.length > 15) {
-      errors.firstName = "Must be 15 characters or less";
+    if (!values.first_name) {
+      errors.first_name = "Required";
+    } else if (values.first_name.length > 15) {
+      errors.first_name = "Must be 15 characters or less";
     }
-    if (!values.secondName) {
-      errors.secondName = "Required";
-    } else if (values.secondName.length > 20) {
-      errors.secondName = "Must be 20 characters or less";
+    if (!values.second_name) {
+      errors.second_name = "Required";
+    } else if (values.second_name.length > 20) {
+      errors.second_name = "Must be 20 characters or less";
     }
     if (!values.email) {
       errors.email = "Required";
@@ -55,47 +56,61 @@ const Register = () => {
   };
 
   const initialValues = {
-    firstName: "",
-    secondName: "",
+    first_name: "",
+    second_name: "",
     email: "",
     password: "",
     confirmPassword: "",
     phone: "",
   };
   const navigate = useNavigate();
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    try {
-      const response = await fetch("http://localhost:8000/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-      const result = await response.json();
-      if (response.ok) {
+ const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+  try {
+    const response = await fetch('http://localhost:8000/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        first_name: values.first_name,
+        second_name: values.second_name,
+        email: values.email,
+        password: values.password,
+        confirmPassword: values.confirmPassword,
+        phone: values.phone,
+      }),
+    });
 
-        Swal.fire({
-          title: "Good Job",
-          text: "Registration successful!",
-          icon: "success",
-        });
-        resetForm();
-        navigate("/login");
-      } else {
-        alert(result.message || "Something went wrong!");
-      }
-    } catch (error) {
-      console.log("Error submitting form:", error);
+    const result = await response.json();
+
+    if (!response.ok) {
       Swal.fire({
-        title: "Error",
-        text: "Failed to connect to the server",
-        icon: "error",
+        title: 'Error',
+        text: result.error || 'Registration failed',
+        icon: 'error',
       });
-    } finally {
-      setSubmitting(false);
+      return;
     }
-  };
+
+    Swal.fire({
+      title: 'Success',
+      text: 'Registration successful!',
+      icon: 'success',
+    });
+
+    resetForm();
+    navigate('/login'); // redirect to login page
+  } catch (error) {
+    Swal.fire({
+      title: 'Error',
+      text: 'Something went wrong. Please try again.',
+      icon: 'error',
+    });
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <div className="col-6 parent-container">
@@ -116,34 +131,34 @@ const Register = () => {
         }) => (
           <Form onSubmit={handleSubmit}>
             <Row className="mb-3">
-              <Form.Group as={Col} md="4" controlId="firstName">
+              <Form.Group as={Col} md="4" controlId="first_name">
                 <Form.Label>First name</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="First name"
-                  name="firstName"
-                  value={values.firstName}
+                  name="first_name"
+                  value={values.first_name}
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  isInvalid={touched.firstName && errors.firstName}
+                  isInvalid={touched.first_name && errors.first_name}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.firstName}
+                  {errors.first_name}
                 </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group as={Col} md="4" controlId="secondName">
+              <Form.Group as={Col} md="4" controlId="second_name">
                 <Form.Label>Last name</Form.Label>
                 <Form.Control
                   required
                   type="text"
                   placeholder="Last name"
-                  value={values.secondName}
+                  value={values.second_name}
                   onBlur={handleBlur}
                   onChange={handleChange}
-                  isInvalid={touched.secondName && errors.secondName}
+                  isInvalid={touched.second_name && errors.second_name}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.secondName}
+                  {errors.second_name}
                 </Form.Control.Feedback>
               </Form.Group>
               <Form.Group as={Col} md="4" controlId="email">

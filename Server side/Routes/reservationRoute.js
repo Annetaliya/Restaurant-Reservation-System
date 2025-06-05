@@ -1,14 +1,16 @@
 const express = require('express');
 const route = express.Router();
 const { v4: uuidv4 } = require('uuid')
-const { getDB } = require('../database2.js')
+const supabase = require('../supaBaseClient.js');
 
 route.get('/', async (req, res) => {
     
     try {
-        const db = getDB();
-       const [rows] =  await db.execute('SELECT * FROM reservations')
-       res.json({ message: 'sucsess', data: rows})
+       const {data, error }=  await supabase.from('reservations').select('*')
+       if (error) {
+        throw new Error(error.message)
+       }
+       res.json({ message: 'sucsess', data})
 
     } catch (err) {
         console.log('error fetching reservations:', err.message)
@@ -21,9 +23,17 @@ route.get('/', async (req, res) => {
 route.get('/:id', async (req, res) => {
    
     try {
-        const db = getDB();
-        const [rows] = await db.execute('SELECT * FROM reservations WHERE id = ?', [req.params.id]);
-        res.json({message: 'success', data: rows[0]})
+        
+        const { data, error} = await supabase
+                .from('reservations')
+                .select('*')
+                .eq('id', req.params.id)
+                .single();
+
+        if (error || !data) {
+            return res.status(404).json({error: 'reservation not found'})
+        }
+        res.json({message: 'success', data})
 
     } catch (err) {
         console.log('Error getting reservation:', err.message)
@@ -36,17 +46,30 @@ route.get('/:id', async (req, res) => {
 })
 
 route.post('/', async (req, res) => {
-    const {tableNumber, guestNumber,status, price, floorLevel} = req.body;
-    console.log("Request Body:", req.body);
-    if (!tableNumber || !guestNumber || !status || !floorLevel) {
+    const {table_number, guest_number,status, price, floor_level} = req.body;
+    
+    if (!table_number || !guest_number || !status || !floor_level) {
         return res.status(400).json({"Error": "Error missing required field"})
     } 
     const reservationsid = uuidv4();
     try {
         const db = getDB();
-         const sql = 'INSERT INTO reservations (id, tableNumber, guestNumber, price, status, floorLevel) values(?,?,?,?,?,?)';
-         const params =[reservationsid, tableNumber, guestNumber, price, status, floorLevel]
-         await db.execute(sql, params);
+        const { error } = await supabase
+                .from('reservations')
+                .insert([
+                    {
+                        id: reservationsid,
+                        table_number,
+                        guest_number,
+                        price,
+                        status,
+                        floor_level
+                    }
+                ])
+        if (error) {
+            throw new Error(error.message)
+        }
+        
          res.json({
             message: "success",
             id: reservationsid
@@ -62,7 +85,7 @@ route.post('/', async (req, res) => {
 })
 
 route.patch('/:id', async (req, res) => {
-    const {status} = req.body;
+    const { status } = req.body;
     const { id } = req.params;
 
     if (!status) {
@@ -70,12 +93,15 @@ route.patch('/:id', async (req, res) => {
     }
   
     try {
-        const db = getDB();
-        const sql = `UPDATE reservations SET status = ? WHERE id = ?`
-        const [result] = await db.execute(sql, [status, id]);
-        if (result.affectedRows === 0) {
-            return res.status(400).json({ error: 'Reservation not found'})
+        const { error, data } = await supabase
+                .from('reservations')
+                .update({status})
+                .eq('id', id)
+        if (error) throw error;
+        if (data.length === 0) {
+            return res.status(404).json({error: 'Reservation not found'})
         }
+      
         res.json({message: 'reservations updated', reservationId: id })
 
     } catch (err) {

@@ -13,18 +13,19 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 
 
+
 const Booking = ({ table, show, setShow }) => {
     
     const user = JSON.parse(localStorage.getItem('user'))
    
     const [selectedDate, setSelectedDate] = useState(null)
     const [formData, setFormData] = useState({
-        userId: user ? user.id : '',
-        reservationId: table ? table.id :'',
-        tableNo: table ? table.tableNumber : '',
-        guestNo: table ? table.guestNumber: '',
+        user_id: user ? user.id : '',
+        reservation_id: table ? table.id :'',
+        tableNo: table ? table.table_number : '',
+        guestNo: table ? table.guest_number: '',
         price: table ? table.price: '',
-        bookingDate: '',
+        booking_date: '',
     })
     const navigate = useNavigate();
 
@@ -42,7 +43,7 @@ const Booking = ({ table, show, setShow }) => {
         setSelectedDate(date);
         setFormData((prev) => ({
             ...prev,
-            bookingDate: formattedDate
+            booking_date: formattedDate
         }))
 
     }
@@ -51,14 +52,12 @@ const Booking = ({ table, show, setShow }) => {
 
     const handeClose = () => setShow(false);
      
-   
-
-    const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
         e.preventDefault();
         try {
            
-            const {userId, reservationId, bookingDate} = formData;
-            const payload = {userId, reservationId, bookingDate};
+            const {user_id, reservation_id, booking_date} = formData;
+            const payload = {user_id, reservation_id, booking_date};
             const response  =  await fetch('http://localhost:8000/bookings', {
                 method: 'POST',
                 headers: {
@@ -96,9 +95,7 @@ const Booking = ({ table, show, setShow }) => {
         } catch (error) {
             console.log(error.message)
 
-        }
-        
-
+        }   
     }
     
   return (
@@ -183,29 +180,22 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     
     const handleShow = () => setShow(true);
 
-
     useEffect(() => {
         if (user?.role === 'admin' && location.pathname === '/') {
           navigate('/admin', {replace: true})
         }
     },[user?.role])  
     
-   
-
-   
-    
-    
-
-    const filterdTables = reservationTable.filter((item) => item.floorLevel === selectedLevel)
-
     const fetchReservationTables = async () => {
         
         try {
+           
             const response =  await fetch('http://localhost:8000/reservations');
             if (!response.ok) {
                 throw new Error (`Response status ${response.status}`)
             }
             const result =  await response.json();
+          
             setReservationTable(result.data)
             
 
@@ -218,15 +208,19 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
         fetchReservationTables()
     }, [])
 
+    const filterdTables = reservationTable.filter((item) => item.floor_level === selectedLevel)
+
     const fetchTablebyId = async (id) => {
         
         setLoading(true)
         try {
+           
             const response = await fetch(`http://localhost:8000/reservations/${id}`)
             if (!response.ok) {
                 console.log('Error fetching table')
             }
             const result = await response.json();
+            console.log('table data:', result.data)
             if (user) {
                 setTable(result.data)
                 setLoading(false)
@@ -242,8 +236,8 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
 
   
     useEffect(() => {
-        if (booking && booking.reservationId) {
-            fetchUpdateReservationTable(booking.reservationId);
+        if (booking && booking.reservation_id) {
+            fetchUpdateReservationTable(booking.reservation_id, booking);
         }
     }, [booking]);
    
@@ -251,7 +245,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     <div>
         <img className='headerImg' src={Header} alt='food'/>
         <h1 className='homeIntro'><span>Welcome</span> to eatery bay  {user && 
-           <span>{user.firstName}</span>   
+           <span>{user.first_name}</span>   
         }!</h1>
        
         
@@ -285,8 +279,8 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
                 }} >
                     <FaCircle className={`availability ${item.status === 'available' ? 'availability' : 'noAvailability'}`}/>
                     <div className='tableHome'></div>
-                    <p className='tableNumber'>Table No.{item.tableNumber}</p>
-                    <p className='guestNumber'>Guest Number {item.guestNumber}</p>
+                    <p className='table_number'>Table No.{item.table_number}</p>
+                    <p className='guest_number'>Guest Number {item.guest_number}</p>
                     <p className='price'> ${item.price}</p>
                 </div>       
                 

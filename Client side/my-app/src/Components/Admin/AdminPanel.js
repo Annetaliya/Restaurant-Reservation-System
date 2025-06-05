@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
 
+
 import { useNavigate } from "react-router";
 import './admin.css';
 
@@ -15,11 +16,11 @@ import './admin.css';
 
 function ModalForm({ showModal, handleCloseModal }) {
   const [formData, setFormData] = useState({
-    tableNumber: "",
-    guestNumber: "",
+    table_number: "",
+    guest_number: "",
     price: "",
     status: "",
-    floorLevel: "",
+    floor_level: "",
   });
 
   const handleChange = (e) => {
@@ -28,7 +29,6 @@ function ModalForm({ showModal, handleCloseModal }) {
       [e.target.name]: e.target.value,
     }));
   };
-
   const handleSubmitTable = async (e) => {
     e.preventDefault();
     try {
@@ -53,11 +53,11 @@ function ModalForm({ showModal, handleCloseModal }) {
                 icon: "success",
               });
       setFormData({
-        tableNumber: "",
-        guestNumber: "",
+        table_number: "",
+        guest_number: "",
         price: "",
         status: "",
-        floorLevel: "",
+        floor_level: "",
 
       })
       
@@ -72,6 +72,9 @@ function ModalForm({ showModal, handleCloseModal }) {
   };
 
 
+
+
+
   return (
     <div>
       <Modal show={showModal} onHide={handleCloseModal}>
@@ -80,18 +83,18 @@ function ModalForm({ showModal, handleCloseModal }) {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmitTable}>
-            <Form.Group className="mb-3" controlId="tableNumber">
+            <Form.Group className="mb-3" controlId="table_number">
               <Form.Label>Table Number</Form.Label>
               <Form.Control
                 type="text"
-                name="tableNumber"
-                value={formData.tableNumber}
+                name="table_number"
+                value={formData.table_number}
                 onChange={handleChange}
               />
             </Form.Group>
             <Form.Select 
-              name="guestNumber"
-              value={formData.guestNumber}
+              name="guest_number"
+              value={formData.guest_number}
               onChange={handleChange}
               aria-label="Default select example" 
               className="mb-3"
@@ -122,8 +125,8 @@ function ModalForm({ showModal, handleCloseModal }) {
               <option value="reserved">Reserved</option>
             </Form.Select>
             <Form.Select 
-              name='floorLevel'
-              value={formData.floorLevel}
+              name='floor_level'
+              value={formData.floor_level}
               onChange={handleChange}
               aria-label="Default select example"
             >
@@ -160,24 +163,13 @@ function SideBar({setIsLoggedIn}) {
   const handleShowModal = () => setShowModal(true);
   const navigate = useNavigate()
 
-  const handleLogout = async() => {
-    try { 
-        await fetch('http://localhost:8000/logout', {
-            method: 'POST',
-            credentials: 'include',
-        })
+  function handleLogout () {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('booking')
         setIsLoggedIn(false); 
         navigate('/login')
-
-    } catch (error) {
-        console.log(error.message)
-
-    }
-   
-}
+   }
 
   return (
     <>
@@ -220,10 +212,9 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
 
   const filteredSearchReservations = reservations.filter((element) => 
-    element.firstName?.toLowerCase().includes(searchParams.toLowerCase()) || 
+    element.first_name?.toLowerCase().includes(searchParams.toLowerCase()) || 
     element.id?.includes(searchParams)
   )
-
   const fetchReservations = async () => {
     try {
       const response = await fetch("http://localhost:8000/bookings");
@@ -238,6 +229,8 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
     }
   };
 
+ 
+
   useEffect(() => {
     fetchReservations();
     
@@ -248,7 +241,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
  
   
-  async function subscribe() {
+   async function subscribe() {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
         try {
           const registration = await navigator.serviceWorker.register('/sw.js');
@@ -264,9 +257,9 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
               'Content-Type': 'application/json',
               },
              body: JSON.stringify(subscription)
-
-            })
             
+
+            }) 
             
           } else {
             console.log('Already subscribed', presentSubscription);
@@ -314,7 +307,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
   useEffect(() => {
     const filterdReservation = reservations.filter((element) => {
-      const reservationDate = element.bookingDate.split(" ")[0];
+      const reservationDate = element.booking_date.split(" ")[0];
       return reservationDate === today;
     });
     setTodaysReservations(filterdReservation);
@@ -336,7 +329,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
           )
         );
         const result = await response.json();
-        console.log("Admin changed result", result);
+       
         localStorage.setItem("booking", JSON.stringify(result.data));
         Swal.fire({
           text: "Update successful!",
@@ -366,8 +359,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
    }
   }
   
-
-  const handeDeleteReservation = async (id, reservationId) => {
+const handeDeleteReservation = async (id, reservationId) => {
     try {
       const response = await fetch(`http://localhost:8000/bookings/${id}`, {
         method: "DELETE",
@@ -377,7 +369,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
       }
       const tablesLeft = reservations.filter((element) => element.id !== id);
       setReservations(tablesLeft);
-      const result = await response.json();
+  
       localStorage.removeItem("booking");
       
       await fetchUpdateReservationTable( reservationId, "available")
@@ -395,6 +387,8 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
       });
     }
   };
+ 
+
   return (
     <div>
       <SideBar setIsLoggedIn={setIsLoggedIn}/>
@@ -411,10 +405,6 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
             <Button onClick={handleRemoveNotification}>Clear All</Button>
           </div>
         )}
-        
-        
-        
-
       </div>
     
       <InputGroup className="w-50 mx-auto mb-5">
@@ -478,16 +468,16 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
                 ref={(el) => (rowRefs.current[item.id] = el)}
                 className={`${highlighrow === item.id ? 'highlighted' : ''}`}
               >
-                <td>{item.bookingDate.split("T")[0]}</td>
-                <td>{item.bookingDate.split("T")[1]}</td>
-                <td>{item.firstName}</td>
+                <td>{item.booking_date.split("T")[0]}</td>
+                <td>{item.booking_date.split("T")[1]}</td>
+                <td>{item.users.first_name}</td>
                 <td>{item.id.split("-")[0]}</td>
-                <td>{item.tableNumber}</td>
-                <td>{item.guestNumber}</td>
+                <td>{item.reservations.table_number}</td>
+                <td>{item.reservations.guest_number}</td>
                 <td>{item.status}</td>
                 <td>
                   <Button
-                    onClick={() => handleUpdateReservation(item.id, item.reservationId)}
+                    onClick={() => handleUpdateReservation(item.id, item.reservation_id)}
                     disabled={item.status === "confirmed"}
                   >
                     Confirm

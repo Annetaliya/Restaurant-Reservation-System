@@ -1,16 +1,26 @@
 const express = require('express');
 const route = express.Router();
 const { v4: uuidv4 } = require('uuid')
-const { getDB } = require('../database2.js');
+const supabase = require('../supaBaseClient')
 
 
 route.post('/', async (req, res) => {
-    const subscriptions = JSON.stringify(req.body);
+    const { endpoint, keys } = req.body;
     const id = uuidv4();
-    const db = getDB();
+    
+    if (!endpoint || !keys) {
+        return res.status(400).json({ error: 'Missing subscription data'})
+    }
+    
 
     try {
-        await db.execute(`INSERT INTO subscriptions (id, subscriptions) VALUES (?,?)`, [id, subscriptions])
+        const { error } =  await supabase
+            .from('subscriptions')
+            .insert([{ id, endpoint, keys }])
+        if (error) {
+           console.error('Subscription insert failed:', error.message);
+            return res.status(500).json({ error: 'Database Error' }); 
+        }
         res.json({
             message: 'Subscription Saved'
 

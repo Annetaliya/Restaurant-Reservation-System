@@ -12,6 +12,7 @@ import InputGroupText from "react-bootstrap/esm/InputGroupText";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdOutlineAlternateEmail } from "react-icons/md";
 
+
 const Login = ({ setIsLoggedIn }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -38,6 +39,7 @@ const Login = ({ setIsLoggedIn }) => {
   //submit login form
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
+     
       const response = await fetch("http://localhost:8000/login", {
         method: "POST",
         headers: {
@@ -47,13 +49,17 @@ const Login = ({ setIsLoggedIn }) => {
       });
       const result = await response.json();
       if (!response.ok) {
-        if (result.error === "Email not found") {
+        if (result.error.includes('Invalid email')) {
           setErrors({ email: "Email not registered" });
-        } else if (result.error === "Incorrect password") {
+        } else if (result.error.includes("password")) {
           setErrors({ password: "Incorrect Password" });
+        } else {
+          Swal.fire('Error', result.error, 'error')
         }
+        
         return;
       }
+
       localStorage.setItem("token", result.token);
       localStorage.setItem("user", JSON.stringify(result.user));
       Swal.fire({
@@ -61,9 +67,9 @@ const Login = ({ setIsLoggedIn }) => {
         text: "Login successful!",
         icon: "success",
       });
-      const user = JSON.parse(localStorage.getItem('user'))
+      //const user = JSON.parse(localStorage.getItem('user'))
       setIsLoggedIn(true);
-      if (user.role === 'admin') {
+      if (result.user.role === 'admin') {
         navigate('/admin')
       } else {
         navigate('/')
