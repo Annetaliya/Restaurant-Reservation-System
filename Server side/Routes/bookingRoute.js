@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const webpush = require('web-push');
 const VAPIDKEY = process.env.WEB_PUSH_KEY;
-const { getDB } = require('../database2.js');
+
 const supabase = require('../supaBaseClient.js')
 
 
@@ -26,7 +26,7 @@ async function notify (payload) {
         }
         console.log(`🧾 Subscriptions fetched from DB: ${subscriptions.length}`);
         for (const sub of subscriptions) {
-            const subscription = {endpont: sub.endpoint, keys: sub.keys}
+            const subscription = {endpoint: sub.endpoint, keys: sub.keys}
             try {
                 await webpush.sendNotification(subscription, JSON.stringify(payload))
                 console.log(`Push sent to subscription ID ${sub.id}`)
@@ -129,7 +129,7 @@ router.post('/', async (req, res) => {
         await notify({
             title: 'New booking received',
             body: {
-                message: `Tables ${tables} booKed on ${formattedDate.split(' ')[0]}`,
+                message: `Tables ${tables} booKed on ${formattedDate.split('T')[0]}`,
                 bookingId: results[0].bookingId
             }
         })

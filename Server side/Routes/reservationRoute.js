@@ -1,7 +1,6 @@
 const express = require('express');
 const route = express.Router();
 const { v4: uuidv4 } = require('uuid')
-const { getDB } = require('../database2.js')
 const supabase = require('../supaBaseClient.js');
 
 route.get('/', async (req, res) => {

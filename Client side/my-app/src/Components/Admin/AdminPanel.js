@@ -257,8 +257,11 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
               'Content-Type': 'application/json',
               },
              body: JSON.stringify(subscription)
+            
 
             })
+            console.log('This is the subscription',subscription)
+
             
             
           } else {
@@ -369,7 +372,7 @@ const handeDeleteReservation = async (id, reservationId) => {
       }
       const tablesLeft = reservations.filter((element) => element.id !== id);
       setReservations(tablesLeft);
-      const result = await response.json();
+  
       localStorage.removeItem("booking");
       
       await fetchUpdateReservationTable( reservationId, "available")
@@ -474,10 +477,10 @@ const handeDeleteReservation = async (id, reservationId) => {
               >
                 <td>{item.booking_date.split("T")[0]}</td>
                 <td>{item.booking_date.split("T")[1]}</td>
-                <td>{item.first_name}</td>
+                <td>{item.users.first_name}</td>
                 <td>{item.id.split("-")[0]}</td>
-                <td>{item.table_number}</td>
-                <td>{item.guest_number}</td>
+                <td>{item.reservations.table_number}</td>
+                <td>{item.reservations.guest_number}</td>
                 <td>{item.status}</td>
                 <td>
                   <Button
