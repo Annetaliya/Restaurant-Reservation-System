@@ -58,7 +58,7 @@ const Booking = ({ table, show, setShow }) => {
            
             const {user_id, reservation_id, booking_date} = formData;
             const payload = {user_id, reservation_id, booking_date};
-            const response  =  await fetch('http://localhost:8000/bookings', {
+            const response  =  await fetch('https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/bookings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -190,7 +190,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
         
         try {
            
-            const response =  await fetch('http://localhost:8000/reservations');
+            const response =  await fetch('https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/reservations');
             if (!response.ok) {
                 throw new Error (`Response status ${response.status}`)
             }
@@ -215,7 +215,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
         setLoading(true)
         try {
            
-            const response = await fetch(`http://localhost:8000/reservations/${id}`)
+            const response = await fetch(`https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/reservations/${id}`)
             if (!response.ok) {
                 console.log('Error fetching table')
             }

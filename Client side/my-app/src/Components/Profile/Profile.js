@@ -41,7 +41,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
     const fetchBookingByUser = async (userId) => {
        
         try { 
-            const response =  await fetch(`http://localhost:8000/bookings/user/${userId}`)
+            const response =  await fetch(`https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/bookings/user/${userId}`)
             if (!response.ok) {
                 throw new Error('error fetching booking')
             }

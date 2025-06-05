@@ -40,7 +40,7 @@ const Login = ({ setIsLoggedIn }) => {
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
      
-      const response = await fetch("http://localhost:8000/login", {
+      const response = await fetch("https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/login", {
         method: "POST",
         headers: {
           "content-Type": "application/json",
