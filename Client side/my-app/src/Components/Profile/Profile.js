@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router';
 import Table from 'react-bootstrap/Table';
 
 
+
 const Profile = ({ setIsLoggedIn, user }) => {
     
 
@@ -29,7 +30,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
 
    useEffect(() => {
     const filteredBooking = selectBooking.filter((element) => {
-        return element.bookingDate.split("T")[0] >= now.split(' ')[0];
+        return element.booking_date.split("T")[0] >= now.split(' ')[0];
     })
     setCurrentBookings(filteredBooking)
 
@@ -48,7 +49,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
             const result = await response.json() 
 
             setSelectedBooking(result.data) 
-            console.log(result.data)
+       
            
 
         } catch (error) {
@@ -68,32 +69,21 @@ const Profile = ({ setIsLoggedIn, user }) => {
 
 
 
-    const handleLogout = async() => {
-        try { 
-            await fetch('http://localhost:8000/logout', {
-                method: 'POST',
-                credentials: 'include',
-            })
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.removeItem('booking')
-            setIsLoggedIn(false); 
-            navigate('/login')
-
-        } catch (error) {
-            console.log(error.message)
-
-        }
-       
-    }
+   function handleLogout () {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('booking')
+        setIsLoggedIn(false); 
+        navigate('/login')
+   }
 
   
   return (
     <div className='parentProfile'>
         <div className='userInfo'>
             <FaUserCircle size={70} className='profileIcon'/>
-            <p>{user?.firstName} {user?.secondName}</p>
-            <p>Hi {user?.firstName} here are your available bookings</p>
+            <p>{user?.first_name} {user?.second_name}</p>
+            <p>Hi {user?.first_name} here are your available bookings</p>
             
         </div>
           <Table className="col-10 mx-auto table">
@@ -111,9 +101,9 @@ const Profile = ({ setIsLoggedIn, user }) => {
                 .filter((element) => element.status !== 'cancelled')
                 .map((item) => (
                     <tr key={item.id}>
-                        <td>{item.bookingDate.split('T')[0]}</td>
-                        <td>{item.tableNumber}</td>
-                        <td>{item.price}</td>
+                        <td>{item.booking_date.split('T')[0]}</td>
+                        <td>{item.reservations.table_number}</td>
+                        <td>{item.reservations.price}</td>
                         <td>{item.status}</td>
 
                     </tr>

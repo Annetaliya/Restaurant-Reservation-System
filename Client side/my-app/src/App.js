@@ -20,7 +20,7 @@ function App() {
  
 
 
-  const fetchUpdateReservationTable = async (id,) => {
+  const fetchUpdateReservationTable = async (id, booking) => {
          
              try { 
               if (!id || !booking) {
@@ -53,9 +53,6 @@ function App() {
                     })
                   )
                  }
- 
-                 const updatedData =  await response.json();
-                 console.log('this is a reserved table being updated', updatedData)
  
              } catch (error) {
                  console.log(error.message)
