@@ -49,7 +49,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
             const result = await response.json() 
 
             setSelectedBooking(result.data) 
-            console.log(result.data)
+       
            
 
         } catch (error) {

@@ -259,10 +259,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
              body: JSON.stringify(subscription)
             
 
-            })
-            console.log('This is the subscription',subscription)
-
-            
+            }) 
             
           } else {
             console.log('Already subscribed', presentSubscription);
@@ -332,7 +329,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
           )
         );
         const result = await response.json();
-        console.log("Admin changed result", result);
+       
         localStorage.setItem("booking", JSON.stringify(result.data));
         Swal.fire({
           text: "Update successful!",
