@@ -4,12 +4,12 @@ const cors = require('cors');
 
 
 const PATH = 8000;
-const userRoutes = require('./Routes/userRoutes.js');
-const reservationRoutes = require('./Routes/reservationRoute.js')
-const loginRoute = require('./Routes/login.js');
+const userRoutes = require('./api/userRoutes.js');
+const reservationRoutes = require('./api/reservationRoute.js')
+const loginRoute = require('./api/login.js');
 const bodyParser = require('body-parser');
-const bookingRoute = require('./Routes/bookingRoute.js');
-const subscribe = require('./Routes/subscription.js');
+const bookingRoute = require('./api/bookingRoute.js');
+const subscribe = require('./api/subscription.js');
 const session = require('express-session')
 require('dotenv').config();
 const SECRET_KEY = process.env.JWT_SECRET;
