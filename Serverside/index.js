@@ -25,7 +25,7 @@ app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true,              
   }));
-
+//jwt
 app.use(session({
     secret: SECRET_KEY,
     resave: false,
