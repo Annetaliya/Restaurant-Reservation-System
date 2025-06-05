@@ -40,4 +40,8 @@ app.use('/login', loginRoute);
 app.use('/bookings', bookingRoute)
 app.use('/subscribe', subscribe)
 
+app.get('/', (req, res) => {
+  res.send('API is running successfully!');
+});
+
 module.exports = app;
