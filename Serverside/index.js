@@ -40,9 +40,4 @@ app.use('/login', loginRoute);
 app.use('/bookings', bookingRoute)
 app.use('/subscribe', subscribe)
 
-
-
-
 module.exports = app;
-
-//app.listen(PATH , () => {console.log(`app is listening on port ${PATH}`)})
