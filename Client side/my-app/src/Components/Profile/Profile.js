@@ -4,7 +4,7 @@ import { FaUserCircle } from "react-icons/fa";
 import Button from "react-bootstrap/Button";
 import { useNavigate, useParams } from 'react-router';
 import Table from 'react-bootstrap/Table';
-import { supabase } from '../../superBaseClient';
+
 
 
 const Profile = ({ setIsLoggedIn, user }) => {
@@ -80,14 +80,14 @@ const Profile = ({ setIsLoggedIn, user }) => {
             // localStorage.removeItem('booking')
             // setIsLoggedIn(false); 
             // navigate('/login')
-             const { error } =  await supabase.auth.signOut()
-             if (error) {
-                throw error;
-            }
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.removeItem('booking')
-            setIsLoggedIn(false); 
+            //  const { error } =  await supabase.auth.signOut()
+            //  if (error) {
+            //     throw error;
+            // }
+            // localStorage.removeItem('token');
+            // localStorage.removeItem('user');
+            // localStorage.removeItem('booking')
+            // setIsLoggedIn(false); 
             navigate('/login')
 
         } catch (error) {

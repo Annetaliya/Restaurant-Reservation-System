@@ -11,7 +11,7 @@ import InputGroup from "react-bootstrap/InputGroup";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdOutlineAlternateEmail } from "react-icons/md";
-import { supabase } from "../../superBaseClient";
+
 
 const Login = ({ setIsLoggedIn }) => {
   const [showPassword, setShowPassword] = useState(false);

@@ -7,7 +7,7 @@ import Button from "react-bootstrap/Button";
 import Swal from "sweetalert2";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Modal from "react-bootstrap/Modal";
-import { supabase } from "../../superBaseClient";
+
 
 import { useNavigate } from "react-router";
 import './admin.css';
@@ -169,14 +169,14 @@ function SideBar({setIsLoggedIn}) {
         //     method: 'POST',
         //     credentials: 'include',
         // })
-        const { error } =  await supabase.auth.signOut()
-        if (error) {
-          throw error;
-        }
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('booking')
-        setIsLoggedIn(false); 
+        // const { error } =  await supabase.auth.signOut()
+        // if (error) {
+        //   throw error;
+        // }
+        // localStorage.removeItem('token');
+        // localStorage.removeItem('user');
+        // localStorage.removeItem('booking')
+        // setIsLoggedIn(false); 
         navigate('/login')
 
     } catch (error) {
@@ -330,33 +330,29 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
   const handleUpdateReservation = async (id) => {
     try {
-      const { data, error } = await supabase
-        .from('booking')
-        .update({ status: 'confirmed' })
-        .eq('id', id)
-      // const response = await fetch(`http://localhost:8000/bookings/${id}`, {
-      //   method: "PATCH",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ status: "confirmed" }),
-      // });
-      if (error) {
-        throw new Error(error.message)
-      }
-      setReservations((prevReservations) =>
-        prevReservations.map((item) =>
-          item.id === id ? { ...item, status: "confirmed" } : item
-        )
-      );
-        // const result = await response.json();
-      console.log("Admin changed result", data[0]);
-      localStorage.setItem("booking", JSON.stringify(data[0]));
-      Swal.fire({
-        text: "Update successful!",
-        icon: "success",
+      const response = await fetch(`http://localhost:8000/bookings/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: "confirmed" }),
       });
-      
+      if (response.ok) {
+        setReservations((prevReservations) =>
+          prevReservations.map((item) =>
+            item.id === id ? { ...item, status: "confirmed" } : item
+          )
+        );
+        const result = await response.json();
+        console.log("Admin changed result", result);
+        localStorage.setItem("booking", JSON.stringify(result.data));
+        Swal.fire({
+          text: "Update successful!",
+          icon: "success",
+        });
+      } else {
+        throw new Error("Failed to update status");
+      }
     } catch (error) {
       console.log(error.message);
       Swal.fire({
@@ -378,26 +374,17 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
    }
   }
   
-
-  const handeDeleteReservation = async (id, reservationId) => {
+const handeDeleteReservation = async (id, reservationId) => {
     try {
-      const { error } =  await supabase
-        .from('booking')
-        .delete()
-        .eq('id', id);
-
-        if (error) {
-          throw new Error(`Error deleting reservation: ${error.message}`)
-        }
-      // const response = await fetch(`http://localhost:8000/bookings/${id}`, {
-      //   method: "DELETE",
-      // });
-      // if (!response.ok) {
-      //   throw new Error(`Error deleting reservation: ${response.statusText}`);
-      // }
+      const response = await fetch(`http://localhost:8000/bookings/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error(`Error deleting reservation: ${response.statusText}`);
+      }
       const tablesLeft = reservations.filter((element) => element.id !== id);
       setReservations(tablesLeft);
-      //const result = await response.json();
+      const result = await response.json();
       localStorage.removeItem("booking");
       
       await fetchUpdateReservationTable( reservationId, "available")
@@ -415,6 +402,8 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
       });
     }
   };
+ 
+
   return (
     <div>
       <SideBar setIsLoggedIn={setIsLoggedIn}/>

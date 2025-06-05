@@ -96,7 +96,7 @@ router.post('/', async (req, res) => {
 
             if (insertError) throw insertError;
 
-            await supabase.from('resevations').update({ status: 'reserved'}).eq('id', resId)
+            await supabase.from('reservations').update({ status: 'reserved'}).eq('id', resId)
 
             const { data: reservationData } = await supabase
                 .from('reservations')
@@ -267,9 +267,17 @@ router.delete('/:id', async (req, res) =>{
     if (cancelError) {
         return res.status(500).json({error: cancelError.message})
     }
+    const { error: reservationError } = await supabase
+        .from('reservations')
+        .update({ status: 'available'})
+        .eq('id', booking.reservation_id)
+
+        if (reservationError) {
+            return res.status(500).json({ error: reservationError.message})
+        }
 
     //update the reservation table as available after cancellation of booking
-    (await supabase.from('reservations').update({ status: 'available'})).eq('id', booking.reservation_id)
+   // (await supabase.from('reservations').update({ status: 'available'})).eq('id', booking.reservation_id)
 
    
 

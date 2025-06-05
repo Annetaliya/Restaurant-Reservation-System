@@ -10,7 +10,7 @@ import { Link, useNavigate } from "react-router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import InputGroup from "react-bootstrap/InputGroup";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
-import { supabase } from "../../superBaseClient";
+
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);

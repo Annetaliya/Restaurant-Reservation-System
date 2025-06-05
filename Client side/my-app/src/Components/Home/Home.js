@@ -10,7 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Swal from "sweetalert2";
 import Header from '../../Images/restaurant header.jpg';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../../superBaseClient';
+
 
 
 
@@ -263,7 +263,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
   
     useEffect(() => {
         if (booking && booking.reservation_id) {
-            fetchUpdateReservationTable(booking.reservation_id);
+            fetchUpdateReservationTable(booking.reservation_id, booking);
         }
     }, [booking]);
    
