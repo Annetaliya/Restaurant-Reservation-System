@@ -43,6 +43,6 @@ app.use('/subscribe', subscribe)
 
 
 
+module.exports = app;
 
-
-app.listen(PATH , () => {console.log(`app is listening on port ${PATH}`)})
+//app.listen(PATH , () => {console.log(`app is listening on port ${PATH}`)})
