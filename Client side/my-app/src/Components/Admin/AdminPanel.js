@@ -405,10 +405,6 @@ const handeDeleteReservation = async (id, reservationId) => {
             <Button onClick={handleRemoveNotification}>Clear All</Button>
           </div>
         )}
-        
-        
-        
-
       </div>
     
       <InputGroup className="w-50 mx-auto mb-5">

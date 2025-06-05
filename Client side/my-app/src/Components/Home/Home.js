@@ -95,9 +95,7 @@ const Booking = ({ table, show, setShow }) => {
         } catch (error) {
             console.log(error.message)
 
-        }
-        
-
+        }   
     }
     
   return (
@@ -181,7 +179,6 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     const location = useLocation();
     
     const handleShow = () => setShow(true);
-
 
     useEffect(() => {
         if (user?.role === 'admin' && location.pathname === '/') {
