@@ -29,6 +29,7 @@ app.use(cors({
       callback(new Error('CORS not allowed from this origin: ' + origin))
     }
   },
+  methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
   credentials: true
 }))
 
