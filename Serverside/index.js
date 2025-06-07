@@ -3,7 +3,7 @@ const app = express();
 const cors = require('cors');
 
 
-const PATH = 8000;
+//const PATH = 8000;
 const userRoutes = require('./api/userRoutes.js');
 const reservationRoutes = require('./api/reservationRoute.js')
 const loginRoute = require('./api/login.js');
@@ -19,10 +19,14 @@ const SECRET_KEY = process.env.JWT_SECRET;
 //const cookieSession = require('cookie-session');
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'https://restaurant-reservation-system-doafu7qaz.vercel.app'
+];
 
 app.use(cors({
-    origin: 'https://restaurant-reservation-system-doafu7qaz.vercel.app/',
+    origin: allowedOrigins,
     credentials: true,              
   }));
 //jwt
