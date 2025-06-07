@@ -1,5 +1,4 @@
 import React from 'react'
-import contactHeader from '../../Images/restaurant contact.jpg';
 import './contact.css'
 import { FaFacebook } from "react-icons/fa";
 import { IoCallOutline } from "react-icons/io5";
