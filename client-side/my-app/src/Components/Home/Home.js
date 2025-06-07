@@ -186,10 +186,11 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
         }
     },[user?.role])  
     
+
+    //get reservation tables
     const fetchReservationTables = async () => {
         
         try {
-           
             const response =  await fetch('https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/reservations');
             if (!response.ok) {
                 throw new Error (`Response status ${response.status}`)
