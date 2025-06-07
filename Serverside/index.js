@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const serverless = require('serverless-http')
+//const serverless = require('serverless-http')
 
 
 //const PATH = 8000;
@@ -54,4 +54,4 @@ app.get('/', (req, res) => {
   res.send('API is running successfully!');
 });
 
-module.exports = serverless(app);
+module.exports = app;
