@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const serverless = require('serverless-http')
 
 
 //const PATH = 8000;
@@ -31,16 +32,10 @@ app.use(cors({
   credentials: true
 }))
 
-//const cookieSession = require('cookie-session');
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json());
 
-
-// app.use(cors({
-//     origin: allowedOrigins,
-//     credentials: true,              
-//   }));
-//jwt
 app.use(session({
     secret: SECRET_KEY,
     resave: false,
@@ -59,4 +54,4 @@ app.get('/', (req, res) => {
   res.send('API is running successfully!');
 });
 
-module.exports = app;
+module.exports = serverless(app);
