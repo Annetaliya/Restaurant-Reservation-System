@@ -184,7 +184,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
         if (user?.role === 'admin' && location.pathname === '/') {
           navigate('/admin', {replace: true})
         }
-    },[user?.role])  
+    })  
     
 
     //get reservation tables
@@ -207,7 +207,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
     }
     useEffect(() => {
         fetchReservationTables()
-    }, [])
+    })
 
     const filterdTables = reservationTable.filter((item) => item.floor_level === selectedLevel)
 
@@ -240,7 +240,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
         if (booking && booking.reservation_id) {
             fetchUpdateReservationTable(booking.reservation_id, booking);
         }
-    }, [booking]);
+    });
    
   return (
     <div>

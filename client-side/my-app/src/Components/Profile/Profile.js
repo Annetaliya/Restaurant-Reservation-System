@@ -34,7 +34,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
     })
     setCurrentBookings(filteredBooking)
 
-   }, [selectBooking])
+   }, [selectBooking, now])
 
    
 
@@ -64,7 +64,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
             navigate('/')
         }
         fetchBookingByUser(userInfo)
-    }, [user, id])
+    }, [user, id, navigate])
    
 
 
