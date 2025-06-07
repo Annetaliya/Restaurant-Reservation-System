@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://restaurant-reservation-system-doafu7qaz.vercel.app/',
     credentials: true,              
   }));
 //jwt
