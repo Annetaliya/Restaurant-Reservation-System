@@ -14,11 +14,6 @@ const session = require('express-session')
 require('dotenv').config();
 const SECRET_KEY = process.env.JWT_SECRET;
 
-
-
-//const cookieSession = require('cookie-session');
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json());
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:5173',
@@ -26,9 +21,25 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true,              
-  }));
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('CORS not allowed from this origin: ' + origin))
+    }
+  },
+  credentials: true
+}))
+
+//const cookieSession = require('cookie-session');
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json());
+
+
+// app.use(cors({
+//     origin: allowedOrigins,
+//     credentials: true,              
+//   }));
 //jwt
 app.use(session({
     secret: SECRET_KEY,
