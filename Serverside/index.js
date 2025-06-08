@@ -18,7 +18,8 @@ const SECRET_KEY = process.env.JWT_SECRET;
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:5173',
-  'https://restaurant-reservation-system-doafu7qaz.vercel.app'
+  'https://restaurant-reservation-system-doafu7qaz.vercel.app',
+ 'https://restaurant-reservation-sy-git-9196bf-annettes-projects-70970dfb.vercel.app/'
 ];
 
 app.use(cors({
