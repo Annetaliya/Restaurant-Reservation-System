@@ -66,7 +66,7 @@ const Register = () => {
   const navigate = useNavigate();
  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
   try {
-    const response = await fetch('https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/users', {
+    const response = await fetch('https://restaurant-reservation-system-server-annettes-projects-70970dfb.vercel.app/api/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

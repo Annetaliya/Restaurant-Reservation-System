@@ -32,7 +32,7 @@ function ModalForm({ showModal, handleCloseModal }) {
   const handleSubmitTable = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/reservations", {
+      const response = await fetch("https://restaurant-reservation-system-server-annettes-projects-70970dfb.vercel.app/api/reservations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -217,7 +217,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
   )
   const fetchReservations = async () => {
     try {
-      const response = await fetch("https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/bookings");
+      const response = await fetch("https://restaurant-reservation-system-server-annettes-projects-70970dfb.vercel.app/api/bookings");
       if (!response.ok) {
         console.log("Error fetching the reservations");
       }
@@ -251,7 +251,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
               userVisibleOnly: true,
               applicationServerKey: publicKey
              })
-            await fetch('https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/subscribe', {
+            await fetch('https://restaurant-reservation-system-server-annettes-projects-70970dfb.vercel.app/api/subscribe', {
               method: 'POST',
               headers: {
               'Content-Type': 'application/json',
@@ -315,7 +315,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
 
   const handleUpdateReservation = async (id) => {
     try {
-      const response = await fetch(`https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/bookings/${id}`, {
+      const response = await fetch(`https://restaurant-reservation-system-server-annettes-projects-70970dfb.vercel.app/api/bookings/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -361,7 +361,7 @@ const AdminPanel = ({fetchUpdateReservationTable, setIsLoggedIn, user}) => {
   
 const handeDeleteReservation = async (id, reservationId) => {
     try {
-      const response = await fetch(`https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/bookings/${id}`, {
+      const response = await fetch(`https://restaurant-reservation-system-server-annettes-projects-70970dfb.vercel.app/api/bookings/${id}`, {
         method: "DELETE",
       });
       if (!response.ok) {
