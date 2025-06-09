@@ -19,18 +19,27 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:5173',
   'https://restaurant-reservation-system-doafu7qaz.vercel.app',
- 'https://restaurant-reservation-sy-git-9196bf-annettes-projects-70970dfb.vercel.app/'
+  'https://restaurant-reservation-sy-git-9196bf-annettes-projects-70970dfb.vercel.app/',
+  'https://restaurant-reservation-system-livid.vercel.app/'
 ];
 
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true)
+//     } else {
+//       callback(new Error('CORS not allowed from this origin: ' + origin))
+//     }
+//   },
+//   methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
+//   credentials: true
+// }))
+
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true)
-    } else {
-      callback(new Error('CORS not allowed from this origin: ' + origin))
-    }
-  },
-  methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
+  origin: process.env.NODE_ENV === 'production' ? 'https://restaurant-reservation-system-annettes-projects-70970dfb.vercel.app/' : 'http://localhost:3000',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400,
   credentials: true
 }))
 
