@@ -25,12 +25,17 @@ const allowedOrigins = [
 
 
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? 'https://restaurant-reservation-system-annettes-projects-70970dfb.vercel.app' : 'http://localhost:3000',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  maxAge: 86400,
-  credentials: true
-}))
+  credentials: true,
+}));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -55,7 +60,7 @@ app.use("/api/login", loginRoute);
 app.use("/api/bookings", bookingRoute);
 app.use("/api/subscribe", subscribe);
 
-app.get("/api/", (req, res) => {
+app.get("/", (req, res) => {
   res.send("API is running successfully!");
 });
 
