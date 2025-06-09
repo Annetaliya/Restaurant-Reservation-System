@@ -34,7 +34,7 @@ function App() {
               } else {
                 return;
               }
-                 const response =  await fetch(`https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/reservations/${id}`, {
+                 const response =  await fetch(`https://restaurant-reservation-system-server-annettes-projects-70970dfb.vercel.app/api/reservations/${id}`, {
                      method: 'PATCH',
                      headers: {
                          'Content-Type': 'application/json'

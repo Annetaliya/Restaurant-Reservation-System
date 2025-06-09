@@ -41,7 +41,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
     const fetchBookingByUser = async (userId) => {
        
         try { 
-            const response =  await fetch(`https://restaurant-reservation-sy-git-609abf-annettes-projects-70970dfb.vercel.app/bookings/user/${userId}`)
+            const response =  await fetch(`https://restaurant-reservation-system-server-annettes-projects-70970dfb.vercel.app/api/bookings/user/${userId}`)
             if (!response.ok) {
                 throw new Error('error fetching booking')
             }
