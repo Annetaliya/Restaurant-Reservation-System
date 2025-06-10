@@ -23,7 +23,7 @@
       }
     },
     {
-      "src": "/(.*)",
+      "src": "/(?!api/).*",
       "dest": "client-side/my-app/build/index.html"
     }
   ]
