@@ -23,6 +23,29 @@
       }
     },
     
+   {
+      "src": "/static/(.*)",
+      "dest": "client-side/my-app/build/static/$1"
+    },
+     {
+      "src": "/favicon.ico",
+      "dest": "client-side/my-app/build/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "client-side/my-app/build/manifest.json"
+    },
+    {
+      "src": "/logo192.png", 
+      "dest": "client-side/my-app/build/logo192.png"
+    },
+    {
+      "src": "/robots.txt", 
+      "dest": "client-side/my-app/build/robots.txt"
+    },
+    {
+      "handle": "filesystem"
+    },
     {
       "src": "/(.*)",
       "dest": "client-side/my-app/build/index.html"
