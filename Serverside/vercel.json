@@ -24,7 +24,7 @@
     },
     {
       "src": "/(.*)",
-      "rewrite": "client-side/my-app/build/index.html"
+      "dest": "client-side/my-app/build/index.html"
     }
   ]
 }
