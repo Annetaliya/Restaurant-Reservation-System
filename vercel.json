@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "Serverside/index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "client-side/my-app/package.json",
+      "use": "@vercel/static-build"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "Serverside/index.js",
+      "methods": ["GET", "POST", "DELETE", "PATCH", "PUT", "OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "https://restaurant-reservation-system-annettes-projects-70970dfb.vercel.app",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Methods": "GET, POST, DELETE, PATCH, PUT, OPTIONS",
+        "Access-Control-Allow-Credentials": "true"
+      }
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "client-side/my-app/build/index.html"
+    }
+  ]
+}
