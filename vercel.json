@@ -22,9 +22,7 @@
         "Access-Control-Allow-Credentials": "true"
       }
     },
-    {
-      "handle": "filesystem"
-    },
+    
     {
       "src": "/(.*)",
       "dest": "client-side/my-app/build/index.html"
