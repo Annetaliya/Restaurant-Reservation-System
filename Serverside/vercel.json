@@ -10,11 +10,11 @@
     {
       "src": "/api/(.*)",
       "dest": "/index.js",
-      "methods": ["GET", "POST", "OPTIONS"],
+      "methods": ["GET", "POST", "DELETE", "UPDATE", "OPTIONS"],
       "headers": {
         "Access-Control-Allow-Origin": "https://restaurant-reservation-system-annettes-projects-70970dfb.vercel.app",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
-        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+        "Access-Control-Allow-Methods": "GET,POST, DELETE, UPDATE, OPTIONS",
         "Access-Control-Allow-Credentials": "true"
       }
     }
