@@ -4,6 +4,10 @@
     {
       "src": "index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "client-side/my-app/package.json",
+      "use": "@vercel/static-build"
     }
   ],
   "routes": [
@@ -17,6 +21,10 @@
         "Access-Control-Allow-Methods": "GET,POST, DELETE, UPDATE, OPTIONS",
         "Access-Control-Allow-Credentials": "true"
       }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "client-side/my-app/build/index.html"
     }
   ]
 }
