@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 
 
 const Footer = () => {
+  const user = JSON.parse(localStorage.getItem('user'));
 
   return (
     <div className='container-fluid parentFooter'>
@@ -18,7 +19,7 @@ const Footer = () => {
         <div className='footerElements'>
           {/* <a href='/contact'>Contact</a> */}
             <Link className='contact' to='/contact'>Contact</Link>
-            <Link className='contact' to='/profile'>Profile</Link>
+            <Link className='contact' to={`/profile/${user.id}`}>Profile</Link>
            
             <p>Blog</p>
             <p>Reviews</p>

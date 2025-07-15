@@ -26,6 +26,7 @@
     list-style: none;
     padding-bottom: 20px;
     text-decoration: none;
+    display: block;
 }
 .dispayIcons {
     display: flex;
