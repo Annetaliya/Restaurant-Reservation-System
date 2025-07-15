@@ -18,10 +18,12 @@ const Footer = () => {
         <div className='footerElements'>
           {/* <a href='/contact'>Contact</a> */}
             <Link className='contact' to='/contact'>Contact</Link>
+            <Link className='contact' to='/profile'>Profile</Link>
            
             <p>Blog</p>
             <p>Reviews</p>
         </div>
+        
         <div className='dispayIcons'>
             <FaFacebook className='iconsContact' size={45}/>
             <FaSquareXTwitter className='iconsContact' size={45}/>
