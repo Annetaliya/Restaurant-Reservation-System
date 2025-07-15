@@ -74,7 +74,7 @@ const Profile = ({ setIsLoggedIn, user }) => {
         localStorage.removeItem('user');
         localStorage.removeItem('booking')
         setIsLoggedIn(false); 
-        navigate('/login')
+        navigate('/')
    }
 
   
