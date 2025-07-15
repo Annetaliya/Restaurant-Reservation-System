@@ -68,16 +68,20 @@ body {
 
     .menuMobile {
         position: absolute;
-        top: 10px;
+        top: 35px;
         right: 10px;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        height: 50vh;
-        width: 40vw;
+        align-items: start;
+        justify-content: space-around;
+        height: 25vh;
+        width: 30vw;
         gap: 20px;
-        background: rgb(238,174,202);
-        background: linear-gradient(90deg, rgba(238,174,202,1) 0%, rgba(233,178,148,0.11034668994550945) 100%);
+        background: #fff;
+        color: #020024;
+        padding-bottom: 10px;
+        /* background: rgb(238,174,202);
+        background: linear-gradient(90deg, rgba(238,174,202,1) 0%, rgba(233,178,148,0.11034668994550945) 100%); */
     
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
         border-radius: 5px;
