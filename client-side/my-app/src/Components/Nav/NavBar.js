@@ -6,6 +6,7 @@ import { TiThMenu } from "react-icons/ti";
 import { IoMdNotifications } from "react-icons/io";
 import { CiLogin } from "react-icons/ci";
 import "./nav.css";
+import { Link } from "react-router-dom";
 
 const userDetails = JSON.parse(localStorage.getItem('user'));
 let newId = ''
@@ -56,8 +57,15 @@ const NavBar = ({ isLoggedIn, user }) => {
           .map((element, index) => (
             <div key={index} className="listcontainer">
               <div >{element.icon}</div>
-              <a onClick={() => {setSelectedNav(element.path)
-                                  console.log('updated')
+              <Link
+              to={element.path}
+              onClick={() => {setSelectedNav(element.path)}}
+              className={`liststyle ${selectedNav === element.path ? "navActive" : ""}`}
+              >
+                {element.item}
+              </Link>
+              {/* <a onClick={() => {setSelectedNav(element.path)
+                                  
 
                   }}href={element.path}>
                 <li
@@ -68,7 +76,7 @@ const NavBar = ({ isLoggedIn, user }) => {
                 >
                   {element.item}
                 </li>
-              </a>
+              </a> */}
             </div>
           ))}
       </ul>
