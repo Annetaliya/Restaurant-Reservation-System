@@ -146,6 +146,7 @@ const Booking = ({ table, show, setShow }) => {
                         className='form-control mb-3'
                         showTimeSelect dateFormat="Pp" 
                         placeholderText='click to pick date'
+                        minDate={new Date()}
                         />
                     </Form.Group>
                     <Button variant="success" type='submit'>
@@ -222,7 +223,7 @@ const Home = ({ booking, fetchUpdateReservationTable, reservationTable, setReser
                 console.log('Error fetching table')
             }
             const result = await response.json();
-            console.log('table data:', result.data)
+            //console.log('table data:', result.data)
             if (user) {
                 setTable(result.data)
                 setLoading(false)
