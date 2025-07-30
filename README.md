@@ -23,7 +23,7 @@ This projects demontrates a booking system where a user is a able to reserve a t
 
 ## Authors
 
- **Annete**
+ **Annette**
 
 - Location: Kenya
 - GitHub: [annete](https://github.com/annetaliya/)  
