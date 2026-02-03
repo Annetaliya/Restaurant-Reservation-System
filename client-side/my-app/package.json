@@ -14,8 +14,8 @@
     "react-datepicker": "^8.2.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
-    "react-router": "^7.2.0",
-    "react-router-dom": "^7.2.0",
+    "react-router": "^6.30.3",
+    "react-router-dom": "^6.30.3",
     "react-scripts": "^5.0.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
@@ -48,6 +48,9 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "ajv": "^7.2.4"
   }
 }
