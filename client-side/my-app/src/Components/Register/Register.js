@@ -6,7 +6,7 @@ import Row from "react-bootstrap/Row";
 import "./register.css";
 import { Formik } from "formik";
 import Swal from "sweetalert2";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import InputGroup from "react-bootstrap/InputGroup";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
