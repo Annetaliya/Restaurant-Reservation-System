@@ -100,7 +100,7 @@
     padding: 10px 30px;
     border-radius: 8px;
     margin-bottom: 10px;
-    border: solid 1px #51219E;
+    /* border: solid 1px #51219E; */
 }
 .modalBtn {
     position: absolute;

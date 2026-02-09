@@ -8,8 +8,7 @@
     height: 30vh;
     display: flex;
     align-items: center;
-    gap: 80px;
-    justify-content: right;
+    justify-content: space-around;
 }
 .footerElements p {
     color: #fff;
@@ -30,7 +29,8 @@
 }
 .dispayIcons {
     display: flex;
-    flex-direction: column;
+    gap: 20px;
+    align-items: center;
     transition: transform 0.3s ease-in-out;
 
 }

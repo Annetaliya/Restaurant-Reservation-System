@@ -6,7 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 const mockTables = [
     {
         id: 1,
-        table_no: 'Table No 1',
+        table_number: 'Table No 1',
         seats: 4,
         status: 'available'
     
@@ -39,3 +39,4 @@ test('shows no tables message when no tables match selection', () => {
 )
     expect(screen.getByText(/no tables available/i)).toBeInTheDocument()
 })
+

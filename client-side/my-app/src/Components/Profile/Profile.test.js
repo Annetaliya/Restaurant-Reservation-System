@@ -1,4 +1,4 @@
-import {render, screen } from '@testing-library/react';
+import {render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Profile from './Profile';
 
@@ -14,3 +14,4 @@ test('renders user name and greeting', () => {
     expect(screen.getByText('Annette Adhiambo')).toBeInTheDocument();
     expect(screen.getByText(/here are your available bookings/i)).toBeInTheDocument()
 })
+
