@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import InputGroup from "react-bootstrap/InputGroup";
-import InputGroupText from "react-bootstrap/esm/InputGroupText";
+import InputGroupText from "react-bootstrap/InputGroupText";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdOutlineAlternateEmail } from "react-icons/md";
 

@@ -1,7 +1,23 @@
-import {render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import {render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
+import Swal from 'sweetalert2';
 import Register from './Register'
+
+
+
+jest.mock('sweetalert2');
+jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
+    useNavigate: jest.fn()
+}));
+
+
+global.fetch = jest.fn();
+const navigateMock = jest.fn();
+useNavigate.mockReturnValue(navigateMock);
+
+
 
 test('renders all form fields', () => {
     render(
@@ -31,3 +47,35 @@ test('shows error when passwords do not match', async () => {
 
     expect(await screen.findByText(/passwords must match/i)).toBeInTheDocument()
 })
+
+
+
+test('shows error when submitting empty values', async () => {
+    fetch.mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({error: 'Validation error'})
+    })
+    
+    render(
+        <MemoryRouter>
+            <Register />
+        </MemoryRouter>
+    )
+    fireEvent.click(screen.getByRole('button', {name: /submit/i}))
+    await waitFor(() => {
+        expect(Swal.fire).toHaveBeenCalledWith(
+            expect.objectContaining({
+                title: 'Error',
+                icon: 'error'
+            })
+        )
+    })
+
+    
+})
+
+
+
+
+
+
